@@ -18,6 +18,13 @@ DBFile::DBFile () {
 	
 }
 
+DBFile::~DBFile(){
+	delete file;
+	delete readPage;
+	delete writePage;
+	delete current;
+
+}
 
 int DBFile::Create (char *f_path, fType f_type, void *startup) {
 

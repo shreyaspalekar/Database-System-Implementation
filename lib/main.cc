@@ -31,10 +31,17 @@ int main () {
 	myComparison.Print ();
 
 	// now open up the text file and start procesing it
-        FILE *tableFile = fopen ("/cise/tmp/dbi_sp11/DATA/10M/lineitem.tbl", "r");
-
-        Record temp;
+        
+		//FILE *tableFile = fopen ("/cise/tmp/dbi_sp11/DATA/10M/lineitem.tbl", "r");
+		Record temp;
         Schema mySchema ("catalog", "lineitem");
+		DBFile dbf;
+		dbf.Load(&mySchema, "/cise/tmp/dbi_sp11/DATA/10M/lineitem.tbl");
+		dbf.GetNext(&temp);
+		temp.Print(&mySchema);
+		
+		
+        
 
 	//char *bits = literal.GetBits ();
 	//cout << " numbytes in rec " << ((int *) bits)[0] << endl;
@@ -42,7 +49,7 @@ int main () {
 
         // read in all of the records from the text file and see if they match
 	// the CNF expression that was typed in
-	int counter = 0;
+	/*int counter = 0;
 	ComparisonEngine comp;
         while (temp.SuckNextRecord (&mySchema, tableFile) == 1) {
 		counter++;
@@ -53,7 +60,7 @@ int main () {
 		if (comp.Compare (&temp, &literal, &myComparison))
                 	temp.Print (&mySchema);
 
-        }
+        }*/
 
 }
 
