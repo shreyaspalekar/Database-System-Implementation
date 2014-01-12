@@ -20,6 +20,7 @@ class DBFile {
 	Page* writePage;
 	File* file;
 	off_t pageIndex;
+	char* name;
 	
 public:
 	DBFile (); 
