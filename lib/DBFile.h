@@ -14,7 +14,6 @@ typedef enum {heap, sorted, tree} fType;
 
 class DBFile {
 	
-	Record* write;
 	Record* current;
 	Page* readPage;
 	Page* writePage;

@@ -9,14 +9,24 @@
 
 // stub file .. replace it with your own DBFile.cc
 
-DBFile::DBFile () {}
+DBFile::DBFile () {
+
+	this->file = new File();
+	this->readPage = new Page();
+	this->writePage = new Page();
+	this->current = new Record();
+	
+}
 
 
 int DBFile::Create (char *f_path, fType f_type, void *startup) {
 
-	this->File->Open(0,fpath);
+	this->file->Open(0,f_path);
 	pageIndex=1;
+	
+	return 1;//TODO:check>> void for File Open !!
 
+	
 }
 
 void DBFile::Load (Schema &f_schema, char *loadpath) {
@@ -54,7 +64,8 @@ int DBFile::Close () {
 void DBFile::Add (Record &rec) {
 
 	//Consume rec
-	this->write->consume(rec);
+	Record *write;
+	write->consume(rec);
 	
 	if(writePage->append(write)==0)
 	{		
