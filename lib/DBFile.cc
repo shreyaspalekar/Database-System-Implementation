@@ -9,11 +9,13 @@
 
 // stub file .. replace it with your own DBFile.cc
 
-DBFile::DBFile () {
-//getPage for writepage and readpage.
-}
+DBFile::DBFile () {}
 
 int DBFile::Create (char *f_path, fType f_type, void *startup) {
+
+	this.File->Open(0,fpath);
+	pageIndex=1;
+
 }
 
 void DBFile::Load (Schema &f_schema, char *loadpath) {
@@ -28,6 +30,9 @@ void DBFile::Load (Schema &f_schema, char *loadpath) {
 }
 
 int DBFile::Open (char *f_path) {
+	//TODO:metadata
+	this.File->Open(1,fpath);
+	pageIndex=1;
 }
 
 void DBFile::MoveFirst () {
@@ -38,6 +43,11 @@ void DBFile::MoveFirst () {
 }
 
 int DBFile::Close () {
+
+	//TODO:metadata
+
+	return this.file->close();
+	
 }
 
 void DBFile::Add (Record &rec) {
