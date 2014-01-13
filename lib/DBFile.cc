@@ -126,17 +126,18 @@ int DBFile::GetNext (Record &fetchme, CNF &cnf, Record &literal) {
 	ComparisonEngine compare;
 	int result1 = 0;
 	int result2 = 1;
+	Record temp;
 	
 	while(result1==0||result2!=0){
 		
-		result2 = this->GetNext(*current);//requires reference..check if is right
-		result1 = compare.Compare(this->current,&literal,&cnf);//int Compare(Record *left, Record *literal, CNF *myComparison); is this right
+		result2 = this->GetNext(&temp);//requires reference..check if is right
+		result1 = compare.Compare(&temp,&literal,&cnf);//int Compare(Record *left, Record *literal, CNF *myComparison); is this right
 	
 	}
 	
 	if(result1==1)
 	{
-		fetchme.Copy(this->current);
+		fetchme.Copy(&temp);
 		return 1;
 	}
 	
