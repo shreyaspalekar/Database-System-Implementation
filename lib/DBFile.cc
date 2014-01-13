@@ -130,14 +130,14 @@ int DBFile::GetNext (Record &fetchme, CNF &cnf, Record &literal) {
 	
 	while(result1==0||result2!=0){
 		
-		result2 = this->GetNext(&temp);//requires reference..check if is right
+		result2 = this->GetNext(temp);//requires reference..check if is right
 		result1 = compare.Compare(&temp,&literal,&cnf);//int Compare(Record *left, Record *literal, CNF *myComparison); is this right
 	
 	}
 	
 	if(result1==1)
 	{
-		fetchme.Copy(&temp);
+		fetchme.Copy(temp);
 		return 1;
 	}
 	
