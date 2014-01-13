@@ -85,6 +85,10 @@ void DBFile::Add (Record &rec) {
 
 int DBFile::GetNext (Record &fetchme) {
 	
+	//BUG: Might return wrong results
+	
+	fetchme.Consume(*current);
+	
 	int result = this->readPage->GetFirst(this->current);
 	
 
@@ -105,7 +109,7 @@ int DBFile::GetNext (Record &fetchme) {
 	
 	
 	
-	fetchme = *current;//is this right? REFERENCES CANNOT BE REINITIALIZED
+	//is this right? REFERENCES CANNOT BE REINITIALIZED
 	return 1;
 	
 }
