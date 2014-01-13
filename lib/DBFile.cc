@@ -39,10 +39,10 @@ int DBFile::Create (char *f_path, fType f_type, void *startup) {
 void DBFile::Load (Schema &f_schema, char *loadpath) {
 	
 	FILE* tableFile = fopen (loadpath,"r");
-	Record* temp;//need reference see below, make a record
+	Record temp;//need reference see below, make a record
 	
 	while(temp->SuckNextRecord(&f_schema,tableFile)!=0)
-		this->Add(*temp);//TODO: add requires a reference
+		this->Add(&temp);//TODO: add requires a reference
 		
 	fclose(tableFile);
 }
@@ -71,14 +71,14 @@ int DBFile::Close () {
 void DBFile::Add (Record &rec) {
 
 	//Consume rec
-	Record *write;
-	write->Consume(&rec);//consume needs a pointer, is this right?
+	Record write;
+	write.Consume(&rec);//consume needs a pointer, is this right?
 	
 	if(writePage->Append(write)==0)
 	{		
 		this->file->AddPage(writePage,(this->file->GetLength())+1);
 		this->writePage->EmptyItOut();
-		writePage->Append(write);
+		writePage->Append(&write);
 	}
 		
 }
