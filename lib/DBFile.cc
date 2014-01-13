@@ -137,7 +137,7 @@ int DBFile::GetNext (Record &fetchme, CNF &cnf, Record &literal) {
 	
 	if(result1==1)
 	{
-		fetchme.Copy(temp);
+		fetchme.Copy(&temp);
 		return 1;
 	}
 	
