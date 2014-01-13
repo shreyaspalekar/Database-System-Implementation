@@ -39,10 +39,10 @@ int DBFile::Create (char *f_path, fType f_type, void *startup) {
 void DBFile::Load (Schema &f_schema, char *loadpath) {
 	
 	FILE* tableFile = fopen (loadpath,"r");
-	Record* temp;
+	Record* temp;//need reference see below, make a record
 	
 	while(temp->SuckNextRecord(&f_schema,tableFile)!=0)
-		this->Add(*temp);
+		this->Add(*temp);//TODO: add requires a reference
 		
 	fclose(tableFile);
 }
@@ -55,8 +55,8 @@ int DBFile::Open (char *f_path) {
 
 void DBFile::MoveFirst () {
 //USE GetNext ? is two line code better??
-	this->file->GetPage(this->readPage,0); //TODO: check off_t type
-	this->readPage->GetFirst(this->current);
+	this->file->GetPage(this->readPage,0); //TODO: check off_t type,  void GetPage (Page *putItHere, off_t whichPage)
+	this->readPage->GetFirst(this->current);//check if this->readPage is pointer
 
 }
 
@@ -72,7 +72,7 @@ void DBFile::Add (Record &rec) {
 
 	//Consume rec
 	Record *write;
-	write->Consume(&rec);
+	write->Consume(&rec);//consume needs a pointer, is this right?
 	
 	if(writePage->Append(write)==0)
 	{		
@@ -86,7 +86,7 @@ void DBFile::Add (Record &rec) {
 int DBFile::GetNext (Record &fetchme) {
 	
 
-	if(this->readPage->GetFirst(this->current)==0){
+	if(this->readPage->GetFirst(this->current)==0){//int GetFirst (Record *firstOne), check type
 		
 		pageIndex++;
 		
@@ -103,7 +103,7 @@ int DBFile::GetNext (Record &fetchme) {
 	
 	
 	
-	fetchme = *this->current;
+	fetchme = *this->current;//is this right? REFERENCES CANNOT BE REINITIALIZED
 	return 1;
 	
 }
@@ -116,8 +116,8 @@ int DBFile::GetNext (Record &fetchme, CNF &cnf, Record &literal) {
 	
 	while(result1==0||result2!=0){
 		
-		result2 = this->GetNext(*this->current);
-		result1 = compare.Compare(this->current,&literal,&cnf);
+		result2 = this->GetNext(*this->current);//requires reference..check if is right
+		result1 = compare.Compare(this->current,&literal,&cnf);//int Compare(Record *left, Record *literal, CNF *myComparison); is this right
 	
 	}
 	
