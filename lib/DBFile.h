@@ -20,6 +20,7 @@ class DBFile {
 	File* file;
 	off_t pageIndex;
 	char* name;
+	int endOfFile;
 	
 public:
 	DBFile (); 
