@@ -103,7 +103,7 @@ int DBFile::GetNext (Record &fetchme) {
 	
 	
 	
-	fetchme = this->(*current);//is this right? REFERENCES CANNOT BE REINITIALIZED
+	fetchme = *current;//is this right? REFERENCES CANNOT BE REINITIALIZED
 	return 1;
 	
 }
@@ -116,14 +116,14 @@ int DBFile::GetNext (Record &fetchme, CNF &cnf, Record &literal) {
 	
 	while(result1==0||result2!=0){
 		
-		result2 = this->GetNext(this->(*current));//requires reference..check if is right
+		result2 = this->GetNext(*current);//requires reference..check if is right
 		result1 = compare.Compare(this->current,&literal,&cnf);//int Compare(Record *left, Record *literal, CNF *myComparison); is this right
 	
 	}
 	
 	if(result1==1)
 	{
-		fetchme = this->(*current);
+		fetchme = *current;
 		return 1;
 	}
 	
