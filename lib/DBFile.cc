@@ -30,6 +30,7 @@ int DBFile::Create (char *f_path, fType f_type, void *startup) {
 
 	this->file->Open(0,f_path);
 	pageIndex=1;
+	endOfFile=1;
 	
 	return 1;//TODO:check>> void for File Open !!
 
@@ -51,6 +52,8 @@ int DBFile::Open (char *f_path) {
 	//TODO:metadata
 	this->file->Open(1,f_path);
 	pageIndex=1;
+	endOfFile = 0;
+	return 1;
 }
 
 void DBFile::MoveFirst () {
@@ -63,7 +66,7 @@ void DBFile::MoveFirst () {
 int DBFile::Close () {
 
 	//TODO:metadata
-
+	endOfFile = 1;
 	return this->file->Close();
 	
 }
@@ -87,7 +90,9 @@ int DBFile::GetNext (Record &fetchme) {
 	
 	//BUG: Might return wrong results
 	//Fix structure return 0 may not be called
-	
+	if(endOfFile==1)
+		return 0;
+		
 	fetchme.Copy(this->current);
 	
 	int result = this->readPage->GetFirst(this->current);
@@ -97,8 +102,9 @@ int DBFile::GetNext (Record &fetchme) {
 		
 		pageIndex++;
 		
-		if(pageIndex>this->file->GetLength())
-			return 0;
+		if(pageIndex>this->file->GetLength()){
+			endOfFile = 1;	
+		}
 		
 		else{
 			this->file->GetPage(this->readPage,pageIndex);
