@@ -85,8 +85,10 @@ void DBFile::Add (Record &rec) {
 
 int DBFile::GetNext (Record &fetchme) {
 	
+	int result = this->readPage->GetFirst(this->current);
+	
 
-	if(this->readPage->GetFirst(this->current)==0){//int GetFirst (Record *firstOne), check type
+	if(result==0){//int GetFirst (Record *firstOne), check type
 		
 		pageIndex++;
 		
