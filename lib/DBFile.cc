@@ -128,7 +128,7 @@ int DBFile::GetNext (Record &fetchme, CNF &cnf, Record &literal) {
 	int result2 = 1;
 	//Record temp2;
 	
-	while(result1==0||result2!=0){
+	while(result1==0&&result2!=0){
 		
 		result2 = this->GetNext(fetchme);//requires reference..check if is right
 		result1 = compare.Compare(&fetchme,&literal,&cnf);//int Compare(Record *left, Record *literal, CNF *myComparison); is this right
