@@ -2,7 +2,7 @@ WORKING
 ======================================
 Load
 
-seg fault on scan as Open is not fully implemented
+seg fault on scan problem with getnext, line 332 record.cc ,bits of record
 
 TODO
 ======================================
