@@ -102,7 +102,7 @@ int DBFile::GetNext (Record &fetchme) {
 		
 		pageIndex++;
 		
-		if(pageIndex>=this->file->GetLength()){
+		if(pageIndex>=this->file->GetLength()-1){
 			endOfFile = 1;	
 		}
 		
