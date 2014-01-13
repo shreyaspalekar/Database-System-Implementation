@@ -13,3 +13,5 @@ Trivials:
 pointers can be set to null
 
 references cannot be set to null or reinitialised
+
+references do not need to be dereferences like pointers ie *
