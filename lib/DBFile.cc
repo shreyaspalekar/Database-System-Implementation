@@ -41,8 +41,8 @@ void DBFile::Load (Schema &f_schema, char *loadpath) {
 	FILE* tableFile = fopen (loadpath,"r");
 	Record temp;//need reference see below, make a record
 	
-	while(temp->SuckNextRecord(&f_schema,tableFile)!=0)
-		this->Add(&temp);//TODO: add requires a reference
+	while(temp.SuckNextRecord(&f_schema,tableFile)!=0)
+		this->Add(temp);//TODO: add requires a reference
 		
 	fclose(tableFile);
 }
@@ -78,7 +78,7 @@ void DBFile::Add (Record &rec) {
 	{		
 		this->file->AddPage(writePage,(this->file->GetLength())+1);
 		this->writePage->EmptyItOut();
-		writePage->Append(&write);
+		writePage->Append(write);
 	}
 		
 }
