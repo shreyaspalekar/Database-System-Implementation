@@ -74,11 +74,11 @@ void DBFile::Add (Record &rec) {
 	Record write;
 	write.Consume(&rec);//consume needs a pointer, is this right?
 	
-	if(writePage->Append(write)==0)
+	if(writePage->Append(&write)==0)
 	{		
 		this->file->AddPage(writePage,(this->file->GetLength())+1);
 		this->writePage->EmptyItOut();
-		writePage->Append(write);
+		writePage->Append(&write);
 	}
 		
 }
