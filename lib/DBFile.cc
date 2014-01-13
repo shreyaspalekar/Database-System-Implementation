@@ -135,11 +135,12 @@ int DBFile::GetNext (Record &fetchme, CNF &cnf, Record &literal) {
 	
 	}
 	
+	if(result2==0)
+		return 0;
+		
 	if(result1==1)
-	{
-		//fetchme.Copy(&temp2);
 		return 1;
-	}
+
 	
 	return 0;
 }
