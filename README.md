@@ -6,7 +6,7 @@ Course Project COP6726-Database System Implementation
 
 Check references vs pointers
 
-Do performance testing : Valgrind
+Do performance testing : Valgrind,memcheck
 
 Trivials:
 
