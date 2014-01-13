@@ -3,12 +3,15 @@ Database-System-Implementation
 
 Course Project COP6726-Database System Implementation
 
+TODO:
 
 LINT
 
 Check references vs pointers
 
 Do performance testing : Valgrind,memcheck,lint
+
+missing returns
 
 Trivials:
 
