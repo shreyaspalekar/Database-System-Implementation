@@ -87,7 +87,7 @@ int DBFile::GetNext (Record &fetchme) {
 	
 	//BUG: Might return wrong results
 	
-	fetchme.Consume(this->current);
+	fetchme.Copy(this->current);
 	
 	int result = this->readPage->GetFirst(this->current);
 	
@@ -129,7 +129,7 @@ int DBFile::GetNext (Record &fetchme, CNF &cnf, Record &literal) {
 	
 	if(result1==1)
 	{
-		fetchme.Consume(this->current);
+		fetchme.Copy(this->current);
 		return 1;
 	}
 	
