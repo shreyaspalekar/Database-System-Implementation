@@ -86,6 +86,7 @@ void DBFile::Add (Record &rec) {
 int DBFile::GetNext (Record &fetchme) {
 	
 	//BUG: Might return wrong results
+	//Fix structure return 0 may not be called
 	
 	fetchme.Copy(this->current);
 	
