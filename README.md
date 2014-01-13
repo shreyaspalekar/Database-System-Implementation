@@ -3,7 +3,15 @@ Database-System-Implementation
 
 Course Project COP6726-Database System Implementation
 
-TODO:
+WORKING
+======================================
+Load
+
+seg fault on scan as Open is not fully implemented
+
+TODO
+======================================
+Implement DBFile open to have persistency
 
 LINT
 
@@ -13,8 +21,8 @@ Do performance testing : Valgrind,memcheck,lint
 
 missing returns
 
-Trivials:
-
+Trivials
+======================================
 pointers can be set to null
 
 references cannot be set to null or reinitialised
