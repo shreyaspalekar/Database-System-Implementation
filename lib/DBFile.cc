@@ -55,7 +55,7 @@ int DBFile::Open (char *f_path) {
 
 void DBFile::MoveFirst () {
 //USE GetNext ? is two line code better??
-	this->file->GetPage(this->readPage,0); //TODO: check off_t type,  void GetPage (Page *putItHere, off_t whichPage)
+	this->file->GetPage(this->readPage,1); //TODO: check off_t type,  void GetPage (Page *putItHere, off_t whichPage)
 	this->readPage->GetFirst(this->current);//check if this->readPage is pointer
 
 }
