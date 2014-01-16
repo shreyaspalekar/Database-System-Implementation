@@ -2,6 +2,7 @@
 #include <iostream>
 #include "Record.h"
 #include <stdlib.h>
+#include "DBFile.h"
 using namespace std;
 
 extern "C" {
@@ -13,11 +14,11 @@ extern struct AndList *final;
 int main () {
 
 	// try to parse the CNF
-	cout << "Enter in your CNF: ";
-  	if (yyparse() != 0) {
-		cout << "Can't parse your CNF.\n";
-		exit (1);
-	}
+//	cout << "Enter in your CNF: ";
+  //	if (yyparse() != 0) {
+//		cout << "Can't parse your CNF.\n";
+//		exit (1);
+//	}
 
 	// suck up the schema from the file
 	Schema lineitem ("catalog", "lineitem");
@@ -25,10 +26,10 @@ int main () {
 	// grow the CNF expression from the parse tree 
 	CNF myComparison;
 	Record literal;
-	myComparison.GrowFromParseTree (final, &lineitem, literal);
+//	myComparison.GrowFromParseTree (final, &lineitem, literal);
 	
 	// print out the comparison to the screen
-	myComparison.Print ();
+//	myComparison.Print ();
 
 	// now open up the text file and start procesing it
         
@@ -36,8 +37,8 @@ int main () {
 		Record temp;
         Schema mySchema ("catalog", "lineitem");
 		DBFile dbf;
-		dbf.Load(&mySchema, "/cise/tmp/dbi_sp11/DATA/10M/lineitem.tbl");
-		dbf.GetNext(&temp);
+		dbf.Load(mySchema, "/cise/tmp/dbi_sp11/DATA/10M/lineitem.tbl");
+		dbf.GetNext(temp);
 		temp.Print(&mySchema);
 		
 		

@@ -1,7 +1,7 @@
 #include <iostream>
 #include "DBFile.h"
 #include "test.h"
-
+#include <ctime>
 // make sure that the file path/dir information below is correct
 char *dbfile_dir = ""; // dir where binary heap files should be stored
 char *tpch_dir ="/cise/tmp/dbi_sp11/DATA/10M/"; // dir where dbgen tpch files (extension *.tbl) can be found
@@ -29,6 +29,8 @@ void test1 () {
 // sequential scan of a DBfile 
 void test2 () {
 
+	clock_t begin = clock();	
+
 	DBFile dbfile;
 	dbfile.Open (rel->path());
 	dbfile.MoveFirst ();
@@ -43,7 +45,12 @@ void test2 () {
 			cout << counter << "\n";
 		}
 	}
+
+	clock_t end = clock();
+
 	cout << " scanned " << counter << " recs \n";
+	cout << " scan time : " << double(end-begin)/CLOCKS_PER_SEC<< " secs\n";  
+	cout << " records per second : " << double(counter/(double(end-begin)/CLOCKS_PER_SEC))<<"\n";
 	dbfile.Close ();
 }
 
