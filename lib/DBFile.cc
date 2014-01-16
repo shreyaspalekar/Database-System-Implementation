@@ -9,6 +9,8 @@
 
 // stub file .. replace it with your own DBFile.cc
 
+//TODO:optimise for branch misses
+
 DBFile::DBFile () {
 
 	this->file = new File();
