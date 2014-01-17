@@ -1,0 +1,2 @@
+g++ -g -c main.cc
+g++ -o main Record.o Comparison.o ComparisonEngine.o Schema.o File.o y.tab.o lex.yy.o main.o -lfl

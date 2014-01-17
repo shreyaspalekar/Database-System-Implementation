@@ -1,0 +1,95 @@
+021008-1308
+
+readme 
+=========
+Test driver for Assignment 2 BigQ Milestone 1 (spring 2011 dbi) 
+
+This test driver gives a menu-based interface to three options that allows you
+to test your code:
+
+	1. sort
+	2. sort + display
+	3. sort + write
+
+Note that the driver works only with heap dbfiles created over tpch tables.
+Before using the driver, make sure you have generated the necessary heap dbfiles
+(you can use test driver 1 to generate the heap dbfiles. For your convenience a
+copy of test driver 1 is included along with this driver. Look at files
+a1-README, and a1-test.cc)
+
+To compile the driver, type
+	make test.out
+
+To run the driver, type
+	test.out
+and follow the on-screen instructions.
+
+Using the driver:
+==================
+
+1. SETTINGS: The following variables control the various file locations and they
+are declared in test.h:
+	o dbfile_dir -- this is where the driver can locate the binary heap
+dbfiles. The driver assumes that the dbfiles have the extension '.bin'.  By
+default, this is set to "" (thus all the heap dbfiles should be locatable in the
+same directory as the test driver).
+
+2. Next replace the stub files DBFile.h, DBFile.cc, BigQ.h, and BigQ.cc with your
+own code. If you are using additional headers, modify the Makefile to include
+them as well. Then compile and execute the driver and follow the on-screen
+instructions.
+
+3. You will be asked to enter the sort ordering that is to be passed on to the
+BigQ constructor. You will need to enter the sort ordering as a CNF with only one
+literal per clause. The literal must be a valid attribute name for the selected
+relation. The test driver will construct a ordermaker instance to be passed on to
+the BigQ constructor. Some examples are provided below. Note that to use this
+feature, you need to use the new version of the files Parse.y and Comparison.cc
+provided in this driver.
+
+CNF examples to specify sort order:
+===================================
+
+dbfile      |  sortby                                  |  CNF
+---------------------------------------------------------------------------------
+region      |  r_name 	 	                       | (r_name)
+       
+partsupp    |  ps_suppkey, ps_partkey 		       | (ps_suppkey) AND (ps_partkey)
+
+lineitem    |  l_shipdate, l_extendedprice, l_quantity | (l_shipdate) AND 
+							 (l_extendedprice) AND 
+							 (l_quantity)
+
+How the driver works:
+=====================
+
+Once a heap dbfile is selected and a CNF is specified for the sort order, the
+test driver sets up an input and an output pipe and passes them off to the BigQ
+constructor along with an ordermaker instance created from the supplied CNF. The
+test driver then creates two threads:
+	-a producer thread that feeds data into the input pipe by repeatedly
+reading records off from the supplied heap dbfile. The producer thread shuts down
+the input pipe when it has finished dumping all the records from the input dbfile
+	-a consumer thread that repeatedly reads data off from the output pipe
+and verifies that the data is in the correct sorted order (as encoded in the
+ordermaker instance passed off to BigQ).
+
+options:
+========
+1. sort -- simply tells how many records were inserted into the input pipe and
+how many were received by the output pipe and if they were in the correct sorted
+order
+
+2. sort + display -- gives the same information but also prints the records
+received off the output pipe on to the standard output
+
+3. sort + write -- dumps the records received from the output pipe into a heap
+dbfile (with the extension bigq)
+
+Submission Instructions: 
+========================= 
+
+Same as a1 (Instead of creating directory a1, create directory a2. The turnin
+file should be called a2.tar.gz)
+
+-------------------------------------------------------------------------------
