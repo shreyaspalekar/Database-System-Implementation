@@ -94,34 +94,36 @@ int DBFile::GetNext (Record &fetchme) {
 	
 	//BUG: Might return wrong results
 	//Fix structure return 0 may not be called
-	if(endOfFile==1)
-		return 0;
+	if(endOfFile!=1){
 		
-	fetchme.Copy(this->current);
+		
+		fetchme.Copy(this->current);
 	
-	int result = this->readPage->GetFirst(this->current);
+		int result = this->readPage->GetFirst(this->current);
 	
 
-	if(result==0){//int GetFirst (Record *firstOne), check type
+		if(result==0){//int GetFirst (Record *firstOne), check type
 		
-		pageIndex++;
+			pageIndex++;
 		
-		if(pageIndex>=this->file->GetLength()-1){
-			endOfFile = 1;	
+			if(pageIndex>=this->file->GetLength()-1){
+				endOfFile = 1;	
+			}
+		
+			else{
+				this->file->GetPage(this->readPage,pageIndex);
+				this->readPage->GetFirst(this->current);
+			}
+		
+		
 		}
-		
-		else{
-			this->file->GetPage(this->readPage,pageIndex);
-			this->readPage->GetFirst(this->current);
-		}
-		
-		
-	}
 	
 	
 	
 	//is this right? REFERENCES CANNOT BE REINITIALIZED
-	return 1;
+		return 1;
+	}
+	return 0;
 	
 }
 //TODO: where will the current pointer be at the end??
