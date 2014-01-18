@@ -32,6 +32,7 @@ int DBFile::Create (char *f_path, fType f_type, void *startup) {
 
 	this->file->Open(0,f_path);
 	pageIndex=1;
+	writeIndex=1;
 	endOfFile=1;
 	
 	return 1;//TODO:check>> void for File Open !!
@@ -69,6 +70,9 @@ void DBFile::MoveFirst () {
 
 int DBFile::Close () {
 
+	this->file->AddPage(writePage,writeIndex+1);
+	writeIndex++;
+
 	//TODO:metadata
 	endOfFile = 1;
 	return this->file->Close();
@@ -83,7 +87,8 @@ void DBFile::Add (Record &rec) {
 	
 	if(writePage->Append(&write)==0)
 	{		
-		this->file->AddPage(writePage,(this->file->GetLength())+1);
+		this->file->AddPage(writePage,writeIndex+1);
+		writeIndex++;
 		this->writePage->EmptyItOut();
 		writePage->Append(&write);
 	}
