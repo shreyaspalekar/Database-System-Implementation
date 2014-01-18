@@ -19,6 +19,7 @@ class DBFile {
 	Page* writePage;
 	File* file;
 	off_t pageIndex;
+	off_t writeIndex;
 	char* name;
 	int endOfFile;
 	
