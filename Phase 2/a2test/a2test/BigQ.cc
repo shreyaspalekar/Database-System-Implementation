@@ -49,4 +49,6 @@ BigQ::void* TPMMS_Phase1(void* arg){
 }
 
 BigQ::~BigQ () {
+	delete buffer;
+	//delete thread
 }
