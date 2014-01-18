@@ -21,6 +21,7 @@ class DBFile {
 	off_t pageIndex;
 	off_t writeIndex;
 	char* name;
+	int writeIsDirty;
 	int endOfFile;
 	
 public:
