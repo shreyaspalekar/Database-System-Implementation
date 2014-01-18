@@ -33,6 +33,7 @@ int DBFile::Create (char *f_path, fType f_type, void *startup) {
 	this->file->Open(0,f_path);
 	pageIndex=1;
 	writeIndex=1;
+	writeIsDirty=0;
 	endOfFile=1;
 	
 	return 1;//TODO:check>> void for File Open !!
@@ -70,8 +71,10 @@ void DBFile::MoveFirst () {
 
 int DBFile::Close () {
 
-	this->file->AddPage(writePage,writeIndex+1);
-	writeIndex++;
+	if(this->writeIsDirty==1){
+		this->file->AddPage(writePage,writeIndex+1);
+		writeIndex++;
+	}
 
 	//TODO:metadata
 	endOfFile = 1;
@@ -82,6 +85,8 @@ int DBFile::Close () {
 void DBFile::Add (Record &rec) {
 
 	//Consume rec
+	this->writeIsDirty=1;
+
 	Record write;
 	write.Consume(&rec);//consume needs a pointer, is this right?
 	
