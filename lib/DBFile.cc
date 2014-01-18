@@ -72,7 +72,7 @@ void DBFile::MoveFirst () {
 int DBFile::Close () {
 
 	if(this->writeIsDirty==1){
-		this->file->AddPage(writePage,writeIndex+1);
+		this->file->AddPage(writePage,writeIndex);
 		writeIndex++;
 	}
 
@@ -92,7 +92,7 @@ void DBFile::Add (Record &rec) {
 	
 	if(writePage->Append(&write)==0)
 	{		
-		this->file->AddPage(writePage,writeIndex+1);
+		this->file->AddPage(writePage,writeIndex);
 		writeIndex++;
 		this->writePage->EmptyItOut();
 		writePage->Append(&write);
