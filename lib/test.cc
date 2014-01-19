@@ -30,7 +30,7 @@ void test1 () {
 void test2 () {
 
 	clock_t begin = clock();
-	clock_t p_time = 0;
+	//clock_t p_time = 0;
 
 	DBFile dbfile;
 	dbfile.Open (rel->path());
@@ -42,10 +42,10 @@ void test2 () {
 	while (dbfile.GetNext (temp) == 1) {
 		counter += 1;
 		
-		clock_t p_begin = clock();
+	//	clock_t p_begin = clock();
 		temp.Print (rel->schema());
-		clock_t p_end = clock();
-		p_time += p_end - p_begin; 
+	//	clock_t p_end = clock();
+	//	p_time += p_end - p_begin; 
 		
 		if (counter % 10000 == 0) {
 			cout << counter << "\n";
@@ -55,11 +55,11 @@ void test2 () {
 	clock_t end = clock();
 	
 	double total_time = double(end-begin)/CLOCKS_PER_SEC;
-	double print_time = double(p_time)/CLOCKS_PER_SEC;
-	double scan_time = total_time - print_time;
+//	double print_time = double(p_time)/CLOCKS_PER_SEC;
+	double scan_time = total_time ;//- print_time;
 	
 	cout << " scanned " << counter << " recs \n";
-	cout << " print time " << print_time << " recs \n";
+//	cout << " print time " << print_time << " recs \n";
 	cout << " scan time : " << scan_time << " secs\n";  
 	cout << " records per second : " << double(counter/scan_time)<<"\n";
 	dbfile.Close ();
