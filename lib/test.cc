@@ -57,6 +57,7 @@ void test2 () {
 	double scan_time = total_time - print_time;
 	
 	cout << " scanned " << counter << " recs \n";
+	cout << " print time " << print_time << " recs \n";
 	cout << " scan time : " << scan_time << " secs\n";  
 	cout << " records per second : " << double(counter/scan_time)<<"\n";
 	dbfile.Close ();
