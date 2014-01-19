@@ -41,10 +41,12 @@ void test2 () {
 	int counter = 0;
 	while (dbfile.GetNext (temp) == 1) {
 		counter += 1;
+		
 		clock_t p_begin = clock();
 		temp.Print (rel->schema());
 		clock_t p_end = clock();
-		p_time += p_begin - p_end; 
+		p_time += p_end - p_begin; 
+		
 		if (counter % 10000 == 0) {
 			cout << counter << "\n";
 		}
