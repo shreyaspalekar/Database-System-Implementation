@@ -29,7 +29,7 @@ void test1 () {
 // sequential scan of a DBfile 
 void test2 () {
 
-	clock_t begin = clock();
+	
 	//clock_t p_time = 0;
 
 	DBFile dbfile;
@@ -39,6 +39,7 @@ void test2 () {
 	Record temp;
 
 	int counter = 0;
+	clock_t begin = clock();
 	while (dbfile.GetNext (temp) == 1) {
 		counter += 1;
 		
@@ -81,6 +82,7 @@ void test3 () {
 	Record temp;
 
 	int counter = 0;
+	clock_t begin = clock();
 	while (dbfile.GetNext (temp, cnf, literal) == 1) {
 		counter += 1;
 		temp.Print (rel->schema());
@@ -88,7 +90,13 @@ void test3 () {
 			cout << counter << "\n";
 		}
 	}
+	
+	clock_t end = clock();
+	double total_time = double(end-begin)/CLOCKS_PER_SEC;
+	double scan_time = total_time ;
+	
 	cout << " selected " << counter << " recs \n";
+	cout << " query time : " << scan_time << " secs\n";
 	dbfile.Close ();
 }
 
