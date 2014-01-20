@@ -18,6 +18,7 @@ class BigQ {
 	Record temp;
 	Page *buffer;
 	File *runs;
+	int no_runs;
 	pthread_t worker;
 	int page_Index;
 	
@@ -26,6 +27,7 @@ class BigQ {
 		Pipe *input;
 		OrderMaker *sort_order;
 		int run_length;
+		int &num_runs = no_runs;
 		Record *temporary = &temp;
 		Page *buf = buffer;
 		File *run_buffer = runs;
