@@ -30,11 +30,12 @@ class BigQ {
 	
 	}args_phase1;
 
+	void* TPMMS_Phase1(void* arg);
+	void* TPMMS_Phase2(void* arg);
+
 public:
 
 	BigQ (Pipe &in, Pipe &out, OrderMaker &sortorder, int runlen);
-	void* TPMMS_Phase1(void* arg);
-	void* TPMMS_Phase2(void* arg);
 	~BigQ ();
 };
 
