@@ -17,6 +17,7 @@ class BigQ {
 	
 	Record temp;
 	Page *buffer;
+	File *runs;
 	pthread_t worker;
 	int page_Index;
 	
@@ -27,6 +28,8 @@ class BigQ {
 		int run_length;
 		Record *temporary = &temp;
 		Page *buf = buffer;
+		File *run_buffer = runs;
+		char *file_path = "run";
 	
 	}args_phase1;
 

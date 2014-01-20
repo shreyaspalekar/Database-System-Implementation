@@ -29,14 +29,31 @@ BigQ::void* TPMMS_Phase1(void* arg){
 		Page *buf = buffer;
 		*/
 	int page_Index = 0;
-	 struct args_phase1_struct *args = arg;
+	int num_runs = -1;
+	struct args_phase1_struct *args = arg;
 	 
 	 
-	 while(args->input->remove(args->temporary)!=0){ // till input pipe is empty
+	while(args->input->remove(args->temporary)!=0){ // till input pipe is empty
 		
 		//append record temporary to page at pageindex
 		if(args->(*buf)[page_Index]->append(args->temporary) == 0){ 
-			if(++page_Index>args->run_length){} // page index out of bound	
+			if(++page_Index>args->run_length){
+			
+				//Sort runs
+				
+				args->(*run_buffer)[++num_runs] = new File();
+				args->(*run_buffer)[num_runs]->open(0,args->file_path);//concatenate run no
+				
+				args->(*run_buffer)[++num_runs]->AddPage(args->(*buf)[page_Index],(args->(*run_buffer)[++num_runs]->GetLength())+1);
+				
+				for(i=0;i<args->run_length;i++)
+					args->(*buf)[i]->EmptyItOut();
+				
+				page_Index=0;
+				args->(*buf)[page_Index]->append(args->temporary);
+				//code for writing out the run and empting the page buffer
+				//USE FILE OBJECT??
+			} // page index out of bound	
 		}
 		
 		//  if page is full, increment page index
@@ -44,7 +61,7 @@ BigQ::void* TPMMS_Phase1(void* arg){
 		// write out as page[] run as binary
 		// empty put page[]
 		
-	 }
+	}
 	 
 }
 
