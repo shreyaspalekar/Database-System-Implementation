@@ -1,4 +1,3 @@
-
 BEGIN
 region
 region.tbl
@@ -86,7 +85,7 @@ l_orderkey Int
 l_partkey Int
 l_suppkey Int
 l_linenumber Int
-l_quantity Double
+l_quantity Int
 l_extendedprice Double
 l_discount Double
 l_tax Double
