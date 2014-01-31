@@ -49,6 +49,11 @@ BigQ::void* TPMMS_Phase1(void* arg){
 		//append record temporary to page at pageindex
 		if(args->(*buf)[page_Index]->append(args->temporary) == 0){//if page is full
 			
+
+			//!!We should not use page or file toBinary methods!!
+			//the file is made binary by file.close . When page is full create a new file and append the pages to that file.After the run length exceeds
+			//just close the file and open a new file of the next run no.
+			
 			//add page to file buffer at page_index
 			args->(*run_buffer)[num_runs]->AddPage(args->(*buf)[page_Index],page_Index);//getlength doesnt work use page index
 			
