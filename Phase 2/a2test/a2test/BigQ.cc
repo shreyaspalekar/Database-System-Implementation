@@ -4,7 +4,7 @@ BigQ :: BigQ (Pipe &in, Pipe &out, OrderMaker &sortorder, int runlen) {
 	
 	this->run_no = 0;
 	
-	buffer = new Page[runlen];
+	buffer = new Page[runlen];//set to runlen +1 to use indxing starting from 1
 	
  	
 	args_phase1.input = &in;
@@ -30,9 +30,9 @@ BigQ::void* TPMMS_Phase1(void* arg){
 		Record *temporary = &temp;
 		Page *buf = buffer;
 		*/
-	int page_Index = 1;
+	int page_Index = -1;//same as below indexing starts at 1
 	struct args_phase1_struct *args = arg;
-	args->num_runs = 0;//goes from 0 to n
+	args->num_runs = -1;//goes from 0 to n,set to one as the array size is n, else set array size to n+1 to use indexing from 1
 	
 	//Create and open new file 'file.run_no'
 	args->(*run_buffer)[++num_runs] = new File();//file for run1
@@ -57,8 +57,8 @@ BigQ::void* TPMMS_Phase1(void* arg){
 			//add page to file buffer at page_index
 			args->(*run_buffer)[num_runs]->AddPage(args->(*buf)[page_Index],page_Index);//getlength doesnt work use page index
 			
-				
-			if(++page_Index>args->run_length){//increment if run length is exceeded 
+			//create new run file and empty page buffer	
+			if(++page_Index>=args->run_length){//increment if run length is exceeded 
 			
 				//Sort runs
 				
@@ -66,13 +66,13 @@ BigQ::void* TPMMS_Phase1(void* arg){
 				
 				
 
-				
+				//new File
 				args->(*run_buffer)[++num_runs] = new File();  //create new run file
 				char *actual_path;
 				sprintf(actual_path,"%s.%d",file_path,num_runs);//set path as "file_path.num_run"
 				args->(*run_buffer)[num_runs]->open(0,args->file_path);//??concatenate run no
 				
-				
+				//empty page buffer ?? do we need to? can we overwrite?
 				for(i=0;i<args->run_length;i++)
 					args->(*buf)[i]->EmptyItOut();
 				
