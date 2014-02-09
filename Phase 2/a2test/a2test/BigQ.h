@@ -16,6 +16,7 @@ class BigQ {
 
 	
 	Record temp;
+	Record *runBuff;
 	Page *buffer;
 	File *runs;
 	int no_runs;
@@ -23,10 +24,11 @@ class BigQ {
 	int page_Index;
 	
 	struct args_phase1_struct {                                                   
-		
+		//check initialization
 		Pipe *input;
 		OrderMaker *sort_order;
 		int run_length;
+		Record *runBuffer = runBuff; 
 		int &num_runs = no_runs;
 		Record *temporary = &temp;
 		Page *buf = buffer;
