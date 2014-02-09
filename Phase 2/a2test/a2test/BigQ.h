@@ -16,7 +16,7 @@ class BigQ {
 
 	
 	Record temp;
-	Record *runBuff;
+	Record *recordBuff;
 	Page *buffer;
 	File *runs;
 	int no_runs;
@@ -28,7 +28,7 @@ class BigQ {
 		Pipe *input;
 		OrderMaker *sort_order;
 		int run_length;
-		Record *runBuffer = runBuff; 
+		Record *recordBuffer = recordBuff; 
 		int &num_runs = no_runs;
 		Record *temporary = &temp;
 		Page *buf = buffer;
