@@ -6,7 +6,7 @@ BigQ :: BigQ (Pipe &in, Pipe &out, OrderMaker &sortorder, int runlen) {
 	
 	
 	buffer = new Page[runlen];//set to runlen +1 to use indxing starting from 1
-	runBuff = new Record[pageLength];//how many records per page?
+	//runBuff = new Record[pageLength];//how many records per page?
 	
  	
 	args_phase1.input = &in;
@@ -33,7 +33,8 @@ BigQ::void* TPMMS_Phase1(void* arg){
 		Page *buf = buffer;
 		*/
 	int page_Index = -1;//same as below indexing starts at 1
-	int pagelen =0;
+	//int pagelen =0;
+	vector <Record> record_Buffer;//delete record buffer from header
 
 	struct args_phase1_struct *args = arg;
 	args->num_runs = -1;//goes from 0 to n,set to one as the array size is n, else set array size to n+1 to use indexing from 1
@@ -48,10 +49,10 @@ BigQ::void* TPMMS_Phase1(void* arg){
 	while(args->input->remove(args->temporary)!=0){ // till input pipe is empty
 	
 		
-		args->(*recordBuffer)[pagelen++] = args->temporary;
-		
+		//args->(*recordBuffer)[pagelen++] = args->temporary;
+	
 		//append record temporary to page at pageindex
-		if(pagelen >= args->pageLen){//OLD:args->(*buf)[page_Index]->append(args->temporary) == 0){//if page is full
+		if(args->(*buf)[page_Index]->append(args->temporary) == 0){//if page is full
 			//run length exceed sort runs and write out run file
 
 			//!!We should not use page or file toBinary methods!!
@@ -59,12 +60,13 @@ BigQ::void* TPMMS_Phase1(void* arg){
 			//just close the file and open a new file of the next run no.
 			
 			//add page to file buffer at page_index
-			//OLD:args->(*run_buffer)[num_runs]->AddPage(args->(*buf)[page_Index],page_Index);//getlength doesnt work use page index
+			args->(*run_buffer)[num_runs]->AddPage(args->(*buf)[page_Index],page_Index);//getlength doesnt work use page index
 			
 			//create new run file and empty page buffer	
 			if(++page_Index>=args->run_length){//increment if run length is exceeded 
-			
-				//Sort runs
+				
+				//empty out file into the vector
+				//Sort runs vector
 				
 				//quick sort record buffer array
 				
