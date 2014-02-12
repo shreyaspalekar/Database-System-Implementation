@@ -16,7 +16,7 @@ class BigQ {
 
 	
 	Record temp;
-	Record *recordBuff;
+	//Record *recordBuff;
 	int pageLength = 0;//no of recrods per page
 	Page *buffer;
 	File *runs;
@@ -30,7 +30,7 @@ class BigQ {
 		OrderMaker *sort_order;
 		int run_length;
 		int pageLen = pageLength;
-		Record *recordBuffer = recordBuff; 
+		//Record *recordBuffer = recordBuff; 
 		int &num_runs = no_runs;
 		Record *temporary = &temp;
 		Page *buf = buffer;
