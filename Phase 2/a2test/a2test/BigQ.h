@@ -34,7 +34,7 @@ class BigQ {
 		int &num_runs = no_runs;
 		Record *temporary = &temp;
 		Page *buf = buffer;
-		File *run_buffer = runs;
+		DBFile *run_buffer = runs;
 		char *file_path = "run";
 	
 	}args_phase1;
