@@ -5,7 +5,7 @@ BigQ :: BigQ (Pipe &in, Pipe &out, OrderMaker &sortorder, int runlen) {
 	this->run_no = 0;
 	
 	
-	buffer = new Page[runlen];//set to runlen +1 to use indxing starting from 1
+	//buffer = new Page[runlen];//set to runlen +1 to use indxing starting from 1
 	//runBuff = new Record[pageLength];//how many records per page?
 	
  	
@@ -32,18 +32,18 @@ BigQ::void* TPMMS_Phase1(void* arg){
 		Record *temporary = &temp;
 		Page *buf = buffer;
 		*/
-	int page_Index = -1;//same as below indexing starts at 1
+	//int page_Index = -1;//same as below indexing starts at 1
 	//int pagelen =0;
-	vector <Record> record_Buffer;//delete record buffer from header
+	vector <Record> record_Buffer = vector<record>();//delete record buffer from header
 
 	struct args_phase1_struct *args = arg;
 	args->num_runs = -1;//goes from 0 to n,set to one as the array size is n, else set array size to n+1 to use indexing from 1
 	
 	//Create and open new file 'file.run_no'
-	args->(*run_buffer)[++num_runs] = new File();//file for run1
+	args->(*run_buffer)[++num_runs] = new DBFile();//file for run1
 	char *actual_path;
 	sprintf(actual_path,"%s.%d",file_path,num_runs);
-	args->(*run_buffer)[num_runs]->Open(0,actual_path);
+	args->(*run_buffer)[num_runs]->create(actual_path,NULL,NULL);
 	
 	//***check resets of indexes
 	while(args->input->remove(args->temporary)!=0){ // till input pipe is empty
@@ -52,7 +52,9 @@ BigQ::void* TPMMS_Phase1(void* arg){
 		//args->(*recordBuffer)[pagelen++] = args->temporary;
 	
 		//append record temporary to page at pageindex
-		if(args->(*buf)[page_Index]->append(args->temporary) == 0){//if page is full
+		if(args->(*run_buffer)[num_runs]->add(*temporary) == 0){//if file is full !!CHANGE PAGE LIMIT IN DBFILE to runlength
+			
+			//args->(*buf)[page_Index]->append(args->temporary) == 0){//if page is full
 			//run length exceed sort runs and write out run file
 
 			//!!We should not use page or file toBinary methods!!
@@ -60,35 +62,51 @@ BigQ::void* TPMMS_Phase1(void* arg){
 			//just close the file and open a new file of the next run no.
 			
 			//add page to file buffer at page_index
-			args->(*run_buffer)[num_runs]->AddPage(args->(*buf)[page_Index],page_Index);//getlength doesnt work use page index
+			
+			//args->(*run_buffer)[num_runs]->AddPage(args->(*buf)[page_Index],page_Index);//getlength doesnt work use page index
 			
 			//create new run file and empty page buffer	
-			if(++page_Index>=args->run_length){//increment if run length is exceeded 
-				
-				//empty out file into the vector
+			//if(++page_Index>=args->run_length){//increment if run length is exceeded 
+			
+			args->(*run_buffer)[num_runs]->MoveFirst();
+			
+			while(args->(*run_buffer)[num_runs]->GetNext(*temporary) != 0){//empty out file into vector
+				record_Buffer.push_back(*temporary);
+
+			}	
+
 				//Sort runs vector
 				
-				//quick sort record buffer array
-				
-				
+
+			args->(*run_buffer)[num_runs]->MoveFirst();
+			
+			for(i=0;i<record_Buffer.size;i++){//empty record buffer into dbfile
+			
+				*temporary = record_Buffer[i];//check if this copies
+				args->(*run_buffer)[num_runs]->add(*temporary);//check for references and pointers DOES THIS PERFORM DEEP COPY??
+			}	
+				//close dbfile
+
+			args->(*run_buffer)[num_runs]->Close();
 
 				//new File
-				args->(*run_buffer)[++num_runs] = new File();  //create new run file
-				char *actual_path;
-				sprintf(actual_path,"%s.%d",file_path,num_runs);//set path as "file_path.num_run"
-				args->(*run_buffer)[num_runs]->open(0,args->file_path);//??concatenate run no
+			
+			
+			args->(*run_buffer)[++num_runs] = new DBFile();  //create new run file
+			sprintf(actual_path,"%s.%d",file_path,num_runs);//set path as "file_path.num_run"
+			args->(*run_buffer)[num_runs]->create(actual_path,NULL,NULL);//??concatenate run no
 				
 				//empty page buffer ?? do we need to? can we overwrite?
-				for(i=0;i<args->run_length;i++)
+				/*for(i=0;i<args->run_length;i++)
 					args->(*buf)[i]->EmptyItOut();
 				
 				page_Index=1;
 				args->(*buf)[page_Index]->append(args->temporary);
 				//code for writing out the run and empting the page buffer
 				//USE FILE OBJECT??
-			} // page index out of bound
+			//} // page index out of bound
 
-			page_Index = 1;//reset page index
+			page_Index = 1;//reset page index*/
 			
 		}
 		
