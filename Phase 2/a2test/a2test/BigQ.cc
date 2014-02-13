@@ -1,18 +1,20 @@
 #include "BigQ.h"
 
-void BigQ::quicksort(vector<Record> &rb, int left, int right){  
+void BigQ::quicksort(vector<Record> &rb, int left, int right,OrderMaker &sortorder){  
 
 	int i = left;
 	int j = right;
 
-   Record* pivot = rb.at((left+right)/2);
+	ComparisonEngine compare;
+
+   Record pivot = rb.at((left+right)/2);
   
    // partition  
    while (i <= j) {  
-       while (compare(rb.at(i),pivot,sortorder)<0)
+       while (compare.Compare(&rb.at(i),&pivot,&sortorder)<0)
            i++;  
   
-       while (compare(rb.at(j),pivot,sortorder)>0)
+       while (compare.Compare(&rb.at(j),&pivot,&sortorder)>0)
            j--;  
   
        if (i <= j) {  
@@ -22,15 +24,15 @@ void BigQ::quicksort(vector<Record> &rb, int left, int right){
   
            i++;  
            j--;  
-       }  
    }  
+       }  
   
    // recursion  ?
    if (left < j)  
-       quickSort(rb, left, j);  
+       quicksort(rb, left, j,sortorder);  
   
    if (i < right)  
-       quickSort(rb, i, right);  
+       quicksort(rb, i, right,sortorder);  
 }  
 
 
@@ -49,26 +51,28 @@ void* BigQ::TPMMS_Phase1(void* arg){
 	//int pagelen =0;
 	
 	
-	vector <Record> record_Buffer = vector<record>();//delete record buffer from header
+	vector <Record> record_Buffer = vector<Record>();//delete record buffer from header
 
-	struct args_phase1_struct *args = arg;
-	args->num_runs = -1;//goes from 0 to n,set to one as the array size is n, else set array size to n+1 to use indexing from 1
+	struct args_phase1_struct *args;
+	args = (struct args_phase1_struct *)arg;
+
+	args->(*num_runs) = -1;//goes from 0 to n,set to one as the array size is n, else set array size to n+1 to use indexing from 1
 	
 	//Create and open new file 'file.run_no'
-	args->(*run_buffer)[++num_runs] = new DBFile();//file for run1
+	args->(*run_buffer)[++(*num_runs)] = new DBFile();//file for run1
 	char *actual_path;
-	sprintf(actual_path,"%s.%d",file_path,num_runs);
-	args->(*run_buffer)[num_runs]->create(actual_path,NULL,NULL);
+	sprintf(actual_path,"%s.%d",file_path,(*num_runs));
+	args->(*run_buffer)[(*num_runs)]->create(actual_path,NULL,NULL);
 	
 	//***check resets of indexes
-	while(args->input->remove(args->temporary)!=0){ // till input pipe is empty
+	while(args->input->Remove(args->temporary)!=0){ // till input pipe is empty
 	
 		
 		//args->(*recordBuffer)[pagelen++] = args->temporary;
 	
 		//append record temporary to page at pageindex
-		if(args->(*run_buffer)[num_runs]->add(*temporary) == 0 || 
-			args->(*run_buffer)[num_runs]->GetLength()>args->run_length){//if file is full !!CHANGE PAGE LIMIT IN DBFILE to runlength
+		if(args->(*run_buffer)[(*num_runs)]->add(*temporary) == 0 || 
+			args->(*run_buffer)[(*num_runs)]->GetLength()>args->run_length){//if file is full !!CHANGE PAGE LIMIT IN DBFILE to runlength
 			
 			/*Deprecated:
 			//args->(*buf)[page_Index]->append(args->temporary) == 0){//if page is full
@@ -85,33 +89,33 @@ void* BigQ::TPMMS_Phase1(void* arg){
 			//create new run file and empty page buffer	
 			//if(++page_Index>=args->run_length){//increment if run length is exceeded */
 			
-			args->(*run_buffer)[num_runs]->MoveFirst();
+			args->(*run_buffer)[(*num_runs)]->MoveFirst();
 			
-			while(args->(*run_buffer)[num_runs]->GetNext(*temporary) != 0){//empty out file into vector
+			while(args->(*run_buffer)[(*num_runs)]->GetNext(*temporary) != 0){//empty out file into vector
 				record_Buffer.push_back(*temporary);
 
 			}	
 
-			quicksort(record_Buffer,0,record_Buffer.size);	//Sort runs vector
+			quicksort(record_Buffer,0,record_Buffer.size(),args->(*sort_order));	//Sort runs vector
 				
 
-			args->(*run_buffer)[num_runs]->MoveFirst();
+			args->(*run_buffer)[(*num_runs)]->MoveFirst();
 			
-			for(i=0;i<record_Buffer.size;i++){//empty record buffer into dbfile
+			for(int i=0;i<record_Buffer.size();i++){//empty record buffer into dbfile
 			
 				*temporary = record_Buffer[i];//check if this copies
-				args->(*run_buffer)[num_runs]->add(*temporary);//check for references and pointers DOES THIS PERFORM DEEP COPY??
+				args->(*run_buffer)[(*num_runs)]->add(*temporary);//check for references and pointers DOES THIS PERFORM DEEP COPY??
 			}	
 				//close dbfile
 
-			args->(*run_buffer)[num_runs]->Close();
+			args->(*run_buffer)[(*num_runs)]->Close();
 
 				//new File
 			
 			
-			args->(*run_buffer)[++num_runs] = new DBFile();  //create new run file
-			sprintf(actual_path,"%s.%d",file_path,num_runs);//set path as "file_path.num_run"
-			args->(*run_buffer)[num_runs]->create(actual_path,NULL,NULL);//??concatenate run no
+			args->(*run_buffer)[++(*num_runs)] = new DBFile();  //create new run file
+			sprintf(actual_path,"%s.%d",file_path,(*num_runs));//set path as "file_path.num_run"
+			args->(*run_buffer)[(*num_runs)]->create(actual_path,NULL,NULL);//??concatenate run no
 				
 				//empty page buffer ?? do we need to? can we overwrite?
 				/*for(i=0;i<args->run_length;i++)
@@ -146,7 +150,10 @@ BigQ :: BigQ (Pipe &in, Pipe &out, OrderMaker &sortorder, int runlen) {
 	//buffer = new Page[runlen];//set to runlen +1 to use indxing starting from 1
 	//runBuff = new Record[pageLength];//how many records per page?
 	
- 	
+	args_phase1.num_runs = &no_runs;
+	args_phase1.temporary = &temp;
+	args_phase1.run_buffer = runs;
+	args_phase1.file_path = f_name;
 	args_phase1.input = &in;
 	args_phase1.sort_order = &sortorder;
 	args_phase1.run_length = &runlen;
@@ -166,6 +173,6 @@ BigQ :: BigQ (Pipe &in, Pipe &out, OrderMaker &sortorder, int runlen) {
 
 
 BigQ::~BigQ () {
-	delete buffer;
+	//delete buffer;
 	//delete thread
 }

@@ -6,6 +6,7 @@
 #include "File.h"
 #include "Record.h"
 #include "DBFile.h"
+#include "ComparisonEngine.h"
 #include <vector>
 
 using namespace std;
@@ -29,10 +30,10 @@ class BigQ {
 		Pipe *input;
 		OrderMaker *sort_order;
 		int *run_length;
-		int &num_runs = no_runs;
-		Record *temporary = &temp;
-		DBFile *run_buffer = runs;
-		char *file_path = f_name;
+		int *num_runs;
+		Record *temporary;
+		DBFile *run_buffer;
+		char *file_path;
 		
 		/*Deprecated: Replaced by DBFile , no need for indexing
 		//int pageLen = pageLength;
@@ -43,7 +44,7 @@ class BigQ {
 
 	void* TPMMS_Phase1(void* arg);
 	void* TPMMS_Phase2(void* arg);
-	void quicksort(vector<Record> &rb, int left, int right);
+	void quicksort(vector<Record> &rb, int left, int right,OrderMaker &sortorder);
 	
 	/*Deprecated: Replaced by DBFile , no need for indexing
 	//Record *recordBuff;
