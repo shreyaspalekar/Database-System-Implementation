@@ -119,6 +119,40 @@ BigQ::void* TPMMS_Phase1(void* arg){
 	 
 }
 
+BigQ::quicksort(std::vector<Record> &rb, int left, int right){  
+
+	int i = left;
+	int j = right;
+
+   Record* pivot = rb.at((left+right)/2);
+  
+   // partition  
+   while (i <= j) {  
+       while (compare(rb.at(i),pivot,sortorder)<0)
+           i++;  
+  
+       while (compare(rb.at(j),pivot,sortorder)>0)
+           j--;  
+  
+       if (i <= j) {  
+           Record tmp = rb.at(i);  
+           rb.at(i) = rb.at(j);  
+           rb.at(j) = tmp;  
+  
+           i++;  
+           j--;  
+       }  
+   }  
+  
+   // recursion  ?
+   if (left < j)  
+       quickSort(rb, left, j);  
+  
+   if (i < right)  
+       quickSort(rb, i, right);  
+}  
+
+
 BigQ::~BigQ () {
 	delete buffer;
 	//delete thread
