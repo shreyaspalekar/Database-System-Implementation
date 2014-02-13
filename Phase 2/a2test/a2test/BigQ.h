@@ -17,8 +17,8 @@ class BigQ {
 	
 	Record temp;
 	//Record *recordBuff;
-	int pageLength = 0;//no of recrods per page
-	Page *buffer;
+	//int pageLength = 0;//no of recrods per page
+	//Page *buffer;
 	DBFile *runs;
 	int no_runs;
 	pthread_t worker;
@@ -29,11 +29,11 @@ class BigQ {
 		Pipe *input;
 		OrderMaker *sort_order;
 		int run_length;
-		int pageLen = pageLength;
+		//int pageLen = pageLength;
 		//Record *recordBuffer = recordBuff; 
 		int &num_runs = no_runs;
 		Record *temporary = &temp;
-		Page *buf = buffer;
+		//Page *buf = buffer;
 		DBFile *run_buffer = runs;
 		char *file_path = "run";
 	
