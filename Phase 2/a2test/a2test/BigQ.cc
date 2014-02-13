@@ -1,30 +1,41 @@
 #include "BigQ.h"
 
-BigQ :: BigQ (Pipe &in, Pipe &out, OrderMaker &sortorder, int runlen) {
-	
-	this->run_no = 0;
-	
-	
-	//buffer = new Page[runlen];//set to runlen +1 to use indxing starting from 1
-	//runBuff = new Record[pageLength];//how many records per page?
-	
- 	
-	args_phase1.input = &in;
-	args_phase1.sort_order = &sortorder;
-	args_phase1.run_length = &runlen;
-	
-	pthread_create (&worker, NULL, TPMMS_phase1 , (void *)&args_phase1);
-	
-	// read data from in pipe sort them into runlen pages
-	
-    	// construct priority queue over sorted runs and dump sorted data 
- 	// into the out pipe
+void BigQ::quicksort(vector<Record> &rb, int left, int right){  
 
-    	// finally shut down the out pipe
-	out.ShutDown ();
-}
+	int i = left;
+	int j = right;
 
-BigQ::void* TPMMS_Phase1(void* arg){
+   Record* pivot = rb.at((left+right)/2);
+  
+   // partition  
+   while (i <= j) {  
+       while (compare(rb.at(i),pivot,sortorder)<0)
+           i++;  
+  
+       while (compare(rb.at(j),pivot,sortorder)>0)
+           j--;  
+  
+       if (i <= j) {  
+           Record tmp = rb.at(i);  
+           rb.at(i) = rb.at(j);  
+           rb.at(j) = tmp;  
+  
+           i++;  
+           j--;  
+       }  
+   }  
+  
+   // recursion  ?
+   if (left < j)  
+       quickSort(rb, left, j);  
+  
+   if (i < right)  
+       quickSort(rb, i, right);  
+}  
+
+
+
+void* BigQ::TPMMS_Phase1(void* arg){
 	/*
 	Pipe *input;
 		OrderMaker *sort_order;
@@ -125,38 +136,33 @@ BigQ::void* TPMMS_Phase1(void* arg){
 	 
 }
 
-BigQ::quicksort(std::vector<Record> &rb, int left, int right){  
 
-	int i = left;
-	int j = right;
 
-   Record* pivot = rb.at((left+right)/2);
-  
-   // partition  
-   while (i <= j) {  
-       while (compare(rb.at(i),pivot,sortorder)<0)
-           i++;  
-  
-       while (compare(rb.at(j),pivot,sortorder)>0)
-           j--;  
-  
-       if (i <= j) {  
-           Record tmp = rb.at(i);  
-           rb.at(i) = rb.at(j);  
-           rb.at(j) = tmp;  
-  
-           i++;  
-           j--;  
-       }  
-   }  
-  
-   // recursion  ?
-   if (left < j)  
-       quickSort(rb, left, j);  
-  
-   if (i < right)  
-       quickSort(rb, i, right);  
-}  
+BigQ :: BigQ (Pipe &in, Pipe &out, OrderMaker &sortorder, int runlen) {
+	
+	this->no_runs = 0;
+	
+	
+	//buffer = new Page[runlen];//set to runlen +1 to use indxing starting from 1
+	//runBuff = new Record[pageLength];//how many records per page?
+	
+ 	
+	args_phase1.input = &in;
+	args_phase1.sort_order = &sortorder;
+	args_phase1.run_length = &runlen;
+	
+	pthread_create (&worker, NULL, TPMMS_phase1 , (void *)&args_phase1);
+	
+	// read data from in pipe sort them into runlen pages
+	
+    	// construct priority queue over sorted runs and dump sorted data 
+ 	// into the out pipe
+
+    	// finally shut down the out pipe
+	out.ShutDown ();
+}
+
+
 
 
 BigQ::~BigQ () {

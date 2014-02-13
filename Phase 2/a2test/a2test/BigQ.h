@@ -5,6 +5,8 @@
 #include "Pipe.h"
 #include "File.h"
 #include "Record.h"
+#include "DBFile.h"
+#include <vector>
 
 using namespace std;
 
@@ -26,7 +28,7 @@ class BigQ {
 		
 		Pipe *input;
 		OrderMaker *sort_order;
-		int run_length;
+		int *run_length;
 		int &num_runs = no_runs;
 		Record *temporary = &temp;
 		DBFile *run_buffer = runs;
@@ -41,6 +43,7 @@ class BigQ {
 
 	void* TPMMS_Phase1(void* arg);
 	void* TPMMS_Phase2(void* arg);
+	void quicksort(vector<Record> &rb, int left, int right);
 	
 	/*Deprecated: Replaced by DBFile , no need for indexing
 	//Record *recordBuff;
