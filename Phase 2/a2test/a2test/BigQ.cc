@@ -17,10 +17,10 @@ BigQ :: BigQ (Pipe &in, Pipe &out, OrderMaker &sortorder, int runlen) {
 	
 	// read data from in pipe sort them into runlen pages
 	
-    // construct priority queue over sorted runs and dump sorted data 
+    	// construct priority queue over sorted runs and dump sorted data 
  	// into the out pipe
 
-    // finally shut down the out pipe
+    	// finally shut down the out pipe
 	out.ShutDown ();
 }
 
@@ -32,8 +32,12 @@ BigQ::void* TPMMS_Phase1(void* arg){
 		Record *temporary = &temp;
 		Page *buf = buffer;
 		*/
+	
+	//Deprecated: replaced by DBFile
 	//int page_Index = -1;//same as below indexing starts at 1
 	//int pagelen =0;
+	
+	
 	vector <Record> record_Buffer = vector<record>();//delete record buffer from header
 
 	struct args_phase1_struct *args = arg;
@@ -52,8 +56,10 @@ BigQ::void* TPMMS_Phase1(void* arg){
 		//args->(*recordBuffer)[pagelen++] = args->temporary;
 	
 		//append record temporary to page at pageindex
-		if(args->(*run_buffer)[num_runs]->add(*temporary) == 0){//if file is full !!CHANGE PAGE LIMIT IN DBFILE to runlength
+		if(args->(*run_buffer)[num_runs]->add(*temporary) == 0 || 
+			args->(*run_buffer)[num_runs]->GetLength()>args->run_length){//if file is full !!CHANGE PAGE LIMIT IN DBFILE to runlength
 			
+			/*Deprecated:
 			//args->(*buf)[page_Index]->append(args->temporary) == 0){//if page is full
 			//run length exceed sort runs and write out run file
 
@@ -66,7 +72,7 @@ BigQ::void* TPMMS_Phase1(void* arg){
 			//args->(*run_buffer)[num_runs]->AddPage(args->(*buf)[page_Index],page_Index);//getlength doesnt work use page index
 			
 			//create new run file and empty page buffer	
-			//if(++page_Index>=args->run_length){//increment if run length is exceeded 
+			//if(++page_Index>=args->run_length){//increment if run length is exceeded */
 			
 			args->(*run_buffer)[num_runs]->MoveFirst();
 			
@@ -75,7 +81,7 @@ BigQ::void* TPMMS_Phase1(void* arg){
 
 			}	
 
-				//Sort runs vector
+			quicksort(record_Buffer,0,record_Buffer.size);	//Sort runs vector
 				
 
 			args->(*run_buffer)[num_runs]->MoveFirst();
