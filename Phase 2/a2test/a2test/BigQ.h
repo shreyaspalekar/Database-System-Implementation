@@ -19,7 +19,7 @@ class BigQ {
 	//Record *recordBuff;
 	int pageLength = 0;//no of recrods per page
 	Page *buffer;
-	File *runs;
+	DBFile *runs;
 	int no_runs;
 	pthread_t worker;
 	int page_Index;
