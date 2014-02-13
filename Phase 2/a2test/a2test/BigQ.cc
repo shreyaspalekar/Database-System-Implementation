@@ -53,8 +53,8 @@ void* BigQ::TPMMS_Phase1(void* arg){
 	
 	vector <Record> record_Buffer = vector<Record>();//delete record buffer from header
 
-	struct args_phase1_struct *args;
-	args = (struct args_phase1_struct *)arg;
+	args_phase1_struct *args;
+	args = (args_phase1_struct *)arg;
 
 	args->(*num_runs) = -1;//goes from 0 to n,set to one as the array size is n, else set array size to n+1 to use indexing from 1
 	

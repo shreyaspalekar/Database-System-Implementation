@@ -42,6 +42,8 @@ class BigQ {
 	
 	}args_phase1;
 
+	typedef struct args_phase1_struct args_phase1_struct;
+
 	void* TPMMS_Phase1(void* arg);
 	void* TPMMS_Phase2(void* arg);
 	void quicksort(vector<Record> &rb, int left, int right,OrderMaker &sortorder);
