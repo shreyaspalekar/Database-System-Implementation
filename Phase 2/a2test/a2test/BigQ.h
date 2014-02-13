@@ -18,6 +18,7 @@ class BigQ {
 	int no_runs;
 	pthread_t worker;
 	int page_Index;
+	char *f_name = "run";
 	
 	struct args_phase1_struct {                                                   
 		
@@ -29,7 +30,7 @@ class BigQ {
 		int &num_runs = no_runs;
 		Record *temporary = &temp;
 		DBFile *run_buffer = runs;
-		char *file_path = "run";
+		char *file_path = f_name;
 		
 		/*Deprecated: Replaced by DBFile , no need for indexing
 		//int pageLen = pageLength;
