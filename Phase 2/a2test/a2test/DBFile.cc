@@ -160,3 +160,9 @@ int DBFile::GetNext (Record &fetchme, CNF &cnf, Record &literal) {
 	
 	return 0;
 }
+
+
+off_t DBFile::GetLength(){
+
+	return this->file->GetLength();
+}

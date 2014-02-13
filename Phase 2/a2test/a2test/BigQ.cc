@@ -56,13 +56,14 @@ void* BigQ::TPMMS_Phase1(void* arg){
 	args_phase1_struct *args;
 	args = (args_phase1_struct *)arg;
 
-	args->(*num_runs) = -1;//goes from 0 to n,set to one as the array size is n, else set array size to n+1 to use indexing from 1
+	*(args->num_runs) = -1;//goes from 0 to n,set to one as the array size is n, else set array size to n+1 to use indexing from 1
 	
 	//Create and open new file 'file.run_no'
-	args->(*run_buffer)[++(*num_runs)] = new DBFile();//file for run1
+
+	(args->run_buffer)->at(++*(args->num_runs)) = new DBFile();//file for run1
 	char *actual_path;
-	sprintf(actual_path,"%s.%d",file_path,(*num_runs));
-	args->(*run_buffer)[(*num_runs)]->create(actual_path,NULL,NULL);
+	sprintf(actual_path,"%s.%d",*(args->file_path),*(args->num_runs));
+	args->run_buffer->at(*(args->num_runs))->Create(actual_path,heap,NULL);
 	
 	//***check resets of indexes
 	while(args->input->Remove(args->temporary)!=0){ // till input pipe is empty
@@ -71,8 +72,13 @@ void* BigQ::TPMMS_Phase1(void* arg){
 		//args->(*recordBuffer)[pagelen++] = args->temporary;
 	
 		//append record temporary to page at pageindex
-		if(args->(*run_buffer)[(*num_runs)]->add(*temporary) == 0 || 
-			args->(*run_buffer)[(*num_runs)]->GetLength()>args->run_length){//if file is full !!CHANGE PAGE LIMIT IN DBFILE to runlength
+		if((int)args->run_buffer->at(*(args->num_runs))->GetLength()<*(args->run_length)){
+
+			args->run_buffer->at(*(args->num_runs))->Add(*(args->temporary));
+
+		}
+
+		else{//if file is full !!CHANGE PAGE LIMIT IN DBFILE to runlength
 			
 			/*Deprecated:
 			//args->(*buf)[page_Index]->append(args->temporary) == 0){//if page is full
@@ -89,33 +95,33 @@ void* BigQ::TPMMS_Phase1(void* arg){
 			//create new run file and empty page buffer	
 			//if(++page_Index>=args->run_length){//increment if run length is exceeded */
 			
-			args->(*run_buffer)[(*num_runs)]->MoveFirst();
+			args->run_buffer->at(*(args->num_runs))->MoveFirst();
 			
-			while(args->(*run_buffer)[(*num_runs)]->GetNext(*temporary) != 0){//empty out file into vector
-				record_Buffer.push_back(*temporary);
+			while(args->run_buffer->at(*(args->num_runs))->GetNext(*(args->temporary)) != 0){//empty out file into vector
+				record_Buffer.push_back(*(args->temporary));
 
 			}	
 
-			quicksort(record_Buffer,0,record_Buffer.size(),args->(*sort_order));	//Sort runs vector
+			BigQ::quicksort(record_Buffer,0,record_Buffer.size(),*(args->sort_order));	//Sort runs vector
 				
 
-			args->(*run_buffer)[(*num_runs)]->MoveFirst();
+			args->run_buffer->at(*(args->num_runs))->MoveFirst();
 			
 			for(int i=0;i<record_Buffer.size();i++){//empty record buffer into dbfile
 			
-				*temporary = record_Buffer[i];//check if this copies
-				args->(*run_buffer)[(*num_runs)]->add(*temporary);//check for references and pointers DOES THIS PERFORM DEEP COPY??
+				*(args->temporary) = record_Buffer[i];//check if this copies
+				args->run_buffer->at(*(args->num_runs))->Add(*(args->temporary));//check for references and pointers DOES THIS PERFORM DEEP COPY??
 			}	
 				//close dbfile
 
-			args->(*run_buffer)[(*num_runs)]->Close();
+			args->run_buffer->at(*(args->num_runs))->Close();
 
 				//new File
 			
 			
-			args->(*run_buffer)[++(*num_runs)] = new DBFile();  //create new run file
-			sprintf(actual_path,"%s.%d",file_path,(*num_runs));//set path as "file_path.num_run"
-			args->(*run_buffer)[(*num_runs)]->create(actual_path,NULL,NULL);//??concatenate run no
+			(args->run_buffer)->at(++*(args->num_runs)) = new DBFile(); //create new run file
+			sprintf(actual_path,"%s.%d",args->file_path,*(args->num_runs));//set path as "file_path.num_run"
+			args->run_buffer->at(*(args->num_runs))->Create(actual_path,heap,NULL);//??concatenate run no
 				
 				//empty page buffer ?? do we need to? can we overwrite?
 				/*for(i=0;i<args->run_length;i++)
@@ -149,7 +155,8 @@ BigQ :: BigQ (Pipe &in, Pipe &out, OrderMaker &sortorder, int runlen) {
 	
 	//buffer = new Page[runlen];//set to runlen +1 to use indxing starting from 1
 	//runBuff = new Record[pageLength];//how many records per page?
-	
+	runs = new vector<DBFile*>();	
+
 	args_phase1.num_runs = &no_runs;
 	args_phase1.temporary = &temp;
 	args_phase1.run_buffer = runs;
@@ -158,7 +165,9 @@ BigQ :: BigQ (Pipe &in, Pipe &out, OrderMaker &sortorder, int runlen) {
 	args_phase1.sort_order = &sortorder;
 	args_phase1.run_length = &runlen;
 	
-	pthread_create (&worker, NULL, TPMMS_phase1 , (void *)&args_phase1);
+	pthread_create (&worker, NULL, &BigQ::TPMMS_Phase1 , (void *)&args_phase1);
+
+	pthread_join(worker,NULL);
 	
 	// read data from in pipe sort them into runlen pages
 	

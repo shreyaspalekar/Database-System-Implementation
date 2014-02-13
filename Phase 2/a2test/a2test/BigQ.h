@@ -17,7 +17,7 @@ class BigQ {
 	//Record temp to read in records from pipes
 	
 	Record temp;
-	DBFile *runs;
+	vector<DBFile*> *runs;
 	int no_runs;
 	pthread_t worker;
 	int page_Index;
@@ -32,7 +32,7 @@ class BigQ {
 		int *run_length;
 		int *num_runs;
 		Record *temporary;
-		DBFile *run_buffer;
+		vector<DBFile*> *run_buffer;
 		char *file_path;
 		
 		/*Deprecated: Replaced by DBFile , no need for indexing
@@ -44,9 +44,9 @@ class BigQ {
 
 	typedef struct args_phase1_struct args_phase1_struct;
 
-	void* TPMMS_Phase1(void* arg);
+	static void* TPMMS_Phase1(void* arg);
 	void* TPMMS_Phase2(void* arg);
-	void quicksort(vector<Record> &rb, int left, int right,OrderMaker &sortorder);
+	static void quicksort(vector<Record> &rb, int left, int right,OrderMaker &sortorder);
 	
 	/*Deprecated: Replaced by DBFile , no need for indexing
 	//Record *recordBuff;
