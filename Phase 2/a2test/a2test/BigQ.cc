@@ -143,6 +143,8 @@ void* BigQ::TPMMS_Phase1(void* arg){
 		// empty put page[]
 		
 	}
+	
+	args->run_buffer->at(*(args->num_runs))->Close();
 	 
 }
 
