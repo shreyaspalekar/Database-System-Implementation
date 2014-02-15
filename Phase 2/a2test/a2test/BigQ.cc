@@ -60,10 +60,16 @@ void* BigQ::TPMMS_Phase1(void* arg){
 	
 	//Create and open new file 'file.run_no'
 
-	(args->run_buffer)->at(++*(args->num_runs)) = new DBFile();//file for run1
-	char *actual_path;
-	sprintf(actual_path,"%s.%d",args->file_path,*(args->num_runs));
+	DBFile *new_file = new DBFile();
+	*(args->num_runs)++;
+	(args->run_buffer)->push_back(new_file);//file for run1
+	char actual_path[20];
+
+	cout << "Reached";
+	sprintf(actual_path,"%s.%d","run",*(args->num_runs));//(args->file_path) removed
 	args->run_buffer->at(*(args->num_runs))->Create(actual_path,heap,NULL);
+
+	cout << "Reached";
 	
 	//***check resets of indexes
 	while(args->input->Remove(args->temporary)!=0){ // till input pipe is empty
@@ -80,6 +86,7 @@ void* BigQ::TPMMS_Phase1(void* arg){
 
 		else{//if file is full !!CHANGE PAGE LIMIT IN DBFILE to runlength
 			
+	cout << "Reached";
 			/*Deprecated:
 			//args->(*buf)[page_Index]->append(args->temporary) == 0){//if page is full
 			//run length exceed sort runs and write out run file
@@ -120,7 +127,7 @@ void* BigQ::TPMMS_Phase1(void* arg){
 			
 			
 			(args->run_buffer)->at(++*(args->num_runs)) = new DBFile(); //create new run file
-			sprintf(actual_path,"%s.%d",args->file_path,*(args->num_runs));//set path as "file_path.num_run"
+			sprintf(actual_path,"%s.%d","run",*(args->num_runs));//set path as "file_path.num_run"
 			args->run_buffer->at(*(args->num_runs))->Create(actual_path,heap,NULL);//??concatenate run no
 				
 				//empty page buffer ?? do we need to? can we overwrite?
@@ -158,12 +165,12 @@ BigQ :: BigQ (Pipe &in, Pipe &out, OrderMaker &sortorder, int runlen) {
 	//buffer = new Page[runlen];//set to runlen +1 to use indxing starting from 1
 	//runBuff = new Record[pageLength];//how many records per page?
 	runs = new vector<DBFile*>();
-	*f_name = 'run';
+//	*f_name = 'run';
 
 	args_phase1.num_runs = &no_runs;
 	args_phase1.temporary = &temp;
 	args_phase1.run_buffer = runs;
-	args_phase1.file_path = f_name;
+	args_phase1.file_path = "run";
 	args_phase1.input = &in;
 	args_phase1.sort_order = &sortorder;
 	args_phase1.run_length = &runlen;
