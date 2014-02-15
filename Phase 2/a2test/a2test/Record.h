@@ -35,6 +35,7 @@ private:
 
 public:
 	Record ();
+//	Record (Record &);
 	~Record();
 
 	// suck the contents of the record fromMe into this; note that after

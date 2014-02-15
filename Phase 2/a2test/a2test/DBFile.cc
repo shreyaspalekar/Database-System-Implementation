@@ -55,6 +55,8 @@ void DBFile::Load (Schema &f_schema, char *loadpath) {
 int DBFile::Open (char *f_path) {
 	//TODO:metadata
 	this->file->Open(1,f_path);
+
+		//this->file->GetPage(this->readPage,1); //TODO: check off_t type,  void GetPage (Page *putItHere, off_t whichPage)
 	pageIndex=1;
 	endOfFile = 0;
 	return 1;
@@ -64,7 +66,7 @@ void DBFile::MoveFirst () {
 //USE GetNext ? is two line code better??
 //Should we let File.cc handle the boundry conditions??
 	//if(this->file->GetLength()>1){
-		this->file->GetPage(this->readPage,1); //TODO: check off_t type,  void GetPage (Page *putItHere, off_t whichPage)
+	        this->file->GetPage(this->readPage,1); //TODO: check off_t type,  void GetPage (Page *putItHere, off_t whichPage)
 		this->readPage->GetFirst(this->current);//check if this->readPage is pointer
 	//}
 }
@@ -84,6 +86,7 @@ int DBFile::Close () {
 
 void DBFile::Add (Record &rec) {
 
+	endOfFile = 0;
 	//Consume rec
 	this->writeIsDirty=1;
 
@@ -108,6 +111,10 @@ int DBFile::GetNext (Record &fetchme) {
 		
 		
 		fetchme.Copy(this->current);
+
+		if((int)this->GetLength()==0)
+			this->readPage=this->writePage;
+
 	
 		int result = this->readPage->GetFirst(this->current);
 	

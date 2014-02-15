@@ -10,6 +10,13 @@ Record :: Record () {
 	bits = NULL;
 }
 
+/*Record :: Record(Record &nu){
+
+	this->Copy(&nu);
+
+}*/
+
+
 Record :: ~Record () {
 	if (bits != NULL) {
 		delete [] bits;

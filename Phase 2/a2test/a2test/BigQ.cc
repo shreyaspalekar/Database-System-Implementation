@@ -65,20 +65,21 @@ void* BigQ::TPMMS_Phase1(void* arg){
 	(args->run_buffer)->push_back(new_file);//file for run1
 	char actual_path[20];
 
-	cout << "Reached";
+	
 	sprintf(actual_path,"%s.%d","run",*(args->num_runs));//(args->file_path) removed
 	args->run_buffer->at(*(args->num_runs))->Create(actual_path,heap,NULL);
 
-	cout << "Reached";
-	
+	cout << "Created run file "<<*(args->num_runs)<<"\n";
+	int result =1;
 	//***check resets of indexes
-	while(args->input->Remove(args->temporary)!=0){ // till input pipe is empty
+	while(result!=0){ // till input pipe is empty
 	
-		
+				
 		//args->(*recordBuffer)[pagelen++] = args->temporary;
 	
+	        result = args->input->Remove(args->temporary); // till input pipe is empty
 		//append record temporary to page at pageindex
-		if((int)args->run_buffer->at(*(args->num_runs))->GetLength()<*(args->run_length)){
+		if((int)args->run_buffer->at(*(args->num_runs))->GetLength()<*(args->run_length)&&result!=0){
 
 			args->run_buffer->at(*(args->num_runs))->Add(*(args->temporary));
 
@@ -86,7 +87,8 @@ void* BigQ::TPMMS_Phase1(void* arg){
 
 		else{//if file is full !!CHANGE PAGE LIMIT IN DBFILE to runlength
 			
-	cout << "Reached";
+		        cout<<"Pages read "<<(int)args->run_buffer->at(*(args->num_runs))->GetLength();
+	                cout << "Run No:  "<<*(args->num_runs)<<"\n";
 			/*Deprecated:
 			//args->(*buf)[page_Index]->append(args->temporary) == 0){//if page is full
 			//run length exceed sort runs and write out run file
@@ -102,16 +104,36 @@ void* BigQ::TPMMS_Phase1(void* arg){
 			//create new run file and empty page buffer	
 			//if(++page_Index>=args->run_length){//increment if run length is exceeded */
 			
+
+			
+			args->run_buffer->at(*(args->num_runs))->Close();
+			
+			args->run_buffer->at(*(args->num_runs))->Open(actual_path);
+			
 			args->run_buffer->at(*(args->num_runs))->MoveFirst();
 			
-			while(args->run_buffer->at(*(args->num_runs))->GetNext(*(args->temporary)) != 0){//empty out file into vector
-				record_Buffer.push_back(*(args->temporary));
+			cout << "Reached 1\n";
+			
+			int z = 0;
 
+			Record temp;
+
+			while(args->run_buffer->at(*(args->num_runs))->GetNext(temp) != 0){//empty out file into vector
+				
+			//	Record *nu = new Record();
+			//	nu->Consume(&temp);
+				record_Buffer.push_back(temp);
+				z++;
 			}	
-
+			cout << "read "<<z<<" records\n";
+			cout << "Reached 2\n";
+			cout << "Record Buffer size: "<< record_Buffer.size()<<"\n";
+			
 			BigQ::quicksort(record_Buffer,0,record_Buffer.size(),*(args->sort_order));	//Sort runs vector
 				
 
+			cout << "Reached 3\n";
+			
 			args->run_buffer->at(*(args->num_runs))->MoveFirst();
 			
 			for(int i=0;i<record_Buffer.size();i++){//empty record buffer into dbfile
@@ -120,17 +142,25 @@ void* BigQ::TPMMS_Phase1(void* arg){
 				args->run_buffer->at(*(args->num_runs))->Add(*(args->temporary));//check for references and pointers DOES THIS PERFORM DEEP COPY??
 			}	
 				//close dbfile
+			record_Buffer.clear();
 
+
+			cout << "Reached 4\n";
 			args->run_buffer->at(*(args->num_runs))->Close();
 
 				//new File
 			
+			cout << "Reached 5\n";
 			
-			(args->run_buffer)->at(++*(args->num_runs)) = new DBFile(); //create new run file
+                        DBFile *new_file = new DBFile();
+	                *(args->num_runs)++;
+			args->run_buffer->push_back(new_file); //create new run file
+
 			sprintf(actual_path,"%s.%d","run",*(args->num_runs));//set path as "file_path.num_run"
 			args->run_buffer->at(*(args->num_runs))->Create(actual_path,heap,NULL);//??concatenate run no
 				
 				//empty page buffer ?? do we need to? can we overwrite?
+			cout << "Reached 6\n";
 				/*for(i=0;i<args->run_length;i++)
 					args->(*buf)[i]->EmptyItOut();
 				
@@ -150,7 +180,7 @@ void* BigQ::TPMMS_Phase1(void* arg){
 		// empty put page[]
 		
 	}
-	
+	cout << "Closing last file";	
 	args->run_buffer->at(*(args->num_runs))->Close();
 	 
 }
