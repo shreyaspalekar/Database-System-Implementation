@@ -1,0 +1,222 @@
+execlog file:
+--------------
+The expected output along with execution time for the predicates in files q1,...,q12 is given below. The queries were executed on postgres. The execution times given are only a ballpark. Don't worry if your program takes longer time to finish.
+
+(q1) select * from region where r_name='EUROPE';
+
+tpch1g=# select * from region where r_name='EUROPE';
+ r_regionkey |          r_name           |                   r_comment                   
+-------------+---------------------------+-----------------------------------------------
+           3 | EUROPE                    | special, bold deposits haggle foxes. platelet |
+(1 row)
+
+Time: 0.782 ms
+
+(q2)  select * from region where r_name < 'middle east' and r_regionkey > 1;
+
+tpch1g=# select * from region where r_name < 'middle east' and r_regionkey > 1;
+ r_regionkey |          r_name           |                                                    r_comment                                                    
+-------------+---------------------------+-----------------------------------------------------------------------------------------------------------------
+           2 | ASIA                      | silent, bold requests sleep slyly across the quickly sly dependencies. furiously silent instructions alongside  |
+           3 | EUROPE                    | special, bold deposits haggle foxes. platelet                                                                   |
+(2 rows)
+
+Time: 80.351 ms
+
+(q3) select * from nation where n_regionkey = 3 and n_nationkey > 10 and n_name > 'japan';
+
+tpch1g=# select * from nation where n_regionkey = 3 and n_nationkey > 10 and n_name > 'japan';
+ n_nationkey |          n_name           | n_regionkey |                                                  n_comment                                                  
+-------------+---------------------------+-------------+-------------------------------------------------------------------------------------------------------------
+          19 | ROMANIA                   |           3 | deposits boost against the brave id                                                                         |
+          22 | RUSSIA                    |           3 | slowly pending patterns x-ray quickly. ironic, even accounts haggle furiously. even, final deposits mold bl |
+          23 | UNITED KINGDOM            |           3 | fluffily regular pinto beans breach according to the ironic dolph                                           |
+(3 rows)
+
+Time: 118.920 ms
+
+
+(q4)  select * from supplier where s_suppkey < 10;
+
+tpch1g=# select * from supplier where s_suppkey < 10;
+ s_suppkey |          s_name           |              s_address              | s_nationkey |     s_phone     | s_acctbal |                                           s_comment                                           
+-----------+---------------------------+-------------------------------------+-------------+-----------------+-----------+-----------------------------------------------------------------------------------------------
+         1 | Supplier#000000001        |  N kD4on9OM Ipw3,gf0JBoQDd7tgrzrddZ |          17 | 27-918-335-1736 |   5755.94 | requests haggle carefully. accounts sublate finally. carefully ironic pa                      |
+         2 | Supplier#000000002        | 89eJ5ksX3ImxJQBvxObC,               |           5 | 15-679-861-2259 |   4032.68 | furiously stealthy frays thrash alongside of the slyly express deposits. blithely regular req |
+         3 | Supplier#000000003        | q1,G3Pj6OjIuUYfUoH18BFTKP5aU9bEV3   |           1 | 11-383-516-1199 |    4192.4 | furiously regular instructions impress slyly! carefu                                          |
+         4 | Supplier#000000004        | Bk7ah4CK8SYQTepEmvMkkgMwg           |          15 | 25-843-787-7479 |   4641.08 | final ideas cajole. furiously close dep                                              |
+         5 | Supplier#000000005        | Gcdm2rJRzl5qlTVzc                   |          11 | 21-151-690-3663 |   -283.84 | carefully silent instructions are slyly according t                                           |
+         6 | Supplier#000000006        | tQxuVm7s7CnK                        |          14 | 24-696-997-4969 |   1365.79 | even requests wake carefully! fluffily final pinto beans run slyly among t                    |
+         7 | Supplier#000000007        | s,4TicNGB4uO6PaSqNBUq               |          23 | 33-990-965-2201 |   6820.35 | carefully express packages believe furiously after the fur                                    |
+         8 | Supplier#000000008        | 9Sq4bBH2FQEmaFOocY45sRTxo6yuoG      |          17 | 27-498-742-3860 |   7627.85 | carefully express escapades are slyly                                              |
+         9 | Supplier#000000009        | 1KhUgZegwM3ua7dsYmekYBsK            |          10 | 20-403-398-8662 |   5302.37 | slyly regular decoys mold slyly ironic dugouts. requests are carefully-- carefully            |
+(9 rows)
+
+Time: 105.006 ms
+
+(q5)  select * from supplier where s_nationkey = 18 and s_acctbal > 1000 and s_suppkey < 400;
+
+tpch1g=# select * from supplier where s_nationkey = 18 and s_acctbal > 1000 and s_suppkey < 400;
+ s_suppkey |          s_name           |                s_address                 | s_nationkey |     s_phone     | s_acctbal |                                            s_comment                                             
+-----------+---------------------------+------------------------------------------+-------------+-----------------+-----------+--------------------------------------------------------------------------------------------------
+        11 | Supplier#000000011        | JfwTs,LZrV, M,9C                         |          18 | 28-613-996-1505 |   3393.08 | quickly bold asymptotes mold carefully unusual pearls. requests boost at the blith               |
+        27 | Supplier#000000027        | lC4CjKwNHUr6L4xIpzOBK4NlHkFTg            |          18 | 28-708-999-2028 |   1887.62 | furiously thin packages use                                                      |
+        41 | Supplier#000000041        | G 1FKHR435 wMKFmyt                       |          18 | 28-739-447-2525 |   6942.67 | silently regular packages hinder. blithely express decoys must                                   |
+        72 | Supplier#000000072        | mKpAJojtawk2alqV4 ZEbJ3PH3wfYqy AM8rGq1  |          18 | 28-113-898-6643 |    7014.5 | quickly even platelets haggle alongside of the furiously express pa                              |
+        99 | Supplier#000000099        | 4SxkTHG28nZrtT0,MnVF9H                   |          18 | 28-272-909-1617 |   3671.34 | fluffily final packages haggle carefully ab                                                      |
+       117 | Supplier#000000117        | ZnlLNC,8YN10T4mjI8eq5bJ                  |          18 | 28-470-879-3141 |   4589.18 | unusual deposits are dugouts. ironic, even ideas alongside of the furiously regular foxes cajole |
+       119 | Supplier#000000119        | 4CxBrM0o4yt6LYFxZIyZ89Xnf8LZNn6KcYc      |          18 | 28-558-264-1202 |   2060.13 | blithely express theodolites wake furiously within the b                                         |
+       187 | Supplier#000000187        | oMtyTl6hTyLQhiBwrUaa42zKOjfNobEq         |          18 | 28-127-320-9230 |   8517.04 | fluffily regular deposits at t                                                      |
+       191 | Supplier#000000191        | X dZg6Dtv17X7                            |          18 | 28-437-699-1621 |      1445 | carefully express platelets are idly slyly fi                                                    |
+       196 | Supplier#000000196        | TQX4fMwB5tXoz4Fi4CEhALhi6                |          18 | 28-430-406-1127 |   4710.62 | slyly regular requests use slyly. fluffily ironic pl                                             |
+       201 | Supplier#000000201        | e3lZO QY9QpCVdc0HXrqXB5uxXnOi r          |          18 | 28-782-585-7326 |   9537.73 | blithely even theodolites are instructions. regular requests affix slyl                          |
+       213 | Supplier#000000213        | 1s7 4odatD2BWz1QjXR2 2SnFhc,Rvr2Icxh1m7f |          18 | 28-317-938-6979 |   2616.54 | deposits cajole slyly. express packag                                                      |
+       255 | Supplier#000000255        | qx16XyCEUh9OawVeQWOlGlhAU32iHFPNkO       |          18 | 28-629-327-4139 |   4663.08 | final packages about the blithely unusual theodolites wake blithely spec                         |
+       294 | Supplier#000000294        | 20vnacv,dtZ0mr5kukNf                     |          18 | 28-299-788-1836 |   6700.75 | blithely special ideas sleep slyly. foxes wake carefully fu                                      |
+       302 | Supplier#000000302        | ow8Io1JHkPnIAGCQYCWC                     |          18 | 28-734-845-8630 |   4422.77 | slyly bold decoys unwind accordin                                                      |
+       319 | Supplier#000000319        | tcES8Ay3zcHQER9K6gAKFWlDvcg nrbPl        |          18 | 28-288-466-7847 |   1578.18 | express deposits cajole carefully across the ca                                                  |
+       324 | Supplier#000000324        | QDsgOSozg jniYR2HzxofLZyk0qGdJe          |          18 | 28-637-452-5085 |   8042.43 | quickly ironic ideas cajole blithely unusual requests: carefully ev                              |
+       385 | Supplier#000000385        | 4RDwKCNc6 yBY                            |          18 | 28-730-866-8837 |   5836.17 | accounts about the slyly unusual requests n                                                      |
+       388 | Supplier#000000388        | n27XQohXrXlJRLdsyXNoljPS                 |          18 | 28-306-827-7902 |   6540.34 | furiously even deposits nag over the fluffily ironic instructi                                   |
+(19 rows)
+
+Time: 121.814 ms
+
+(q6) select * from customer where c_nationkey = 23 and c_mktsegment = 'FURNITURE' and c_acctbal > 7023.99 and c_acctbal < 7110.83;
+
+tpch1g=# select * from customer where c_nationkey = 23 and c_mktsegment = 'FURNITURE' and c_acctbal > 7023.99 and c_acctbal < 7110.83;
+ c_custkey |       c_name       |               c_address               | c_nationkey |     c_phone     | c_acctbal | c_mktsegment |           c_comment                                                   
+-----------+--------------------+---------------------------------------+-------------+-----------------+-----------+--------------+--------------------------------------------------------------------------------------------------------------
+     30970 | Customer#000030970 | O,N4bwYdHoSdg64DGAc6OuxWjn5rlP63sWAT  |          23 | 33-739-174-9054 |   7054.59 | FURNITURE    | dependencies detect slyly silent requests. fin                                                               |
+     35802 | Customer#000035802 | r8fEXhwF4MKMZQ,lIRTTVjSBqEnb7kENEVDEY |          23 | 33-931-338-6655 |   7027.91 | FURNITURE    | fluffily regular packages detect slyly above the blithely pending packages.                                  |
+     38796 | Customer#000038796 | nIGHXXDiaVBoX  BCrIx1JUKx             |          23 | 33-893-935-9650 |   7079.41 | FURNITURE    | furiously ironic accounts sleep furiously. platelets c                                                       |
+     61179 | Customer#000061179 | dpdbiV6kFYz x6OT84qR9j                |          23 | 33-825-707-8461 |   7075.72 | FURNITURE    | slyly regular foxes cajole carefully fluffily ironic pinto beans. blithely ironic packages                   |
+     72898 | Customer#000072898 | lzr8Pa4oWhhXCH,Lj3Iv                  |          23 | 33-119-734-3569 |   7096.31 | FURNITURE    | even packages breach slyly along the sly requests. quickly final ideas                                       |
+     73441 | Customer#000073441 | 7BHFD659A qNnOliO                     |          23 | 33-868-482-1168 |   7038.25 | FURNITURE    | regularly regular foxes use dolphins. slyly iron                                                             |
+     85818 | Customer#000085818 | nahgIhPPabGH5P7Xsk40qdUmJm,           |          23 | 33-688-221-5550 |   7073.67 | FURNITURE    | ironic excuses integrate fluffily. blithely regular packages after the furiously regular platelets wake si   |
+     98151 | Customer#000098151 | hEk1 FNtkn9wwr,1nmPgPBPrz6CWjvjikbG   |          23 | 33-870-939-7560 |    7045.3 | FURNITURE    | deposits haggle furiously. even orbits hang sometimes. pending, regular pinto beans unwind. blithely f       |
+    125850 | Customer#000125850 | g0870ozQ6flfrpcDBi0EdzslbTZuXH2Y      |          23 | 33-577-932-3052 |   7076.18 | FURNITURE    | slyly even packages haggle blithely against the furiously express foxes. fur                                 |
+    145598 | Customer#000145598 | Sn6XgG8wImdX1i7h2AWfsoNVBCIJ4oSaa     |          23 | 33-685-336-6690 |   7064.61 | FURNITURE    | quickly special accounts cajole slyly fluffily unusual pinto beans. carefully express deposits boost slyly b |
+(10 rows)
+
+Time: 582.609 ms
+
+(q7) select * from part where p_brand='Brand#13' and p_retailprice > 500 and p_retailprice < 930 and p_size > 28 and p_size < 1000000;
+
+tpch1g=# select * from part where p_brand='Brand#13' and p_retailprice > 500 and p_retailprice < 930 and p_size > 28 and p_size < 1000000;
+ p_partkey |                  p_name                  |          p_mfgr           |  p_brand   |         p_type         | p_size | p_container | p_retailprice |       p_comment        
+-----------+------------------------------------------+---------------------------+------------+------------------------+--------+-------------+---------------+------------------------
+      1022 | olive smoke blue dim ghost               | Manufacturer#1            | Brand#13   | SMALL BURNISHED COPPER |     33 | WRAP CAN    |        923.02 | slyly ironic reques    |
+      3001 | moccasin wheat honeydew cornflower royal | Manufacturer#1            | Brand#13   | PROMO POLISHED TIN     |     36 | MED CAN     |           904 | slyly             |
+      3022 | brown bisque burlywood dim royal         | Manufacturer#1            | Brand#13   | LARGE BURNISHED BRASS  |     41 | LG BAG      |        925.02 | accounts sleep caref   |
+      4005 | floral goldenrod firebrick ghost cyan    | Manufacturer#1            | Brand#13   | ECONOMY PLATED STEEL   |     34 | SM JAR      |           909 | fluffily pending cour  |
+      8000 | brown chartreuse metallic bisque blush   | Manufacturer#1            | Brand#13   | LARGE PLATED STEEL     |     36 | LG PKG      |           908 | doggedly bold p        |
+     10011 | hot lawn burlywood papaya blanched       | Manufacturer#1            | Brand#13   | PROMO ANODIZED NICKEL  |     32 | JUMBO BAG   |        921.01 | blithely express frets |
+     17008 | beige blanched dark blush bisque         | Manufacturer#1            | Brand#13   | MEDIUM BRUSHED COPPER  |     46 | MED BOX     |           925 | furiously ir           |
+     24005 | khaki chiffon drab navajo firebrick      | Manufacturer#1            | Brand#13   | ECONOMY ANODIZED BRASS |     38 | JUMBO PKG   |           929 | always bol             |
+(8 rows)
+
+Time: 701.706 ms
+-----------------
+
+(q8) select * from partsupp where ps_supplycost > 999.98;
+
+tpch1g=# select * from partsupp where ps_supplycost > 999.98;
+ ps_partkey | ps_suppkey | ps_availqty | ps_supplycost |                                                                                           ps_comment                                                                              
+------------+------------+-------------+---------------+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+       1213 |       3714 |        5070 |        999.99 | fluffily regular theodolites haggle furiously. unusual requests across the even depo                                                                              |
+      15717 |       3221 |        9790 |        999.99 | carefully final platelets dazzle furiously expres                                                                              |
+      19079 |       1581 |        4680 |        999.99 | express deposits sleep carefully ironic packages! q                                                                              |
+      26924 |       1929 |        9218 |          1000 | accounts wake. quickly ironic instructions cajole furiously against the slyly bold pinto beans. slyly final deposits boost fl                                                                   |
+      30836 |       5843 |        6993 |        999.99 | fluffily final dependencies after the slyly final pinto beans wake furiously against the ideas. quickly s                                                                              |
+      31554 |       1555 |        2409 |          1000 | slyly even packages are requests-- regular packages sleep furiously express requests. furiously final Tiresias haggle.                                                                          |
+      52644 |       5150 |        8224 |        999.99 | express ideas around the carefully bold deposits nag furiously slyly ironic requ                                                                              |
+      99907 |       7435 |        7911 |          1000 | final excuses according to the bold, even requests use furiously against the even, even packages. pending, final accounts use. even requests snooze: furiously silent accounts ar               |
+     103943 |       3944 |        5065 |          1000 | epitaphs hang about the carefully even epitaphs. even accounts integrate carefully regular, ironic theodolites. blithely ironic instructions are slyly instructions. courts use furiously       |
+     105389 |        410 |        8531 |        999.99 | slyly bold deposits dazzle along the blithely final platelets. quick accounts along the blithely bold deposits are blithely unusual                                                             |
+     130470 |       2984 |        2592 |        999.99 | carefully final pinto beans sleep blithely with the furiously regular sentiments. quickly fina                                                                              |
+     142176 |       7205 |        9737 |          1000 | slyly regular accounts integrate; blithely final accounts to the slyly even ideas maintain carefully even accounts. blithely final deposits are across the special asymptotes. deposits wake ab |
+     182623 |       7660 |        4963 |        999.99 | instructions haggle furiously slow theodolites. blithely express foxes are after the quickly even deposits-- doggedly pending packages wake above the instruction                               |
+     185850 |       5851 |        9994 |          1000 | regularly final accounts boost deposits. bold ideas shall snooze. blithely regular accounts cajole blithely. slyly express deposits cajole quickly alongside of t                               |
+(14 rows)
+
+Time: 703.346 ms
+
+(q9) select * from partsupp where ps_availqty<10 and ps_supplycost > 100 and ps_suppkey < 300;
+
+tpch1g=# select * from partsupp where ps_availqty<10 and ps_supplycost > 100 and ps_suppkey < 300;
+ ps_partkey | ps_suppkey | ps_availqty | ps_supplycost |                                                                                       ps_comment                                                                 
+------------+------------+-------------+---------------+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+       7696 |        197 |           6 |        268.55 | evenly unusual dolphins sleep busily. ideas wake quickly. furiously final foxes behind the final packages nag blithely along the furiously special deposits. quickly                    |
+      10245 |        246 |           7 |         722.6 | ironic foxes about the quickly bold instructions detect against the blithely special requests. slyly regular excuses sleep besides the                                                  |
+      25097 |        102 |           1 |        167.93 | furiously unusual ideas impress after the ironic requests. quickly ironic theodolites sleep slyly. bol                                                                      |
+      27573 |         76 |           2 |        624.24 | enticing, bold sauternes above the carefully regular packages cajole pe                                                                      |
+      42762 |        275 |           5 |        275.99 | special asymptotes hang accounts. regular theodolites integrate carefully above the regular, brave pinto beans. ironic pe                                                               |
+      50050 |         51 |           5 |        487.83 | furiously silent packages sleep furiously furiously regular packages. carefully e                                                                      |
+      50225 |        226 |           7 |        320.96 | even, even requests cajole final pinto beans-- slyly final platelets haggle slyly pending, slow pearls. furiously silent requests serve slyly enticingly ironic requests. furiously reg |
+      77622 |        130 |           6 |        352.93 | pending, regular requests cajole furiously carefully unusual requests. blithely even instructions sleep blithely fluffily pending foxes. furio                                          |
+      85011 |         28 |           4 |        628.75 | carefully pending sentiments use ironic, permanent deposits. furiously regular dependencies lose furiously. furiously ironic platelets boost according to the sly, fina                 |
+     112746 |        280 |           7 |        460.99 | slyly even theodolites boost. carefully final packages integrate                                                                      |
+     137572 |         86 |           8 |        180.55 | silently ironic requests wake after the thin, final packages. pending foxes                                                                      |
+     172720 |        272 |           5 |        437.41 | slyly special accounts about the deposits use furiously blithely pending ideas. furiously express ideas haggle carefully al                                                             |
+     187487 |          6 |           7 |         447.8 | unusual requests wake furiously quickly even accounts. deposits serve blithely. busy, even fo                                                                      |
+     192666 |        224 |           1 |        374.58 | carefully final packages cajole about the blithely silent packages. furi                                                                      |
+(14 rows)
+
+Time: 2465.929 ms
+
+(q10) select * from orders where o_orderpriority ='1-URGENT' and o_shippriority=0 and o_totalprice < 1051.89;
+
+tpch1g=# select * from orders where o_orderpriority ='1-URGENT' and o_orderstatus = 'O' and o_shippriority=0 and o_totalprice > 1015.68 and o_totalprice < 1051.89;
+ o_orderkey | o_custkey | o_orderstatus | o_totalprice | o_orderdate | o_orderpriority |     o_clerk     | o_shippriority |                                   o_comment                        
+------------+-----------+---------------+--------------+-------------+-----------------+-----------------+----------------+-------------------------------------------------------------------------------
+     298468 |     72782 | O             |      1035.34 | 1996-02-08  | 1-URGENT        | Clerk#000000305 |              0 | regular platelets wake                               |
+    1636866 |    123397 | O             |      1030.26 | 1997-01-09  | 1-URGENT        | Clerk#000000268 |              0 | pinto beans haggle against the packages. regular instructions integrate aroun |
+    1866274 |     43048 | O             |      1040.95 | 1998-05-29  | 1-URGENT        | Clerk#000000353 |              0 | regular, special pinto beans about t                               |
+    2270022 |     34705 | O             |      1020.97 | 1995-07-19  | 1-URGENT        | Clerk#000000592 |              0 | unusual asymptotes cajole furiously. carefully regular accounts haggle fr     |
+    2364615 |    101876 | O             |      1051.24 | 1996-06-03  | 1-URGENT        | Clerk#000000450 |              0 | slyly ironic deposits nag. permanent pinto beans a                            |
+    2383909 |    105200 | O             |      1044.37 | 1998-03-12  | 1-URGENT        | Clerk#000000824 |              0 | fluffily final requests boost furiously along the fluffily e                  |
+    2459431 |      5533 | O             |      1019.65 | 1995-11-15  | 1-URGENT        | Clerk#000000137 |              0 | express asymptotes are. special accounts wake at the dogged foxe              |
+    2685028 |    109360 | O             |      1024.26 | 1997-09-23  | 1-URGENT        | Clerk#000000273 |              0 | finally unusual foxes are blithely after the ironic package                   |
+    4442532 |     62309 | O             |      1038.36 | 1998-02-02  | 1-URGENT        | Clerk#000000811 |              0 | ironic, unusual deposits cajole. unus                               |
+    5859040 |     76096 | O             |      1039.61 | 1996-01-02  | 1-URGENT        | Clerk#000000737 |              0 | final accounts dazzle furiously. quietly thin ideas try                       |
+(10 rows)
+
+Time: 1403.102 ms
+
+
+(q11) select * from lineitem where l_shipdate > '1994-01-01' and l_shipdate < '1994-01-04' and l_discount > 0.05 and l_discount < 0.06 and l_quantity = 4;
+
+tpch1g=# select * from lineitem where l_shipdate > '1994-01-01' and l_shipdate < '1994-01-04' and l_discount > 0.05 and l_discount < 0.06 and l_quantity = 4;
+ l_orderkey | l_partkey | l_suppkey | l_linenumber | l_quantity | l_extendedprice | l_discount | l_tax | l_returnflag | l_linestatus | l_shipdate | l_commitdate | l_receiptdate |      l_shipinstruct       | l_shipmode |                 l_comment             
+------------+-----------+-----------+--------------+------------+-----------------+------------+-------+--------------+--------------+------------+--------------+---------------+---------------------------+------------+--------------------------------------------
+     629893 |    191666 |      1667 |            4 |          4 |         7030.64 |       0.06 |  0.08 | A            | F            | 1994-01-02 | 1993-12-11   | 1994-01-27    | COLLECT COD               | SHIP       | bravely bold deposit                       |
+     987651 |    191424 |      1425 |            5 |          4 |         6061.68 |       0.05 |     0 | A            | F            | 1994-01-02 | 1993-11-18   | 1994-01-04    | DELIVER IN PERSON         | RAIL       | silent ideas are. b                        |
+    1334916 |    152761 |       307 |            1 |          4 |         7255.04 |       0.05 |  0.01 | A            | F            | 1994-01-03 | 1993-12-27   | 1994-01-04    | NONE                      | TRUCK      | ironic, bold accounts haggle caref         |
+    1775014 |      9980 |      9981 |            2 |          4 |         7559.92 |       0.05 |  0.02 | A            | F            | 1994-01-02 | 1994-01-13   | 1994-01-09    | DELIVER IN PERSON         | TRUCK      | theodolites from the                       |
+    1929446 |     79239 |      9240 |            2 |          4 |         4872.92 |       0.05 |  0.07 | A            | F            | 1994-01-02 | 1994-01-15   | 1994-01-21    | COLLECT COD               | TRUCK      | carefully express packages wake above the  |
+    1978016 |      7380 |      4881 |            7 |          4 |         5149.52 |       0.05 |  0.03 | A            | F            | 1994-01-02 | 1994-02-03   | 1994-01-06    | NONE                      | MAIL       | furiously even packages are. care          |
+    2900837 |    179153 |      9154 |            1 |          4 |          4928.6 |       0.06 |     0 | R            | F            | 1994-01-02 | 1993-12-03   | 1994-01-29    | NONE                      | TRUCK      | carefully special instructions             |
+    3029670 |    185316 |       353 |            1 |          4 |         5605.24 |       0.05 |     0 | A            | F            | 1994-01-03 | 1994-02-11   | 1994-01-20    | TAKE BACK RETURN          | SHIP       | ironically unusual theodol                 |
+    3081318 |     71366 |      6381 |            4 |          4 |         5349.44 |       0.06 |  0.07 | A            | F            | 1994-01-02 | 1993-11-09   | 1994-01-26    | DELIVER IN PERSON         | FOB        | carefully bold sheaves                     |
+    3331619 |    187601 |       120 |            2 |          4 |          6754.4 |       0.06 |  0.06 | A            | F            | 1994-01-02 | 1993-12-31   | 1994-01-09    | DELIVER IN PERSON         | FOB        | carefully iro                              |
+    3932192 |     92903 |      7922 |            1 |          4 |          7583.6 |       0.06 |     0 | A            | F            | 1994-01-02 | 1994-01-17   | 1994-01-29    | TAKE BACK RETURN          | TRUCK      | slyly final pl                             |
+    4651430 |     87233 |      2250 |            2 |          4 |         4880.92 |       0.06 |  0.07 | R            | F            | 1994-01-02 | 1994-03-13   | 1994-01-28    | DELIVER IN PERSON         | AIR        | regular depo                               |
+    4830688 |    178621 |      1139 |            4 |          4 |         6798.48 |       0.05 |  0.03 | R            | F            | 1994-01-03 | 1994-01-09   | 1994-01-29    | TAKE BACK RETURN          | RAIL       | fluffily pending dependencies cajole slyly |
+    4901252 |    118389 |      3412 |            3 |          4 |         5629.52 |       0.06 |  0.06 | A            | F            | 1994-01-02 | 1993-12-22   | 1994-01-17    | TAKE BACK RETURN          | MAIL       | slyly regular inst                         |
+    5818855 |      5032 |      2533 |            6 |          4 |         3748.12 |       0.06 |  0.07 | R            | F            | 1994-01-02 | 1993-10-25   | 1994-01-31    | TAKE BACK RETURN          | MAIL       | never express instructions breach flu      |
+(15 rows)
+
+Time: 17306.200 ms
+
+(q12) select * from lineitem where l_orderkey > 100 and l_orderkey < 1000 and l_partkey > 100 and l_partkey < 5000 and l_shipmode='AIR' and l_linestatus='F' and l_tax < '0.07';
+
+tpch1g=# select * from lineitem where l_orderkey > 100 and l_orderkey < 1000 and l_partkey > 100 and l_partkey < 5000 and l_shipmode='AIR' and l_linestatus='F' and l_tax < '0.07';
+ l_orderkey | l_partkey | l_suppkey | l_linenumber | l_quantity | l_extendedprice | l_discount | l_tax | l_returnflag | l_linestatus | l_shipdate | l_commitdate | l_receiptdate |      l_shipinstruct       | l_shipmode |             l_comment             
+------------+-----------+-----------+--------------+------------+-----------------+------------+-------+--------------+--------------+------------+--------------+---------------+---------------------------+------------+-----------------------------------
+        130 |      1739 |      4240 |            2 |         48 |           78755 |       0.03 |  0.02 | R            | F            | 1992-07-01 | 1992-07-12   | 1992-07-24    | NONE                      | AIR        | express, stealthy frets haggle. f |
+        194 |      2594 |      5095 |            1 |         17 |           25442 |       0.05 |  0.04 | R            | F            | 1992-05-24 | 1992-05-22   | 1992-05-30    | COLLECT COD               | AIR        | carefully unusual attainment      |
+(2 rows)
+
+Time: 17641.131 ms
+
