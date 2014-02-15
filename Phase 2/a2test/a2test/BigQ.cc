@@ -62,7 +62,7 @@ void* BigQ::TPMMS_Phase1(void* arg){
 
 	(args->run_buffer)->at(++*(args->num_runs)) = new DBFile();//file for run1
 	char *actual_path;
-	sprintf(actual_path,"%s.%d",*(args->file_path),*(args->num_runs));
+	sprintf(actual_path,"%s.%d",args->file_path,*(args->num_runs));
 	args->run_buffer->at(*(args->num_runs))->Create(actual_path,heap,NULL);
 	
 	//***check resets of indexes
@@ -158,7 +158,7 @@ BigQ :: BigQ (Pipe &in, Pipe &out, OrderMaker &sortorder, int runlen) {
 	//buffer = new Page[runlen];//set to runlen +1 to use indxing starting from 1
 	//runBuff = new Record[pageLength];//how many records per page?
 	runs = new vector<DBFile*>();
-	*f_name = "run"
+	*f_name = "run";
 
 	args_phase1.num_runs = &no_runs;
 	args_phase1.temporary = &temp;
