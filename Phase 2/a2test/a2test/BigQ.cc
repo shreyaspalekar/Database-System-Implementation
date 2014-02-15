@@ -158,7 +158,7 @@ BigQ :: BigQ (Pipe &in, Pipe &out, OrderMaker &sortorder, int runlen) {
 	//buffer = new Page[runlen];//set to runlen +1 to use indxing starting from 1
 	//runBuff = new Record[pageLength];//how many records per page?
 	runs = new vector<DBFile*>();
-	*f_name = "run";
+	*f_name = 'run';
 
 	args_phase1.num_runs = &no_runs;
 	args_phase1.temporary = &temp;
