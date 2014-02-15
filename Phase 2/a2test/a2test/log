@@ -1,0 +1,12 @@
+ 
+** IMPORTANT: MAKE SURE THE INFORMATION BELOW IS CORRECT **
+ catalog location: 	catalog
+ tpch files dir: 	/cise/tmp/dbi_sp11/DATA/10M/
+ heap files dir: 	
+ 
+
+ select test option: 
+ 	 1. sort 
+ 	 2. sort + display 
+ 	 3. sort + write 
+	 
