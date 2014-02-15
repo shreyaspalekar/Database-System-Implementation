@@ -21,7 +21,7 @@ class BigQ {
 	int no_runs;
 	pthread_t worker;
 	int page_Index;
-	char *f_name = "run";
+	char *f_name;
 	
 	struct args_phase1_struct {                                                   
 		
