@@ -10,11 +10,16 @@ Record :: Record () {
 	bits = NULL;
 }
 
-/*Record :: Record(Record &nu){
+Record :: Record(Record &nu){
 
 	this->Copy(&nu);
 
-}*/
+}
+
+Record Record:: operator=( Record& rhs ){
+	
+	this->Copy(&rhs);
+}
 
 
 Record :: ~Record () {
