@@ -35,8 +35,8 @@ private:
 
 public:
 	Record ();
-	Record (Record &);
-	Record operator=( Record& rhs );
+//	Record (const Record &);
+//	Record operator=( Record& rhs );
 	~Record();
 
 	// suck the contents of the record fromMe into this; note that after

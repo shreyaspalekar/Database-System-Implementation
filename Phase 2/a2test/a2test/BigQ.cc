@@ -1,4 +1,17 @@
 #include "BigQ.h"
+#include <algorithm>
+/*bool BigQ::sort_func(Record &one,Record& two, OrderMaker &sortorder){
+
+	ComparisonEngine compare;
+
+	if(compare.Compare(&one,&two,&sortorder)<=0)
+		return true;
+
+
+	else
+		return false;
+
+}
 
 void BigQ::quicksort(vector<Record> &rb, int left, int right,OrderMaker &sortorder){  
 
@@ -7,20 +20,22 @@ void BigQ::quicksort(vector<Record> &rb, int left, int right,OrderMaker &sortord
 
 	ComparisonEngine compare;
 
-   Record pivot = rb.at((left+right)/2);
+   Record *pivot = new Record();
+   pivot->Copy(&(rb.at((left+right)/2)));
   
    // partition  
    while (i <= j) {  
-       while (compare.Compare(&rb.at(i),&pivot,&sortorder)<0)
+       while (compare.Compare(&(rb.at(i)),pivot,&sortorder)<0)
            i++;  
   
-       while (compare.Compare(&rb.at(j),&pivot,&sortorder)>0)
+       while (compare.Compare(&(rb.at(j)),pivot,&sortorder)>0)
            j--;  
   
        if (i <= j) {  
-           Record tmp = rb.at(i);  
-           rb.at(i) = rb.at(j);  
-           rb.at(j) = tmp;  
+           Record tmp;
+	   tmp.Copy(&(rb.at(i)));  
+           rb.at(i).Copy(&(rb.at(j)));  
+           rb.at(j).Copy(&tmp);  
   
            i++;  
            j--;  
@@ -35,7 +50,7 @@ void BigQ::quicksort(vector<Record> &rb, int left, int right,OrderMaker &sortord
        quicksort(rb, i, right,sortorder);  
 }  
 
-
+*/
 
 void* BigQ::TPMMS_Phase1(void* arg){
 	/*
@@ -51,7 +66,7 @@ void* BigQ::TPMMS_Phase1(void* arg){
 	//int pagelen =0;
 	
 	
-	vector <Record> record_Buffer = vector<Record>();//delete record buffer from header
+//	vector <Record> record_Buffer = vector<Record>();//delete record buffer from header
 
 	args_phase1_struct *args;
 	args = (args_phase1_struct *)arg;
@@ -71,6 +86,8 @@ void* BigQ::TPMMS_Phase1(void* arg){
 
 	cout << "Created run file "<<*(args->num_runs)<<"\n";
 	int result =1;
+	int num_recs =0;
+
 	//***check resets of indexes
 	while(result!=0){ // till input pipe is empty
 	
@@ -79,6 +96,8 @@ void* BigQ::TPMMS_Phase1(void* arg){
 	
 	        result = args->input->Remove(args->temporary); // till input pipe is empty
 		//append record temporary to page at pageindex
+		num_recs++;		
+
 		if((int)args->run_buffer->at(*(args->num_runs))->GetLength()<*(args->run_length)&&result!=0){
 
 			args->run_buffer->at(*(args->num_runs))->Add(*(args->temporary));
@@ -116,21 +135,21 @@ void* BigQ::TPMMS_Phase1(void* arg){
 			
 			int z = 0;
 
-			Record temp;
+    	                vector <Record> record_Buffer = vector<Record>(num_recs);//delete record buffer from header
+			Record *temp = new Record();
 
-			while(args->run_buffer->at(*(args->num_runs))->GetNext(temp) != 0){//empty out file into vector
+			while(args->run_buffer->at(*(args->num_runs))->GetNext(*temp) != 0){//empty out file into vector
 				
-			//	Record *nu = new Record();
-			//	nu->Consume(&temp);
-				record_Buffer.push_back(temp);
+				record_Buffer.push_back(*temp);
+				temp= new Record();
 				z++;
 			}	
 			cout << "read "<<z<<" records\n";
 			cout << "Reached 2\n";
 			cout << "Record Buffer size: "<< record_Buffer.size()<<"\n";
 			
-			BigQ::quicksort(record_Buffer,0,record_Buffer.size(),*(args->sort_order));	//Sort runs vector
-				
+			//BigQ::quicksort(record_Buffer,0,record_Buffer.size(),*(args->sort_order));	//Sort runs vector
+			sort(record_Buffer.begin(),record_Buffer.begin()+z,sort_func(args->sort_order));	
 
 			cout << "Reached 3\n";
 			

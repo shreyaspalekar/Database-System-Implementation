@@ -47,7 +47,7 @@ class BigQ {
 	static void* TPMMS_Phase1(void* arg);
 	void* TPMMS_Phase2(void* arg);
 	static void quicksort(vector<Record> &rb, int left, int right,OrderMaker &sortorder);
-	
+//	static bool sort_func(Record &,Record &,OrderMaker &sortorder);	
 	/*Deprecated: Replaced by DBFile , no need for indexing
 	//Record *recordBuff;
 	//int pageLength = 0;//no of recrods per page
@@ -58,6 +58,45 @@ public:
 
 	BigQ (Pipe &in, Pipe &out, OrderMaker &sortorder, int runlen);
 	~BigQ ();
+};
+
+class sort_func{
+
+private:
+
+	OrderMaker *sort_order;
+
+public:
+
+	sort_func(OrderMaker *order){
+		this->sort_order = order;
+	}
+
+	sort_func(){};
+
+	bool operator()(const Record &one,const Record &two){
+
+		/*Record *one = new Record();
+
+		Record *two = new Record();
+
+		one->Copy(const_cast<Record *>(&onei));		
+
+		two->Copy(const_cast<Record *>(&twoi));		
+		*/	
+		ComparisonEngine compare;
+
+		if(compare.Compare(const_cast<Record*>(&one),const_cast<Record*>(&two),this->sort_order)<=0)
+			return true;
+
+
+		else
+			return false;
+
+	}
+
+	
+
 };
 
 #endif
