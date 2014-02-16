@@ -3,23 +3,25 @@
 
 void* BigQ::TPMMS_Phase1(void* arg){
 
+	/*Typecast the arguments
+	*/
 	args_phase1_struct *args;
 	args = (args_phase1_struct *)arg;
 
 	*(args->num_runs) = -1;//goes from 0 to n,set to one as the array size is n, else set array size to n+1 to use indexing from 1
 	
-	//Create and open new file 'file.run_no'
-
+	//Create new DBFile object
 	DBFile *new_file = new DBFile();
 	*(args->num_runs)++;
 	(args->run_buffer)->push_back(new_file);//file for run1
-	char actual_path[20];
-
 	
-	sprintf(actual_path,"%s.%d","run",*(args->num_runs));//(args->file_path) removed
+	//Create new binary file by name run.run_no
+	char actual_path[20];
+	sprintf(actual_path,"%s.%d","run",*(args->num_runs));
 	args->run_buffer->at(*(args->num_runs))->Create(actual_path,heap,NULL);
 
 	cout << "Created run file "<<*(args->num_runs)<<"\n";
+	
 	int result =1;
 	int num_recs =0;
 
@@ -27,9 +29,10 @@ void* BigQ::TPMMS_Phase1(void* arg){
 	while(result!=0){ // till input pipe is empty
 	
 				
-
+		//Read record from pipe
 	        result = args->input->Remove(args->temporary); // till input pipe is empty
 								//append record temporary to page at pageindex
+		//Increment record counter
 		num_recs++;		
 
 		if(((int)args->run_buffer->at(*(args->num_runs))->GetLength()<*(args->run_length))&&result!=0){
@@ -40,8 +43,10 @@ void* BigQ::TPMMS_Phase1(void* arg){
 
 		else{
 			
-		        cout<<"Pages read "<<(int)args->run_buffer->at(*(args->num_runs))->GetLength()<<"\n";
+		        cout<<"Pages read "<<(int)args->run_buffer->at(*(args->num_runs))->GetLength()<<"\n\n";
 	                cout << "Run No:  "<<*(args->num_runs)<<"\n";
+	                
+	                /*TODO: we should not close and open the file again*/
 
 			args->run_buffer->at(*(args->num_runs))->Close();
 			
@@ -49,13 +54,16 @@ void* BigQ::TPMMS_Phase1(void* arg){
 			
 			args->run_buffer->at(*(args->num_runs))->MoveFirst();
 			
-			cout << "Reached 1\n";
+			cout << "Close and open file\n";
 			
 			int z = 0;
+
+			//Empty file into record buffer
 
     	      		Record **record_Buffer= new Record*[num_recs];
 			Record *temp = new Record();
 			int count =0;
+			
 			while(args->run_buffer->at(*(args->num_runs))->GetNext(*temp) != 0){//empty out file into vector
 				
 				record_Buffer[count] = new Record();
@@ -63,19 +71,23 @@ void* BigQ::TPMMS_Phase1(void* arg){
 				temp = new Record();
 				z++;
 			}	
+			
+			
 			cout << "read "<<z<<" records\n";
-			cout << "Reached 2\n";
+			cout << "Emptied file into record buffer\n";
 			cout << "Record Buffer size: "<<count<<"\n";
-			cout << "Record Buffer Before  "<<record_Buffer;
+			//cout << "Record Buffer Before  "<<record_Buffer;
 			sort(record_Buffer,record_Buffer+( sizeof record_Buffer / sizeof record_Buffer[0]),sort_func(args->sort_order));	
 
-			cout << "Reached 3\n";
-			cout << "Record Buffer After"<< record_Buffer;
+			cout << "Sorted Record buffer\n";
+			//cout << "Record Buffer After"<< record_Buffer;
 
+			//Reset file 
 			args->run_buffer->at(*(args->num_runs)) = new DBFile();
 						
 			args->run_buffer->at(*(args->num_runs))->Create(actual_path,heap,NULL);
 
+			//Empty record buffer back into file
 			for(int i=0;i<( sizeof record_Buffer / sizeof record_Buffer[0]);i++){//empty record buffer into dbfile
 				
 				cout << record_Buffer[i];
@@ -87,11 +99,11 @@ void* BigQ::TPMMS_Phase1(void* arg){
 			}	
 
 			//close dbfile
-			cout << "Reached 4\n";
+			cout << "Emptied Record Buffer\n";
 			args->run_buffer->at(*(args->num_runs))->Close();
 
 			//new File
-			cout << "Reached 5\n";
+			cout << "Closed file\n";
 			
                         DBFile *new_file = new DBFile();
 	                *(args->num_runs)+=1;
@@ -102,7 +114,7 @@ void* BigQ::TPMMS_Phase1(void* arg){
 			sprintf(actual_path,"%s.%d","run",*(args->num_runs));//set path as "file_path.num_run"
 			args->run_buffer->at(*(args->num_runs))->Create(actual_path,heap,NULL);//??concatenate run no
 			args->run_buffer->at(*(args->num_runs))->Add(*(args->temporary));		
-			cout << "Reached 6\n";
+			cout << "Created new file\n\n";
 
 		}
 		
