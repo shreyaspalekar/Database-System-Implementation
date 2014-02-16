@@ -74,7 +74,7 @@ public:
 
 	sort_func(){};
 
-	bool operator()(const Record &one,const Record &two){
+	bool operator()(Record *one,Record *two){
 
 		/*Record *one = new Record();
 
@@ -86,15 +86,15 @@ public:
 
 		two->Copy(const_cast<Record *>(&twoi));		
 		*/	
-		Record *inp1 = const_cast<Record*>(&one);	
-		Record *inp2 = const_cast<Record*>(&two);	
+	//	Record *inp1 = const_cast<Record*>(one);	
+	//	Record *inp2 = const_cast<Record*>(two);	
 
 //		cout<<"Read at location"<<inp1;
-		cout<<"Comparing "<<inp1<<" and "<<inp2<<"\n";
+		cout<<"Comparing "<<one<<" and "<<two<<"\n";
 
 		ComparisonEngine *compare;
 
-		if(compare->Compare(inp1,inp2,this->sort_order)<=0)
+		if(compare->Compare(one,two,this->sort_order)<=0)
 			return true;
 
 

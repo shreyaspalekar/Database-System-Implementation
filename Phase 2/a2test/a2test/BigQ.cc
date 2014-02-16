@@ -136,12 +136,13 @@ void* BigQ::TPMMS_Phase1(void* arg){
 			int z = 0;
 
     	             //   vector <Record> record_Buffer = vector<Record>(num_recs);//delete record buffer from header
-			Record *record_Buffer= new Record[num_recs];
+			Record **record_Buffer= new Record*[num_recs];
 			Record *temp = new Record();
 			int count =0;
 			while(args->run_buffer->at(*(args->num_runs))->GetNext(*temp) != 0){//empty out file into vector
 				
-				record_Buffer[count++].Consume(temp);
+				record_Buffer[count] = new Record();
+				record_Buffer[count++]->Consume(temp);
 				temp = new Record();
 				//record_Buffer.push_back(*temp);
 				//temp=NULL;
@@ -154,16 +155,22 @@ void* BigQ::TPMMS_Phase1(void* arg){
 //			cout << record_Buffer.at(0).GetBits()<<"\n";			
 			//BigQ::quicksort(record_Buffer,0,record_Buffer.size(),*(args->sort_order));	//Sort runs vector
 			cout << "Record Buffer Before  "<<record_Buffer;
-			sort(record_Buffer,record_Buffer+ (sizeof record_Buffer / sizeof record_Buffer[0]),sort_func(args->sort_order));	
+			sort(record_Buffer,record_Buffer+( sizeof record_Buffer / sizeof record_Buffer[0]),sort_func(args->sort_order));	
 
 			cout << "Reached 3\n";
 			cout << "Record Buffer After"<< record_Buffer;
-//			args->run_buffer->at(*(args->num_runs))->MoveFirst();
-			
-			for(int i=0;i<num_recs;i++){//empty record buffer into dbfile
+
+			args->run_buffer->at(*(args->num_runs)) = new DBFile();
+						
+			args->run_buffer->at(*(args->num_runs))->Create(actual_path,heap,NULL);
+
+			for(int i=0;i<( sizeof record_Buffer / sizeof record_Buffer[0]);i++){//empty record buffer into dbfile
+				
+				cout << record_Buffer[i];
+
 			
 				Record *temp = new Record();
-				temp->Copy(&record_Buffer[i]);//check if this copies
+				temp->Copy(record_Buffer[i]);//check if this copies
 				args->run_buffer->at(*(args->num_runs))->Add(*temp);//check for references and pointers DOES THIS PERFORM DEEP COPY??
 			}	
 				//close dbfile
