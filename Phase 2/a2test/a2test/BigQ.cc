@@ -135,33 +135,38 @@ void* BigQ::TPMMS_Phase1(void* arg){
 			
 			int z = 0;
 
-    	                vector <Record> record_Buffer = vector<Record>(num_recs);//delete record buffer from header
+    	             //   vector <Record> record_Buffer = vector<Record>(num_recs);//delete record buffer from header
+			Record *record_Buffer[num_recs];
 			Record *temp = new Record();
-
+			int count =0;
 			while(args->run_buffer->at(*(args->num_runs))->GetNext(*temp) != 0){//empty out file into vector
 				
-				record_Buffer.push_back(*temp);
-				temp= new Record();
+				record_Buffer[num_recs]->Consume(temp);
+				temp = new Record();
+				//record_Buffer.push_back(*temp);
+				//temp=NULL;
+				//temp= new Record();
 				z++;
 			}	
 			cout << "read "<<z<<" records\n";
 			cout << "Reached 2\n";
-			cout << "Record Buffer size: "<< record_Buffer.size()<<"\n";
-			
+			cout << "Record Buffer size: "<<count<<"\n";
+//			cout << record_Buffer.at(0).GetBits()<<"\n";			
 			//BigQ::quicksort(record_Buffer,0,record_Buffer.size(),*(args->sort_order));	//Sort runs vector
-			sort(record_Buffer.begin(),record_Buffer.begin()+z,sort_func(args->sort_order));	
+			sort(record_Buffer,record_Buffer+z,sort_func(args->sort_order));	
 
 			cout << "Reached 3\n";
 			
-			args->run_buffer->at(*(args->num_runs))->MoveFirst();
+//			args->run_buffer->at(*(args->num_runs))->MoveFirst();
 			
-			for(int i=0;i<record_Buffer.size();i++){//empty record buffer into dbfile
+			for(int i=0;i<num_recs;i++){//empty record buffer into dbfile
 			
-				*(args->temporary) = record_Buffer[i];//check if this copies
-				args->run_buffer->at(*(args->num_runs))->Add(*(args->temporary));//check for references and pointers DOES THIS PERFORM DEEP COPY??
+				Record *temp = new Record();
+				temp->Copy(record_Buffer[i]);//check if this copies
+				args->run_buffer->at(*(args->num_runs))->Add(*temp);//check for references and pointers DOES THIS PERFORM DEEP COPY??
 			}	
 				//close dbfile
-			record_Buffer.clear();
+			//record_Buffer.clear();
 
 
 			cout << "Reached 4\n";

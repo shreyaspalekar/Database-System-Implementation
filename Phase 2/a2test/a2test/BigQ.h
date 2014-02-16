@@ -74,19 +74,24 @@ public:
 
 	sort_func(){};
 
-	bool operator()(const Record &one,const Record &two){
+	bool operator()(const Record *one,const Record *two){
 
 		/*Record *one = new Record();
 
 		Record *two = new Record();
-
 		one->Copy(const_cast<Record *>(&onei));		
+
+		
+
 
 		two->Copy(const_cast<Record *>(&twoi));		
 		*/	
-		ComparisonEngine compare;
+		Record *inp1 = const_cast<Record*>(one);	
+		Record *inp2 = const_cast<Record*>(two);	
 
-		if(compare.Compare(const_cast<Record*>(&one),const_cast<Record*>(&two),this->sort_order)<=0)
+		ComparisonEngine *compare;
+
+		if(compare->Compare(inp1,inp2,this->sort_order)<=0)
 			return true;
 
 
