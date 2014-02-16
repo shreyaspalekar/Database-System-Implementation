@@ -8,6 +8,7 @@
 #include "DBFile.h"
 #include "ComparisonEngine.h"
 #include <vector>
+#include <queue>
 
 using namespace std;
 
@@ -28,6 +29,7 @@ class BigQ {
 		//!!check initialization
 		
 		Pipe *input;
+		Pipe *output;
 		OrderMaker *sort_order;
 		int *run_length;
 		int *num_runs;

@@ -98,7 +98,7 @@ void* BigQ::TPMMS_Phase1(void* arg){
 		//append record temporary to page at pageindex
 		num_recs++;		
 
-		if((int)args->run_buffer->at(*(args->num_runs))->GetLength()<*(args->run_length)&&result!=0){
+		if(((int)args->run_buffer->at(*(args->num_runs))->GetLength()<*(args->run_length))&&result!=0){
 
 			args->run_buffer->at(*(args->num_runs))->Add(*(args->temporary));
 
@@ -189,10 +189,10 @@ void* BigQ::TPMMS_Phase1(void* arg){
 			args->run_buffer->push_back(new_file); //create new run file
 
 			cout<<"num_runs "<<*(args->num_runs)<<" vector Size "<<args->run_buffer->size();
-
+		
 			sprintf(actual_path,"%s.%d","run",*(args->num_runs));//set path as "file_path.num_run"
 			args->run_buffer->at(*(args->num_runs))->Create(actual_path,heap,NULL);//??concatenate run no
-				
+			args->run_buffer->at(*(args->num_runs))->Add(*(args->temporary));		
 				//empty page buffer ?? do we need to? can we overwrite?
 			cout << "Reached 6\n";
 				/*for(i=0;i<args->run_length;i++)
@@ -216,7 +216,77 @@ void* BigQ::TPMMS_Phase1(void* arg){
 	}
 	cout << "Closing last file";	
 //WARNING	args->run_buffer->at(*(args->num_runs))->Close();
-	 
+
+	//Open all files for merging	
+	for (int i=0;i<args->run_buffer->size();i++){
+		char path[20];
+		sprintf(path,"%s.%d","run",i);//(args->file_path) removed
+	
+		args->run_buffer->at(i)->Open(path);
+		args->run_buffer->at(i)->MoveFirst();
+
+		cout<<"Opened run "<<i<<" \n";
+	}
+
+	cout<<"All files opened \n";
+	priority_queue<Record* , vector<Record*> , sort_func> pQueue (sort_func(args->sort_order));
+
+	//build priority queue
+
+	Record *temp = new Record();
+	
+	for (int i=0;i<args->run_buffer->size();i++){
+		
+		args->run_buffer->at(i)->GetNext(*temp);
+		pQueue.push(temp);	
+		temp = new Record();
+	}
+    	
+	int flags=args->run_buffer->size();/*[args->run_buffer->size()];
+
+	for
+
+	 for (i=0;i<args->run_buffer->size();i++){
+	
+		flags[i]=1;
+	}*/
+	Record **next = new Record*[args->run_buffer->size()];
+	
+	for (int i=0;i<args->run_buffer->size();i++){
+
+                        args->run_buffer->at(i)->GetNext(*(*(next+i)));
+
+        }
+
+
+
+	while(flags!=0){
+
+		Record *temp = new Record();
+		temp = pQueue.top();
+		pQueue.pop();
+		args->output->Insert(temp);
+		ComparisonEngine *compare;
+		Record *insert = new Record();
+		insert->Copy(*(next+0));
+		int min =0;
+
+		for (int i=1;i<args->run_buffer->size();i++){
+		
+			if(compare->Compare(insert,*(next+i),args->sort_order) <=0 ){ 
+				insert->Copy(*(next+i));
+				min =i;
+			}
+		}
+
+		if(args->run_buffer->at(min)->GetNext(*(*(next+min)))==0)
+		{	flags--;
+			args->run_buffer->erase(args->run_buffer->begin()+min);
+		}
+
+		pQueue.push(insert);
+	
+	} 
 }
 
 
@@ -236,6 +306,7 @@ BigQ :: BigQ (Pipe &in, Pipe &out, OrderMaker &sortorder, int runlen) {
 	args_phase1.run_buffer = runs;
 	args_phase1.file_path = "run";
 	args_phase1.input = &in;
+	args_phase1.output = &out;
 	args_phase1.sort_order = &sortorder;
 	args_phase1.run_length = &runlen;
 	
