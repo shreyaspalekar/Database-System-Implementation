@@ -185,8 +185,10 @@ void* BigQ::TPMMS_Phase1(void* arg){
 			cout << "Reached 5\n";
 			
                         DBFile *new_file = new DBFile();
-	                *(args->num_runs)++;
+	                *(args->num_runs)+=1;
 			args->run_buffer->push_back(new_file); //create new run file
+
+			cout<<"num_runs "<<*(args->num_runs)<<" vector Size "<<args->run_buffer->size();
 
 			sprintf(actual_path,"%s.%d","run",*(args->num_runs));//set path as "file_path.num_run"
 			args->run_buffer->at(*(args->num_runs))->Create(actual_path,heap,NULL);//??concatenate run no
@@ -213,7 +215,7 @@ void* BigQ::TPMMS_Phase1(void* arg){
 		
 	}
 	cout << "Closing last file";	
-	args->run_buffer->at(*(args->num_runs))->Close();
+//WARNING	args->run_buffer->at(*(args->num_runs))->Close();
 	 
 }
 
