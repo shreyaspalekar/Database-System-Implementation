@@ -92,11 +92,20 @@ public:
 	//	Record *inp2 = const_cast<Record*>(two);	
 
 //		cout<<"Read at location"<<inp1;
-		cout<<"Comparing "<<one<<" and "<<two<<"\n";
+//		cout<<"Comparing "<<one<<" and "<<two<<"\n";
+
+
+
+ //                       Schema schema("catalog","lineitem");
+                        //cout<<"Count: "<<count<<""; 
+//                        one->Print(&schema);
+//			two->Print(&schema);
+
+
 
 		ComparisonEngine *compare;
 
-		if(compare->Compare(one,two,this->sort_order)<=0)
+		if(compare->Compare(one,two,this->sort_order)<0)
 			return true;
 
 

@@ -76,17 +76,25 @@ void* BigQ::TPMMS_Phase1(void* arg){
 			
 			count--;//DO NOT COMMENT
 			
-			Schema schema("catalog","lineitem");
+			//Schema schema("catalog","lineitem");
 			//cout<<"Count: "<<count<<"";
-			for(int i=0;i<count;i++){
+			/*for(int i=0;i<count;i++){
 				cout<<"Printing record: "<<i<<" Count: "<<count<<"\n";
 				(*(record_Buffer+i))->Print(&schema);
-			}
+			}*/
 			cout << "read "<<z<<" records\n";
 			cout << "Emptied file into record buffer\n";
 			cout << "Record Buffer size: "<<count<<"\n";
 			//cout << "Record Buffer Before  "<<record_Buffer;
-			sort(record_Buffer,record_Buffer+(count-1),sort_func(args->sort_order));//( sizeof record_Buffer / sizeof record_Buffer[0]),sort_func(args->sort_order));	
+			
+			cout<<"------------------------------------------------------\n";
+			cout<<count<<"\t "<<(sizeof record_Buffer / sizeof record_Buffer[0])<<"\n";
+			cout<<record_Buffer<<" "<<record_Buffer+(count-1)<<"\n";
+			cout<<record_Buffer<<" "<<record_Buffer+(sizeof record_Buffer / sizeof record_Buffer[0])<<"\n";
+                        cout<<"------------------------------------------------------\n";
+
+			sort(record_Buffer,record_Buffer+(count-1),sort_func(args->sort_order));//
+			//sort(record_Buffer,record_Buffer+(sizeof record_Buffer / sizeof record_Buffer[0]),sort_func(args->sort_order));	
 
 			cout << "Sorted Record buffer\n";
 			//cout << "Record Buffer After"<< record_Buffer;
