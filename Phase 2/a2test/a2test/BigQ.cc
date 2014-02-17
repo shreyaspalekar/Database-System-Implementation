@@ -74,9 +74,11 @@ void* BigQ::TPMMS_Phase1(void* arg){
 				//z++;
 			}while(args->run_buffer->at(*(args->num_runs))->GetNext(*(record_Buffer[count++])) != 0);//empty out file into vector
 			
+			count--;//DO NOT COMMENT
+			
 			Schema schema("catalog","lineitem");
 			//cout<<"Count: "<<count<<"";
-			for(int i=0;i<count-1;i++){
+			for(int i=0;i<count;i++){
 				cout<<"Printing record: "<<i<<" Count: "<<count<<"\n";
 				(*(record_Buffer+i))->Print(&schema);
 			}
@@ -84,7 +86,7 @@ void* BigQ::TPMMS_Phase1(void* arg){
 			cout << "Emptied file into record buffer\n";
 			cout << "Record Buffer size: "<<count<<"\n";
 			//cout << "Record Buffer Before  "<<record_Buffer;
-			sort(record_Buffer,record_Buffer+(count-5),sort_func(args->sort_order));//( sizeof record_Buffer / sizeof record_Buffer[0]),sort_func(args->sort_order));	
+			sort(record_Buffer,record_Buffer+(count-1),sort_func(args->sort_order));//( sizeof record_Buffer / sizeof record_Buffer[0]),sort_func(args->sort_order));	
 
 			cout << "Sorted Record buffer\n";
 			//cout << "Record Buffer After"<< record_Buffer;
