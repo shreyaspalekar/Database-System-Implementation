@@ -76,7 +76,7 @@ void* BigQ::TPMMS_Phase1(void* arg){
 			
 			Schema schema("catalog","lineitem");
 			//cout<<"Count: "<<count<<"";
-			for(int i=0;i<count;i++){
+			for(int i=0;i<count-1;i++){
 				cout<<"Printing record: "<<i<<" Count: "<<count<<"\n";
 				(*(record_Buffer+i))->Print(&schema);
 			}
