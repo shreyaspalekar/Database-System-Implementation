@@ -232,7 +232,9 @@ void File :: Open (int fileLen, char *fName) {
 
 	// figure out the flags for the system open call
         int mode;
-        if (fileLen == 0)
+       	curLength = (off_t)fileLen;
+	
+	if (fileLen == 0)
                 mode = O_TRUNC | O_RDWR | O_CREAT;
         else
                 mode = O_RDWR;

@@ -1,3 +1,4 @@
+#include <iostream>
 #include "TwoWayList.h"
 #include "Record.h"
 #include "Schema.h"
@@ -17,7 +18,7 @@ DBFile::DBFile () {
 	this->readPage = new Page();
 	this->writePage = new Page();
 	this->current = new Record();
-	
+	this->fpath = new char[20];
 }
 
 DBFile::~DBFile(){
@@ -25,12 +26,13 @@ DBFile::~DBFile(){
 	delete readPage;
 	delete writePage;
 	delete current;
-
+	delete fpath;
 }
 
 int DBFile::Create (char *f_path, fType f_type, void *startup) {
 
 	this->file->Open(0,f_path);
+	//*fpath = *f_path;
 	pageIndex=1;
 	writeIndex=1;
 	writeIsDirty=0;
@@ -52,21 +54,37 @@ void DBFile::Load (Schema &f_schema, char *loadpath) {
 	fclose(tableFile);
 }
 
-int DBFile::Open (char *f_path) {
+int DBFile::Open (off_t length,char *f_path) {
 	//TODO:metadata
-	this->file->Open(1,f_path);
 
-		//this->file->GetPage(this->readPage,1); //TODO: check off_t type,  void GetPage (Page *putItHere, off_t whichPage)
+	//*fpath = *f_path;
+	
+	//off_t length =;
+	this->file->Open(length,f_path);
 	pageIndex=1;
 	endOfFile = 0;
 	return 1;
 }
 
+int DBFile::Open (char *f_path) {
+        //TODO:metadata
+
+        //*fpath = *f_path;
+
+        //off_t length =;
+        this->file->Open(1,f_path);
+        pageIndex=1;
+        endOfFile = 0;
+        return 1;
+}
+
+
+
 void DBFile::MoveFirst () {
 //USE GetNext ? is two line code better??
 //Should we let File.cc handle the boundry conditions??
 	//if(this->file->GetLength()>1){
-	        this->file->GetPage(this->readPage,1); //TODO: check off_t type,  void GetPage (Page *putItHere, off_t whichPage)
+		this->file->GetPage(this->readPage,1); //TODO: check off_t type,  void GetPage (Page *putItHere, off_t whichPage)
 		this->readPage->GetFirst(this->current);//check if this->readPage is pointer
 	//}
 }
@@ -86,7 +104,6 @@ int DBFile::Close () {
 
 void DBFile::Add (Record &rec) {
 
-	endOfFile = 0;
 	//Consume rec
 	this->writeIsDirty=1;
 
@@ -111,10 +128,6 @@ int DBFile::GetNext (Record &fetchme) {
 		
 		
 		fetchme.Copy(this->current);
-
-		if((int)this->GetLength()==0)
-			this->readPage=this->writePage;
-
 	
 		int result = this->readPage->GetFirst(this->current);
 	
@@ -125,6 +138,7 @@ int DBFile::GetNext (Record &fetchme) {
 		
 			if(pageIndex>=this->file->GetLength()-1){
 				endOfFile = 1;	
+				cout<<"Setting EOF\n";
 			}
 		
 			else{
@@ -171,5 +185,6 @@ int DBFile::GetNext (Record &fetchme, CNF &cnf, Record &literal) {
 
 off_t DBFile::GetLength(){
 
-	return this->file->GetLength();
+        return this->file->GetLength();
 }
+
