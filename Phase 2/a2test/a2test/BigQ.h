@@ -76,7 +76,7 @@ public:
 
 	sort_func(){};
 
-	bool operator()(Record *one,Record *two){
+	bool operator()(Record *one,Record *two) const{
 
 		/*Record *one = new Record();
 
@@ -105,13 +105,13 @@ public:
 
 		ComparisonEngine *compare;
 
-		if(compare->Compare(one,two,this->sort_order)<0)
+		if(compare->Compare(one,two,this->sort_order)<0){
 			return true;
+		}
 
-
-		else
+		else{
 			return false;
-
+		}
 	}
 
 	
