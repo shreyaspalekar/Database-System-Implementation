@@ -74,7 +74,11 @@ void* BigQ::TPMMS_Phase1(void* arg){
 				//z++;
 			}while(args->run_buffer->at(*(args->num_runs))->GetNext(*(record_Buffer[count++])) != 0);//empty out file into vector
 			
-			
+			Schema schema("catalog","lineitem");
+			cout<<"Record Buffer: ";
+			for(int i=0;i<count;i++){
+				(*(record+i))->Print(&schema);
+			}
 			cout << "read "<<z<<" records\n";
 			cout << "Emptied file into record buffer\n";
 			cout << "Record Buffer size: "<<count<<"\n";
