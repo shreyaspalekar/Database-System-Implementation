@@ -195,19 +195,21 @@ void* BigQ::TPMMS_Phase1(void* arg){
 	Schema schema("catalog","lineitem");
 	(pQueue.top())->Print(&schema);
 		
-	Record *temp1 = new Record();	
+	Record *temp1;// = new Record();	
 
 	for (int i=0;i<args->run_buffer->size();i++){
 	
 		cout<<"Filling index "<<i<<" \n";
                 next[i] = new Record();
-		cout<<"File Length: "<<args->run_buffer->at(i)->GetLength();
-		cout<<"result: "<<args->run_buffer->at(i)->GetNext(*temp)<<"\n";	
-		cout<<temp1<<"\n";
-		temp->Print(&schema);
-		next[i]->Consume(temp1);
 		temp1 = new Record();
-	//	next[i]->Print(&schema);
+		cout<<"File Length: "<<args->run_buffer->at(i)->GetLength();
+		cout<<"result: "<<args->run_buffer->at(i)->GetNext(*temp1)<<"\n";	
+		cout<<temp1<<"\n";
+		cout<<"TEMP:";
+		temp1->Print(&schema);
+		next[i]->Copy(temp1);
+		cout<<"NEXT";
+		next[i]->Print(&schema);
         }
 
 
