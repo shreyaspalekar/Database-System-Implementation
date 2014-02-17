@@ -77,6 +77,7 @@ void* BigQ::TPMMS_Phase1(void* arg){
 			Schema schema("catalog","lineitem");
 			cout<<"Record Buffer: ";
 			for(int i=0;i<count;i++){
+				cout<<"Printing record: "<<i<<"\n";
 				(*(record_Buffer+i))->Print(&schema);
 			}
 			cout << "read "<<z<<" records\n";
