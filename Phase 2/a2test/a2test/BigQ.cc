@@ -82,17 +82,17 @@ void* BigQ::TPMMS_Phase1(void* arg){
 				cout<<"Printing record: "<<i<<" Count: "<<count<<"\n";
 				(*(record_Buffer+i))->Print(&schema);
 			}*/
-			cout << "read "<<z<<" records\n";
-			cout << "Emptied file into record buffer\n";
-			cout << "Record Buffer size: "<<count<<"\n";
+//			cout << "read "<<z<<" records\n";
+//			cout << "Emptied file into record buffer\n";
+//			cout << "Record Buffer size: "<<count<<"\n";
 			//cout << "Record Buffer Before  "<<record_Buffer;
 			
-			cout<<"------------------------------------------------------\n";
+/*			cout<<"------------------------------------------------------\n";
 			cout<<count<<"\t "<<(sizeof record_Buffer / sizeof record_Buffer[0])<<"\n";
 			cout<<record_Buffer<<" "<<record_Buffer+(count-1)<<"\n";
 			cout<<record_Buffer<<" "<<record_Buffer+(sizeof record_Buffer / sizeof record_Buffer[0])<<"\n";
                         cout<<"------------------------------------------------------\n";
-
+*/
 			sort(record_Buffer,record_Buffer+(count-1),sort_func(args->sort_order));//
 			//sort(record_Buffer,record_Buffer+(sizeof record_Buffer / sizeof record_Buffer[0]),sort_func(args->sort_order));	
 
@@ -117,7 +117,7 @@ void* BigQ::TPMMS_Phase1(void* arg){
 
 			//close dbfile
 			cout << "Emptied Record Buffer\n";
-			cout << "File Length"<<args->run_buffer->at(*(args->num_runs))->GetLength()<<"\n";
+//			cout << "File Length"<<args->run_buffer->at(*(args->num_runs))->GetLength()<<"\n";
 			//sizes[*(args->num_runs)] =
 			args->run_buffer->at(*(args->num_runs))->Close();
 			//cout<<"2. Closed at size "<< sizes[*(args->num_runs)];
@@ -145,7 +145,7 @@ void* BigQ::TPMMS_Phase1(void* arg){
 		// empty put page[]
 		
 	}
-	cout << "Closing last file\n";	
+//	cout << "Closing last file\n";	
 //WARNING	args->run_buffer->at(*(args->num_runs))->Close();
 
 	for (int i=0;i<args->run_buffer->size();i++){
@@ -164,11 +164,11 @@ void* BigQ::TPMMS_Phase1(void* arg){
 	
 		args->run_buffer->at(i)->Open(path);//sizes[i],path);
 		args->run_buffer->at(i)->MoveFirst();
-		cout<<"OPened File Length:"<<args->run_buffer->at(i)->GetLength()<<"\n";
-		cout<<"Opened run "<<i<<" \n";
+//		cout<<"OPened File Length:"<<args->run_buffer->at(i)->GetLength()<<"\n";
+//		cout<<"Opened run "<<i<<" \n";
 	}
 
-	cout<<"All files opened \n";
+//	cout<<"All files opened \n";
 	priority_queue<Record* , vector<Record*> , sort_func> pQueue (sort_func(args->sort_order));
 
 	//build priority queue
@@ -192,24 +192,24 @@ void* BigQ::TPMMS_Phase1(void* arg){
 	}*/
 	Record **next = new Record*[args->run_buffer->size()];
 	
-	Schema schema("catalog","lineitem");
-	(pQueue.top())->Print(&schema);
+//	Schema schema("catalog","lineitem");
+//	(pQueue.top())->Print(&schema);
 		
 	Record *temp1;// = new Record();	
 
 	for (int i=0;i<args->run_buffer->size();i++){
 	
-		cout<<"Filling index "<<i<<" \n";
+	//	cout<<"Filling index "<<i<<" \n";
                 next[i] = new Record();
 		temp1 = new Record();
-		cout<<"File Length: "<<args->run_buffer->at(i)->GetLength();
-		cout<<"result: "<<args->run_buffer->at(i)->GetNext(*temp1)<<"\n";	
-		cout<<temp1<<"\n";
-		cout<<"TEMP:";
-		temp1->Print(&schema);
+	//	cout<<"File Length: "<<args->run_buffer->at(i)->GetLength();
+		args->run_buffer->at(i)->GetNext(*temp1);	
+		//cout<<temp1<<"\n";
+//		cout<<"TEMP:";
+//		temp1->Print(&schema);
 		next[i]->Copy(temp1);
-		cout<<"NEXT";
-		next[i]->Print(&schema);
+//		cout<<"NEXT";
+//		next[i]->Print(&schema);
         }
 
 
@@ -227,7 +227,7 @@ void* BigQ::TPMMS_Phase1(void* arg){
 
 		
 		for (int i=1;i<args->run_buffer->size();i++){
-			cout<<"buffer index "<<i<<" \n";	
+//			cout<<"buffer index "<<i<<" \n";	
 
 			if(compare->Compare(insert,*(next+i),args->sort_order) <=0 ){ 
 				insert->Copy(*(next+i));
@@ -242,6 +242,11 @@ void* BigQ::TPMMS_Phase1(void* arg){
 
 		pQueue.push(insert);
 	
+	}
+
+	while(!pQueue.empty()){
+		args->output->Insert(pQueue.top());
+		pQueue.pop();
 	} 
 }
 

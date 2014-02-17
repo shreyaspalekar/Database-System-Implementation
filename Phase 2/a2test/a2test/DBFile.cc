@@ -138,7 +138,7 @@ int DBFile::GetNext (Record &fetchme) {
 		
 			if(pageIndex>=this->file->GetLength()-1){
 				endOfFile = 1;	
-				cout<<"Setting EOF\n";
+//				cout<<"Setting EOF\n";
 			}
 		
 			else{
