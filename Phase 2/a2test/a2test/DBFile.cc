@@ -1,4 +1,3 @@
-#include <iostream>
 #include "TwoWayList.h"
 #include "Record.h"
 #include "Schema.h"
@@ -18,7 +17,7 @@ DBFile::DBFile () {
 	this->readPage = new Page();
 	this->writePage = new Page();
 	this->current = new Record();
-	this->fpath = new char[20];
+	
 }
 
 DBFile::~DBFile(){
@@ -26,13 +25,12 @@ DBFile::~DBFile(){
 	delete readPage;
 	delete writePage;
 	delete current;
-	delete fpath;
+
 }
 
 int DBFile::Create (char *f_path, fType f_type, void *startup) {
 
 	this->file->Open(0,f_path);
-	//*fpath = *f_path;
 	pageIndex=1;
 	writeIndex=1;
 	writeIsDirty=0;
@@ -54,31 +52,13 @@ void DBFile::Load (Schema &f_schema, char *loadpath) {
 	fclose(tableFile);
 }
 
-int DBFile::Open (off_t length,char *f_path) {
+int DBFile::Open (char *f_path) {
 	//TODO:metadata
-
-	//*fpath = *f_path;
-	
-	//off_t length =;
-	this->file->Open(length,f_path);
+	this->file->Open(1,f_path);
 	pageIndex=1;
 	endOfFile = 0;
 	return 1;
 }
-
-int DBFile::Open (char *f_path) {
-        //TODO:metadata
-
-        //*fpath = *f_path;
-
-        //off_t length =;
-        this->file->Open(1,f_path);
-        pageIndex=1;
-        endOfFile = 0;
-        return 1;
-}
-
-
 
 void DBFile::MoveFirst () {
 //USE GetNext ? is two line code better??
@@ -138,7 +118,6 @@ int DBFile::GetNext (Record &fetchme) {
 		
 			if(pageIndex>=this->file->GetLength()-1){
 				endOfFile = 1;	
-//				cout<<"Setting EOF\n";
 			}
 		
 			else{
@@ -182,9 +161,7 @@ int DBFile::GetNext (Record &fetchme, CNF &cnf, Record &literal) {
 	return 0;
 }
 
-
 off_t DBFile::GetLength(){
 
-        return this->file->GetLength();
+	return this->file->GetLength();
 }
-

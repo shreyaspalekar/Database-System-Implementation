@@ -271,6 +271,8 @@ BigQ :: BigQ (Pipe &in, Pipe &out, OrderMaker &sortorder, int runlen) {
 	args_phase1.sort_order = &sortorder;
 	args_phase1.run_length = &runlen;
 	
+	sortorder.Print();
+	
 	pthread_create (&worker, NULL, &BigQ::TPMMS_Phase1 , (void *)&args_phase1);
 
 	pthread_join(worker,NULL);
