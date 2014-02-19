@@ -93,7 +93,7 @@ void* BigQ::TPMMS_Phase1(void* arg){
 			cout<<record_Buffer<<" "<<record_Buffer+(sizeof record_Buffer / sizeof record_Buffer[0])<<"\n";
                         cout<<"------------------------------------------------------\n";
 */
-			sort(record_Buffer,record_Buffer+(count-1),sort_func(args->sort_order));//
+			stable_sort(record_Buffer,record_Buffer+(count),sort_func(args->sort_order));//
 			//sort(record_Buffer,record_Buffer+(sizeof record_Buffer / sizeof record_Buffer[0]),sort_func(args->sort_order));	
 
 			cout << "Sorted Record buffer\n";
@@ -214,6 +214,37 @@ void* BigQ::TPMMS_Phase1(void* arg){
 
 
 
+	/*for (int i=0;i<1;i++){
+
+			
+		Record *insert = new Record();
+		insert->Copy(*(next+0));
+		
+		ComparisonEngine *compare;
+		int min =0;		
+	
+		for (int i=1;i<args->run_buffer->size();i++){
+//			cout<<"buffer index "<<i<<" \n";	
+
+			if(compare->Compare(insert,*(next+i),args->sort_order) <=0 ){ 
+				insert->Copy(*(next+i));
+				min =i;
+			}
+		}
+
+		
+		if(args->run_buffer->at(min)->GetNext(*(*(next+min)))==0)
+		{	flags--;
+			args->run_buffer->erase(args->run_buffer->begin()+min);
+		}
+
+		pQueue.push(insert);
+
+
+
+	}*/
+
+
 	while(flags!=0){
 
 		Record *temp = new Record();
@@ -229,18 +260,22 @@ void* BigQ::TPMMS_Phase1(void* arg){
 		for (int i=1;i<args->run_buffer->size();i++){
 //			cout<<"buffer index "<<i<<" \n";	
 
-			if(compare->Compare(insert,*(next+i),args->sort_order) <=0 ){ 
+			if(compare->Compare(insert,*(next+i),args->sort_order) <0 ){ 
 				insert->Copy(*(next+i));
 				min =i;
 			}
 		}
 
-		if(args->run_buffer->at(min)->GetNext(*(*(next+min)))==0)
+		
+		pQueue.push(insert);
+		
+		int result = args->run_buffer->at(min)->GetNext(*(*(next+min)));
+
+		 if(result==0)
 		{	flags--;
 			args->run_buffer->erase(args->run_buffer->begin()+min);
 		}
 
-		pQueue.push(insert);
 	
 	}
 

@@ -54,7 +54,10 @@ void *consumer (void *arg) {
 
 		if (prev && last) {
 			if (ceng.Compare (prev, last, t->order) == 1) {
+//				Schema *nuw = new Schema("catalog","lineitem");
 				err++;
+				prev->Print(rel->schema());
+				last->Print(rel->schema());
 				cout<<"At index "<<i<<"\n";
 			}
 			if (t->write) {
