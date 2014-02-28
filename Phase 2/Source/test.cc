@@ -54,7 +54,11 @@ void *consumer (void *arg) {
 
 		if (prev && last) {
 			if (ceng.Compare (prev, last, t->order) == 1) {
+//				Schema *nuw = new Schema("catalog","lineitem");
 				err++;
+				prev->Print(rel->schema());
+				last->Print(rel->schema());
+				cout<<"At index "<<i<<"\n";
 			}
 			if (t->write) {
 				dbfile.Add (*prev);
@@ -87,6 +91,8 @@ void test1 (int option, int runlen) {
 	// sort order for records
 	OrderMaker sortorder;
 	rel->get_sort_order (sortorder);
+	sortorder.Print();
+
 
 	int buffsz = 100; // pipe cache size
 	Pipe input (buffsz);

@@ -8,6 +8,7 @@
 #include "DBFile.h"
 #include "ComparisonEngine.h"
 #include <vector>
+#include <queue>
 
 using namespace std;
 
@@ -28,6 +29,7 @@ class BigQ {
 		//!!check initialization
 		
 		Pipe *input;
+		Pipe *output;
 		OrderMaker *sort_order;
 		int *run_length;
 		int *num_runs;
@@ -47,7 +49,7 @@ class BigQ {
 	static void* TPMMS_Phase1(void* arg);
 	void* TPMMS_Phase2(void* arg);
 	static void quicksort(vector<Record> &rb, int left, int right,OrderMaker &sortorder);
-	
+//	static bool sort_func(Record &,Record &,OrderMaker &sortorder);	
 	/*Deprecated: Replaced by DBFile , no need for indexing
 	//Record *recordBuff;
 	//int pageLength = 0;//no of recrods per page
@@ -58,6 +60,62 @@ public:
 
 	BigQ (Pipe &in, Pipe &out, OrderMaker &sortorder, int runlen);
 	~BigQ ();
+};
+
+class sort_func{
+
+private:
+
+	OrderMaker *sort_order;
+
+public:
+
+	sort_func(OrderMaker *order){
+		this->sort_order = order;
+	}
+
+	sort_func(){};
+
+	bool operator()(Record *one,Record *two) const{
+
+		/*Record *one = new Record();
+
+		Record *two = new Record();
+		one->Copy(const_cast<Record *>(&onei));		
+
+		
+
+
+		two->Copy(const_cast<Record *>(&twoi));		
+		*/	
+	//	Record *inp1 = const_cast<Record*>(one);	
+	//	Record *inp2 = const_cast<Record*>(two);	
+
+//		cout<<"Read at location"<<inp1;
+//		cout<<"Comparing "<<one<<" and "<<two<<"\n";
+
+
+
+ //                       Schema schema("catalog","lineitem");
+                        //cout<<"Count: "<<count<<""; 
+//                        one->Print(&schema);
+//			two->Print(&schema);
+
+
+
+		ComparisonEngine *compare;
+
+		if(compare->Compare(one,two,this->sort_order)<0){
+			return true;
+		}
+
+		else{
+			return false;
+		}
+	}
+
+	
+
 };
 
 #endif

@@ -9,10 +9,11 @@
 Record :: Record () {
 	bits = NULL;
 }
+/*
+Record :: Record(const Record &nu){
 
-Record :: Record(Record &nu){
-
-	this->Copy(&nu);
+	Record r = const_cast<Record>(&nu);
+	this->Copy(&r);
 
 }
 
@@ -20,7 +21,7 @@ Record Record:: operator=( Record& rhs ){
 	
 	this->Copy(&rhs);
 }
-
+*/
 
 Record :: ~Record () {
 	if (bits != NULL) {
