@@ -17,7 +17,7 @@ class BigQ {
 	//DataStructures 
 	//Record temp to read in records from pipes
 	
-	Record temp;
+	//Record temp;
 	vector<DBFile*> *runs;
 	int no_runs;
 	pthread_t worker;
@@ -26,21 +26,10 @@ class BigQ {
 	
 	struct args_phase1_struct {                                                   
 		
-		//!!check initialization
-		
 		Pipe *input;
 		Pipe *output;
 		OrderMaker *sort_order;
 		int *run_length;
-		int *num_runs;
-		Record *temporary;
-		vector<DBFile*> *run_buffer;
-		char *file_path;
-		
-		/*Deprecated: Replaced by DBFile , no need for indexing
-		//int pageLen = pageLength;
-		//Record *recordBuffer = recordBuff; 
-		//Page *buf = buffer;*/
 	
 	}args_phase1;
 
@@ -49,6 +38,7 @@ class BigQ {
 	static void* TPMMS_Phase1(void* arg);
 	void* TPMMS_Phase2(void* arg);
 	static void quicksort(vector<Record> &rb, int left, int right,OrderMaker &sortorder);
+	static void sort_run(Page*,int,File&,int&,OrderMaker *);
 //	static bool sort_func(Record &,Record &,OrderMaker &sortorder);	
 	/*Deprecated: Replaced by DBFile , no need for indexing
 	//Record *recordBuff;
@@ -61,6 +51,14 @@ public:
 	BigQ (Pipe &in, Pipe &out, OrderMaker &sortorder, int runlen);
 	~BigQ ();
 };
+
+typedef struct rwrap{
+	
+	Record rec;
+	int run;
+
+}rwrap;
+
 
 class sort_func{
 
@@ -114,8 +112,60 @@ public:
 		}
 	}
 
+
+	bool operator()(rwrap *one,rwrap *two) const{
+
+		ComparisonEngine *compare;
+
+		if(compare->Compare(&(one->rec),&(two->rec),this->sort_order)<0){
+			return true;
+		}
+
+		else{
+			return false;
+		}
+	}
+
 	
 
 };
+
+
+/*class sort_func2{
+
+private:
+
+	OrderMaker *sort_order;
+
+public:
+
+	sort_func(OrderMaker *order){
+		this->sort_order = order;
+	}
+
+	sort_func(){};
+
+	bool operator()(rwrap *one,rwrap *two) const{
+
+		ComparisonEngine *compare;
+
+		if(compare->Compare(&(one->rec),&(two->rec),this->sort_order)<0){
+			return true;
+		}
+
+		else{
+			return false;
+		}
+	}
+
+	
+
+};*/
+
+
+
+
+
+
 
 #endif

@@ -56,9 +56,9 @@ void *consumer (void *arg) {
 			if (ceng.Compare (prev, last, t->order) == 1) {
 //				Schema *nuw = new Schema("catalog","lineitem");
 				err++;
-				prev->Print(rel->schema());
-				last->Print(rel->schema());
-				cout<<"At index "<<i<<"\n";
+				//prev->Print(rel->schema());
+				//last->Print(rel->schema());
+				//cout<<"At index "<<i<<"\n";
 			}
 			if (t->write) {
 				dbfile.Add (*prev);
