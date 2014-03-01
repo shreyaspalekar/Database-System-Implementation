@@ -3,6 +3,10 @@
 
 void BigQ::sort_run(Page *p, int num_recs,File& new_file,int& gp_index,OrderMaker *sort_order){
 
+
+	cout<<"G index start "<<gp_index<<"\n";
+
+
 	Record **record_Buffer= new Record*[num_recs];
 
 	int c   =  0;
@@ -34,13 +38,64 @@ void BigQ::sort_run(Page *p, int num_recs,File& new_file,int& gp_index,OrderMake
 
 	sort(record_Buffer,record_Buffer+(num_recs),sort_func(sort_order));
 
+	//DEBUG
 
-	Schema schema("catalog","lineitem");
+	int k = 0,err = 0,succ = 0;
+
+
+	Record *last = NULL, *prev = NULL;
+
+
+	ComparisonEngine ceng;
+	while (k < num_recs) {
+
+
+		prev = last;
+
+
+		last = record_Buffer[k];
+
+
+
+
+
+
+		if (prev && last) {
+
+
+			if (ceng.Compare (prev, last, sort_order) == 1) {
+
+
+				err++;
+			}
+
+
+			else {
+				succ++;
+
+
+			}
+		}
+
+
+		k++;
+	}
+
+
+
+	cout << "ERROR in sorting this run = " << err << endl;
+	cout << "succ in sorting this run = " << succ << endl;
+
+
+
+
+	/*Schema schema("catalog","lineitem");
 	for(int i=0;i<num_recs;i++){
 	
 		(*(record_Buffer+i))->Print(&schema);
 
-	}
+	}*/
+	//DEBUG
 
 
 	c=0;
@@ -73,9 +128,11 @@ void BigQ::sort_run(Page *p, int num_recs,File& new_file,int& gp_index,OrderMake
 		
 	if(pageIsDirty==1){
 
-		new_file.AddPage(tp,(off_t)(gp_index));	
+		new_file.AddPage(tp,(off_t)(gp_index++));	
 
 	}
+
+	cout<<"G index end "<<gp_index<<"\n";
 
 	delete tp;
 	//delete record_Buffer;
@@ -253,7 +310,7 @@ void* BigQ::TPMMS_Phase1(void* arg){
 	}
 
 	index[num_runs-1][start] = 1+((*(args->run_length))*(num_runs-1));
-	index[num_runs-1][end] = gp_index;
+	index[num_runs-1][end] = gp_index-1;
 
 	//DEBUG
 		

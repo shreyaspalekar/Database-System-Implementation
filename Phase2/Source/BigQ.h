@@ -118,11 +118,13 @@ public:
 		ComparisonEngine *compare;
 
 		if(compare->Compare(&(one->rec),&(two->rec),this->sort_order)<0){
-			return true;
+			//return true;
+			return false;
 		}
 
 		else{
-			return false;
+			//return false;
+			return true;
 		}
 	}
 
