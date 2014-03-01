@@ -87,7 +87,7 @@ void BigQ::sort_run(Page *p, int num_recs,File& new_file,int& gp_index,OrderMake
 	cout << "succ in sorting this run = " << succ << endl;
 
 
-
+	
 
 	/*Schema schema("catalog","lineitem");
 	for(int i=0;i<num_recs;i++){
@@ -135,7 +135,12 @@ void BigQ::sort_run(Page *p, int num_recs,File& new_file,int& gp_index,OrderMake
 	cout<<"G index end "<<gp_index<<"\n";
 
 	delete tp;
-	//delete record_Buffer;
+	
+	for(int i=0;i<num_recs;i++){
+		delete *(record_Buffer+i);
+	}
+
+	delete record_Buffer;
 
 }
 
@@ -183,7 +188,7 @@ void* BigQ::TPMMS_Phase1(void* arg){
 			if((p+p_index)->Append(temporary)==1){
 	
 				num_recs++;
-				temporary = new Record();		
+				//temporary = new Record();	VALGRIND	
 
 			}
 
@@ -227,7 +232,7 @@ void* BigQ::TPMMS_Phase1(void* arg){
 			sort_run(p,num_recs,new_file,gp_index,args->sort_order);
 			
 	                cout << "Runs created  " << num_runs << "\n";
-			cout << "Toal Pages Read " <<  gp_index << "\n";
+			cout << "Total Pages Read " <<  gp_index << "\n";
 			
 
 			//Empty file into record buffer
@@ -251,7 +256,7 @@ void* BigQ::TPMMS_Phase1(void* arg){
 //	cout<<"All files opened \n";
 
 	delete temporary;
-	//delete p;  !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!WHYYY?????
+	//delete p; // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!WHYYY?????
 
 	//DEBUG
 	new_file.Close();
@@ -367,7 +372,12 @@ void* BigQ::TPMMS_Phase1(void* arg){
 				pQueue.push(insert);
 
 			}	
-		}		
+		}	
+
+		
+		//delete insert;   	DOUBLE FREE ERROR
+		//delete t;		DOUBLE FREE ERROR
+	
 	
 	}
 

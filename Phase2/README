@@ -1,3 +1,4 @@
 Big Q has been restructured. 
+implement direction for comparator
 Records go missing for small no of run sizes.
 Have to do more valgrind
