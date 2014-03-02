@@ -14,6 +14,7 @@ typedef enum {heap, sorted, tree} fType;
 
 class DBFile {
 	
+	char file_path[20];
 	Record* current;
 	Page* readPage;
 	Page* writePage;
