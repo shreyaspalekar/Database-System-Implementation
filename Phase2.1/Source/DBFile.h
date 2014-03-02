@@ -39,6 +39,8 @@ class DBFile {
 
 public:
 	DBFile (); 
+	
+	GenericDBFile file* = NULL;
 
 	int Create (char *fpath, fType file_type, void *startup);
 	int Open (char *fpath);
