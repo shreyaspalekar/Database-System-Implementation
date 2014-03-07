@@ -38,9 +38,9 @@ void SortedFile::Load (Schema &f_schema, char *loadpath) {		// requires BigQ ins
 	if(m!=W){
 		m = W;
 		// create input, output pipe and BigQ instance
-		if(inPipe!=NULL)inPipe = new Pipe(100);	// requires size ?
-		if(outPipe!=NULL)outPipe = new Pipe(100);
-		if(bq!=NULL)bq = new BigQ(*inPipe,*outPipe,*(si->myOrder),si->runLength);
+		if(inPipe==NULL)inPipe = new Pipe(100);	// requires size ?
+		if(outPipe==NULL)outPipe = new Pipe(100);
+		if(bq==NULL)bq = new BigQ(*inPipe,*outPipe,*(si->myOrder),si->runLength);
 	}
 
 	FILE* tableFile = fopen (loadpath,"r");
@@ -73,8 +73,6 @@ int SortedFile::Open (char *f_path) {
 	ifs.close();
 
 	m = R;
-
-	cout<<"Calling MF\n";
 
 	MoveFirst();
 
@@ -135,14 +133,32 @@ int SortedFile::Close () {			// requires MergeFromOuputPipe()	done
 
 void SortedFile::Add (Record &rec) {	// requires BigQ instance		done
 
+
+	cout<<m<<"\n";
+
 	if(m!=W){
 		m = W;
+		cout<<m<<"\n";
+
 		// create input, output pipe and BigQ instance
-		if(inPipe!=NULL)inPipe = new Pipe(100);	// requires size ?
-		if(outPipe!=NULL)outPipe = new Pipe(100);
-		if(bq!=NULL)bq = new BigQ(*inPipe,*outPipe,*(si->myOrder),si->runLength);
+		if(inPipe==NULL){
+			inPipe = new Pipe(100);	// requires size ?
+			cout<<"Setting up input pipe\n";		
+		}
+		if(outPipe==NULL){
+			outPipe = new Pipe(100);
+			cout<<"Setting up output pipe\n";
+		}
+		if(bq==NULL){
+
+			cout<<si->runLength<<"\n";
+
+			bq = new BigQ(*inPipe,*outPipe,*(si->myOrder),si->runLength);
+			cout<<"Setting up BigQ\n";
+		}
 	}
 
+	//cout << inPipe<<"\n";
 	
 	inPipe->Insert(&rec);	// pipe blocks and record is consumed or is buffering required ?
 
