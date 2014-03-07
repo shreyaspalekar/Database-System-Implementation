@@ -6,7 +6,8 @@
 #include "ComparisonEngine.h"
 #include "DBFile.h"
 #include "Defs.h"
-
+#include "TwoWayList.h"
+#include "Record.h"
 // stub file .. replace it with your own DBFile.cc
 
 DBFile::DBFile () {
@@ -15,20 +16,22 @@ DBFile::DBFile () {
 
 int DBFile::Create (char *f_path, fType f_type, void *startup) {
 
-	if(f_type==fType.heap){
+	if(f_type==heap){
 
-		file = new HeapFile();
-
-	}
-	else if(f_type==fType.sorted){
-
-		file= new SortedFile();	
+		HeapFile *h = new HeapFile();
+		this->file= h;
 
 	}
+	else if(f_type==sorted){
 
-	if(file!==NULL){
+		SortedFile *s = new SortedFile();
+		this->file= s;	
 
-		file.Create(f_path,f_type,startup);		
+	}
+
+	if(file!=NULL){
+
+		file->Create(f_path,f_type,startup);		
 
 	}	
 
@@ -36,7 +39,7 @@ int DBFile::Create (char *f_path, fType f_type, void *startup) {
 
 void DBFile::Load (Schema &f_schema, char *loadpath) {
 
-	file.Load(f_schema,loadpath);
+	file->Load(f_schema,loadpath);
 
 }
 
@@ -54,16 +57,20 @@ int DBFile::Open (char *f_path) {
 
 	if(f_type=="heap"){
 	
-		file = new Heapfile();
+
+		HeapFile *h = new HeapFile();
+		this->file= h;
 
 	}
 	else if(f_type=="sorted"){
 	
-		file = new SortedFile();
+
+		SortedFile *s = new SortedFile();
+		this->file= s;	
 
 	}
 
-	file.Open(f_path);
+	file->Open(f_path);
 
 	//Note:should we read the order maker at this level or let the sorted file handle it??
 
@@ -73,30 +80,30 @@ int DBFile::Open (char *f_path) {
 
 void DBFile::MoveFirst () {
 
-	file.MoveFirst();
+	file->MoveFirst();
 
 }
 
 int DBFile::Close () {
 
-	return file.Close();
+	return file->Close();
 
 }
 
 void DBFile::Add (Record &rec) {
 
-	return file.Add(rec);
+	return file->Add(rec);
 
 }
 
 int DBFile::GetNext (Record &fetchme) {
 
-	return file.GetNext(fetchme);
+	return file->GetNext(fetchme);
 
 }
 
 int DBFile::GetNext (Record &fetchme, CNF &cnf, Record &literal) {
 
-	return file.GetNext(fetchme,cnf,literal);
+	return file->GetNext(fetchme,cnf,literal);
 
 }

@@ -7,8 +7,11 @@
 #include "File.h"
 #include "Comparison.h"
 #include "ComparisonEngine.h"
+#include "HeapFile.h"
+#include "SortedFile.h"
 
-typedef enum {heap, sorted, tree} fType;
+
+enum fType {heap, sorted, tree} ;
 
 // stub DBFile header..replace it with your own DBFile.h 
 
@@ -31,7 +34,7 @@ public:
 	
 	virtual ~GenericDBFile();
 
-}
+};
 
 
 
@@ -40,7 +43,7 @@ class DBFile {
 public:
 	DBFile (); 
 	
-	GenericDBFile file* = NULL;
+	GenericDBFile *file = NULL;
 
 	int Create (char *fpath, fType file_type, void *startup);
 	int Open (char *fpath);
