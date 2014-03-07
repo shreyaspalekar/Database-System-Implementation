@@ -188,7 +188,7 @@ void* BigQ::TPMMS_Phase1(void* arg){
 			if((p+p_index)->Append(temporary)==1){
 	
 				num_recs++;
-				//temporary = new Record();	VALGRIND	
+				//temporary = new Record();	//VALGRIND	
 
 			}
 
@@ -402,15 +402,10 @@ BigQ :: BigQ (Pipe &in, Pipe &out, OrderMaker &sortorder, int runlen) {
 	
 	pthread_create (&worker, NULL, &BigQ::TPMMS_Phase1 , (void *)&args_phase1);
 
-	pthread_join(worker,NULL);
+	//pthread_join(worker,NULL);// Why?
 	
-	// read data from in pipe sort them into runlen pages
 	
-    	// construct priority queue over sorted runs and dump sorted data 
- 	// into the out pipe
-
-    	// finally shut down the out pipe
-	out.ShutDown ();
+	//out.ShutDown ();
 }
 
 

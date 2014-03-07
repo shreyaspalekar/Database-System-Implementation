@@ -6,17 +6,18 @@ void test2 ();
 void test3 ();
 
 int add_data (FILE *src, int numrecs, int &res) {
-	DBFile dbfile;
 	
-	cout<<"Adding Data\n";
-
+	DBFile dbfile;
 	dbfile.Open (rel->path ());
 	Record temp;
+
+	cout<<"Adding Data\n";
 
 	int proc = 0;
 	int xx = 20000;
 	while ((res = temp.SuckNextRecord (rel->schema (), src)) && ++proc < numrecs) {
 		dbfile.Add (temp);
+		cout<<proc<<"\n";
 		if (proc == xx) cerr << "\t ";
 		if (proc % xx == 0) cerr << ".";
 	}

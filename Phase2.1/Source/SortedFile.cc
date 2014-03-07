@@ -11,8 +11,8 @@
 #include <string.h>
 
 SortedFile::SortedFile () {
-	inPipe = NULL;
-	outPipe = NULL;
+	inPipe = new Pipe(100);	
+	outPipe = new Pipe(100);	
 	bq = NULL;
 	file = new File();
 	readPageBuffer = new Page();
@@ -38,8 +38,8 @@ void SortedFile::Load (Schema &f_schema, char *loadpath) {		// requires BigQ ins
 	if(m!=W){
 		m = W;
 		// create input, output pipe and BigQ instance
-		if(inPipe==NULL)inPipe = new Pipe(100);	// requires size ?
-		if(outPipe==NULL)outPipe = new Pipe(100);
+		//if(inPipe==NULL)inPipe = new Pipe(100);	// requires size ?
+		//if(outPipe==NULL)outPipe = new Pipe(100);
 		if(bq==NULL)bq = new BigQ(*inPipe,*outPipe,*(si->myOrder),si->runLength);
 	}
 
@@ -114,6 +114,10 @@ void SortedFile::MoveFirst () {			// requires MergeFromOuputPipe()
 }
 
 int SortedFile::Close () {			// requires MergeFromOuputPipe()	done
+	
+	if(m==W)	
+		MergeFromOutpipe();
+
 	file->Close();
 	endOfFile = 1;
 	// write updated state to meta file
@@ -136,21 +140,21 @@ int SortedFile::Close () {			// requires MergeFromOuputPipe()	done
 void SortedFile::Add (Record &rec) {	// requires BigQ instance		done
 
 
-	cout<<m<<"\n";
+	//cout<<m<<"\n";
 
 	if(m!=W){
 		m = W;
-		cout<<m<<"\n";
+		//cout<<m<<"\n";
 
 		// create input, output pipe and BigQ instance
-		if(inPipe==NULL){
+		/*if(inPipe==NULL){
 			inPipe = new Pipe(100);	// requires size ?
 			cout<<"Setting up input pipe\n";		
 		}
 		if(outPipe==NULL){
 			outPipe = new Pipe(100);
 			cout<<"Setting up output pipe\n";
-		}
+		}*/
 		if(bq==NULL){
 
 			cout<<si->runLength<<"\n";
@@ -200,6 +204,8 @@ int SortedFile::GetNext (Record &fetchme, CNF &cnf, Record &literal) {		// requi
 void SortedFile:: MergeFromOutpipe(){		// requires both read and write modes
 
 	// close input pipe
+	cout<<inPipe<<"\n";
+
 	inPipe->ShutDown();
 	// get sorted records from output pipe
 	ComparisonEngine *ce;
@@ -216,8 +222,9 @@ void SortedFile:: MergeFromOutpipe(){		// requires both read and write modes
 	newFile->Open(0,"mergedFile");				
 
 	bool nomore = false;
+        int result =GetNew(rFromFile);
 
-	while(true){
+	while(true&&result!=0){
 
 		if(outPipe->Remove(rtemp)==1){		// got the record from out pipe
 
