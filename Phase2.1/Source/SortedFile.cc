@@ -68,6 +68,8 @@ int SortedFile::Open (char *f_path) {
 
 	ifstream ifs(fName,ios::binary);
 
+	ifs.seekg(sizeof(fileName)-1);//,ifs.beg);
+
 	ifs.read((char*)&si, sizeof(si)); 
 
 	ifs.close();
