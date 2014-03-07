@@ -14,7 +14,7 @@ using namespace std;
 
 char *catalog_path = "catalog"; 
 char *dbfile_dir = ""; 
-char *tpch_dir ="/cise/tmp/dbi_sp11/DATA/1G/"; 
+char *tpch_dir ="./table_files/"; 
 
 
 extern "C" {

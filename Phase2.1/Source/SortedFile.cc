@@ -74,6 +74,8 @@ int SortedFile::Open (char *f_path) {
 
 	m = R;
 
+	cout<<"Calling MF\n";
+
 	MoveFirst();
 
 	// set to read mode
@@ -90,8 +92,12 @@ void SortedFile::MoveFirst () {			// requires MergeFromOuputPipe()
 
 	if(m==R){
 		// In read mode, so direct movefirst is possible
-		file->GetPage(readPageBuffer,1); //TODO: check off_t type,  void GetPage (Page *putItHere, off_t whichPage)
-		readPageBuffer->GetFirst(current);
+		
+		if(file->GetLength()!=0){
+			file->GetPage(readPageBuffer,1); //TODO: check off_t type,  void GetPage (Page *putItHere, off_t whichPage)
+			readPageBuffer->GetFirst(current);
+		}
+
 	}
 	else{
 		// change mode to read
@@ -136,8 +142,11 @@ void SortedFile::Add (Record &rec) {	// requires BigQ instance		done
 		if(outPipe!=NULL)outPipe = new Pipe(100);
 		if(bq!=NULL)bq = new BigQ(*inPipe,*outPipe,*(si->myOrder),si->runLength);
 	}
+
+	
 	inPipe->Insert(&rec);	// pipe blocks and record is consumed or is buffering required ?
 
+	cout <<"Added\n";
 }
 
 int SortedFile::GetNext (Record &fetchme) {		// requires MergeFromOuputPipe()		done

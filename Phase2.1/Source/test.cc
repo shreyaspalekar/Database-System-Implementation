@@ -7,6 +7,9 @@ void test3 ();
 
 int add_data (FILE *src, int numrecs, int &res) {
 	DBFile dbfile;
+	
+	cout<<"Adding Data\n";
+
 	dbfile.Open (rel->path ());
 	Record temp;
 

@@ -1,3 +1,5 @@
+#include "Schema.h"
+#include "Record.h"
 
 enum fType {heap, sorted, tree} ;
 class GenericDBFile{
