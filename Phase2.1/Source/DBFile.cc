@@ -8,6 +8,9 @@
 #include "TwoWayList.h"
 #include "Record.h"
 #include "DBFile.h"
+#include <string.h>
+
+
 // stub file .. replace it with your own DBFile.cc
 
 DBFile::DBFile () {
@@ -53,14 +56,14 @@ int DBFile::Open (char *f_path) {
 	fscanf(meta,"%s",f_type);
 	//read meta details from file
 
-	if(f_type=="heap"){
+	if(strcmp(f_type,"heap")==0){
 	
 
 		HeapFile *h = new HeapFile();
 		this->file= h;
 
 	}
-	else if(f_type=="sorted"){
+	else if(strcmp(f_type,"sorted")==0){
 	
 
 		SortedFile *s = new SortedFile();

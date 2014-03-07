@@ -1,12 +1,10 @@
-#ifndef SORTEDFILE_H
-#define SORTEDFILE_H
 #include "TwoWayList.h"
 #include "Record.h"
 #include "Schema.h"
 #include "File.h"
 #include "Comparison.h"
 #include "ComparisonEngine.h"
-#include "DBFile.h"
+//#include "DBFile.h"
 
 
 struct SortInfo { 
@@ -19,11 +17,14 @@ enum Mode {R, W};
 class SortedFile: public GenericDBFile{
 
 private:
+
+	char *fileName;
 	Pipe *inPipe;
 	Pipe *outPipe;
 	BigQ *bq;
 	Page *readPageBuffer;
-	Page *pageToBeMerged;
+	Page *tobeMerged;
+	int pagePtrForMerge;
 	File* file;
 	Mode m;
 	SortInfo *si;
@@ -47,6 +48,7 @@ public:
 	int GetNext (Record &fetchme, CNF &cnf, Record &literal);
 
 	void MergeFromOutpipe();
-	
+	int GetNew(Record *r1);	
+
+	~SortedFile();
 };
-#endif
