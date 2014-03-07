@@ -1,6 +1,6 @@
-#ifndef DBFILE_H
-#define DBFILE_H
 
+#ifndef HEAPFILE_H
+#define HEAPFILE_H
 #include "TwoWayList.h"
 #include "Record.h"
 #include "Schema.h"
@@ -9,12 +9,11 @@
 #include "ComparisonEngine.h"
 #include "DBFile.h"
 
-typedef enum {heap, sorted, tree} fType;
 
 
 class HeapFile : public GenericDBFile{
 
-	char file_path[20];
+	char *file_path;
 	Record* current;
 	Page* readPage;
 	Page* writePage;
@@ -41,5 +40,5 @@ public:
 	int GetNext (Record &fetchme, CNF &cnf, Record &literal);
 
 
-}
+};
 #endif

@@ -1,3 +1,5 @@
+#ifndef SORTEDFILE_H
+#define SORTEDFILE_H
 #include "TwoWayList.h"
 #include "Record.h"
 #include "Schema.h"
@@ -5,7 +7,7 @@
 #include "Comparison.h"
 #include "ComparisonEngine.h"
 #include "DBFile.h"
-#include "BigQ.h"
+
 
 struct SortInfo { 
 	OrderMaker *myOrder; 
@@ -28,7 +30,7 @@ private:
 	Record* current;
 	off_t pageIndex;
 	off_t writeIndex;
-	int endOfFile = 0;
+	int endOfFile;
 
 public:
 	SortedFile (); 
@@ -44,6 +46,7 @@ public:
 	int GetNext (Record &fetchme);
 	int GetNext (Record &fetchme, CNF &cnf, Record &literal);
 
-	void SortedFile:: MergeFromOutpipe();
+	void MergeFromOutpipe();
 	
-}
+};
+#endif

@@ -4,10 +4,10 @@
 #include "File.h"
 #include "Comparison.h"
 #include "ComparisonEngine.h"
-#include "DBFile.h"
 #include "Defs.h"
 #include "TwoWayList.h"
 #include "Record.h"
+#include "DBFile.h"
 // stub file .. replace it with your own DBFile.cc
 
 DBFile::DBFile () {
@@ -18,14 +18,12 @@ int DBFile::Create (char *f_path, fType f_type, void *startup) {
 
 	if(f_type==heap){
 
-		HeapFile *h = new HeapFile();
-		this->file= h;
+		this->file= new HeapFile();
 
 	}
 	else if(f_type==sorted){
 
-		SortedFile *s = new SortedFile();
-		this->file= s;	
+		this->file= new SortedFile();	
 
 	}
 

@@ -4,9 +4,8 @@
 #include "File.h"
 #include "Comparison.h"
 #include "ComparisonEngine.h"
-#include "Heap.h"
 #include "Defs.h"
-
+#include "HeapFile.h"
 // stub file .. replace it with your own Heap.cc
 
 //TODO:optimise for branch misses
@@ -30,7 +29,7 @@ HeapFile::~HeapFile(){
 
 int HeapFile::Create (char *f_path, fType f_type, void *startup) {
 
-	this->file_path = *f_path;
+	*(this->file_path) = *f_path;
 	this->file->Open(0,f_path);
 	pageIndex=1;
 	writeIndex=1;
@@ -53,7 +52,7 @@ void HeapFile::Load (Schema &f_schema, char *loadpath) {
 
 int HeapFile::Open (char *f_path) {
 	//TODO:metadata
-	this->file_path = *f_path;
+	*(this->file_path) = *f_path;
 	this->file->Open(1,f_path);
 	pageIndex=1;
 	endOfFile = 0;

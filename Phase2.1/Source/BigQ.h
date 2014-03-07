@@ -5,7 +5,6 @@
 #include "Pipe.h"
 #include "File.h"
 #include "Record.h"
-#include "DBFile.h"
 #include "ComparisonEngine.h"
 #include <vector>
 #include <queue>
@@ -18,7 +17,6 @@ class BigQ {
 	//Record temp to read in records from pipes
 	
 	//Record temp;
-	vector<DBFile*> *runs;
 	int no_runs;
 	pthread_t worker;
 	int page_Index;
