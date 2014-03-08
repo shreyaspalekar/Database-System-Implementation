@@ -67,6 +67,8 @@ void Pipe :: Insert (Record *insertMe) {
 
 int Pipe :: Remove (Record *removeMe) {
 	 
+	cout<<lastSlot<<" "<<firstSlot<<"\n";
+
 	// first, get a mutex on the pipeline
 	pthread_mutex_lock (&pipeMutex);
 

@@ -73,6 +73,8 @@ int Page :: Append (Record *addMe) {
 	}
 
 	// move to the last record
+	//cout<<"myrecs "<<myRecs<<"\n";
+	
 	myRecs->MoveToFinish ();
 
 	// and add it

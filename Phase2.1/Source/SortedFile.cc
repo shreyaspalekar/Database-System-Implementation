@@ -20,6 +20,18 @@ SortedFile::SortedFile () {
 	m = R;
 }
 
+void* SortedFile::instantiate_BigQ(void* arg){
+
+	thread_arguments *args;
+	args = (thread_arguments *) arg;
+
+	//cout<<"check   "<<(args.s).runLength;
+	//cout<<"t check "<<args->in<<"\n";
+
+	args->b = new BigQ(*(args->in),*(args->out),*((args->s).myOrder),(args->s).runLength);
+
+}
+
 int SortedFile::Create (char *f_path, fType f_type, void *startup) {	// done
 	file->Open(0,f_path);	
 
@@ -139,7 +151,10 @@ int SortedFile::Close () {			// requires MergeFromOuputPipe()	done
 
 void SortedFile::Add (Record &rec) {	// requires BigQ instance		done
 
+	//cout<<"check "<<inPipe<<"\n";
 
+	inPipe->Insert(&rec);
+	//inPipe->ShutDown();
 	//cout<<m<<"\n";
 
 	if(m!=W){
@@ -157,18 +172,32 @@ void SortedFile::Add (Record &rec) {	// requires BigQ instance		done
 		}*/
 		if(bq==NULL){
 
-			cout<<si->runLength<<"\n";
+			//cout<<"run length "<<si->runLength<<"\n";
+			thread_args.in = inPipe;
+			thread_args.out = outPipe;
+			thread_args.s.myOrder = si->myOrder;
+			thread_args.s.runLength =  si->runLength;
+			thread_args.b = bq;
 
-			bq = new BigQ(*inPipe,*outPipe,*(si->myOrder),si->runLength);
+			
+
+			pthread_create(&bigQ_t, NULL, &SortedFile::instantiate_BigQ , (void *)&thread_args);
+
+
 			cout<<"Setting up BigQ\n";
 		}
 	}
 
-	//cout << inPipe<<"\n";
-	
-	inPipe->Insert(&rec);	// pipe blocks and record is consumed or is buffering required ?
 
-	cout <<"Added\n";
+	//cout<<"record adr"<<&rec<<"\n";
+	
+
+	//cout << inPipe<<"\n";
+	//inPipe= new Pipe(100);
+	
+		// pipe blocks and record is consumed or is buffering required ?
+
+	//cout <<"Added\n";
 }
 
 int SortedFile::GetNext (Record &fetchme) {		// requires MergeFromOuputPipe()		done
@@ -296,10 +325,16 @@ void SortedFile:: MergeFromOutpipe(){		// requires both read and write modes
 
 	// delete resources that are not required
 
-	if(rename("mergefile.tmp", fileName)) {				// making merged file the new file
+	if(rename(fileName,"mergefile.tmp")!=0) {				// making merged file the new file
 		cerr <<"rename file error!"<<endl;
 		return;
 	}
+
+	if(rename("mergedFile",fileName)!=0) {				// making merged file the new file
+		cerr <<"rename file error!"<<endl;
+		return;
+	}
+
 	readPageBuffer->EmptyItOut();
 
 	file->Open(1, this->fileName);

@@ -32,6 +32,19 @@ private:
 	off_t pageIndex;
 	off_t writeIndex;
 	int endOfFile;
+	pthread_t bigQ_t;
+
+
+	struct thread_arguments{
+	
+		Pipe *in;
+		Pipe *out;
+		SortInfo s;
+		BigQ *b; 
+
+	}thread_args;
+
+	typedef struct thread_arguments thread_arguments; 
 
 public:
 	SortedFile (); 
@@ -49,6 +62,9 @@ public:
 
 	void MergeFromOutpipe();
 	int GetNew(Record *r1);	
+
+
+	static void *instantiate_BigQ(void*);
 
 	~SortedFile();
 };

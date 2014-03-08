@@ -158,6 +158,8 @@ void* BigQ::TPMMS_Phase1(void* arg){
 	char f_path[8] = "runfile";
 	new_file.Open(0,f_path);
 
+
+	cout<<"runlength in thread"<<*(args->run_length)<<"\n";
 	
 	Page *p = new Page[*(args->run_length)]();	
  
@@ -173,14 +175,14 @@ void* BigQ::TPMMS_Phase1(void* arg){
 	int num_runs  =  1;		//goes from 1 to n,set to one as the array size is n, else set array size to n+1 to use indexing from 1
 	//r_index[num_runs-1]=1;
 	
-
+		
 	//***check resets of indexes
 	while(result!=0){ // till input pipe is empty
 	
-				
+			
 		//Read record from pipe
 	        result = args->input->Remove(temporary); // till input pipe is empty
-								//append record temporary to page at pageindex
+		//cout<<result<<"\n";							//append record temporary to page at pageindex
 		//Increment record counter
 
 		if(result!=0){
@@ -385,6 +387,11 @@ void* BigQ::TPMMS_Phase1(void* arg){
 		args->output->Insert(&((pQueue.top())->rec));
 		pQueue.pop();
 	} 
+	
+
+	//pthread_exit();
+	cout<<"thread shutting down";
+	//args->output->ShutDown();
 }
 
 
@@ -397,14 +404,17 @@ BigQ :: BigQ (Pipe &in, Pipe &out, OrderMaker &sortorder, int runlen) {
 	args_phase1.output = &out;
 	args_phase1.sort_order = &sortorder;
 	args_phase1.run_length = &runlen;
+
+
+	//cout<<"sent run length"<<runlen<<"\n";
 	
-	sortorder.Print();
+	//sortorder.Print();
 	
 	pthread_create (&worker, NULL, &BigQ::TPMMS_Phase1 , (void *)&args_phase1);
 
-	//pthread_join(worker,NULL);// Why?
+	pthread_join(worker,NULL);// Why?
 	
-	
+	cout<<"thread shut";	
 	//out.ShutDown ();
 }
 
