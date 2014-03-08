@@ -333,17 +333,27 @@ void* BigQ::TPMMS_Phase1(void* arg){
 	cout<<"Begin Merge\n";
 	while(flags!=0){
 
+		//Schema schema("catalog","lineitem");
+
 		rwrap *temp;
 		temp = pQueue.top();
 		pQueue.pop();
 
 		next = temp->run;
 
+		//temp->rec.Print(&schema);
+
 		args->output->Insert(&(temp->rec));
 
 		rwrap *insert = new rwrap;		
 		Record *t = new Record();
  
+
+		
+	//	(pQueue.top())->Print(&schema);
+
+
+
 		if(fin[next]==0)
 		{
 			if((buf+next)->GetFirst(t)==0){
@@ -361,7 +371,10 @@ void* BigQ::TPMMS_Phase1(void* arg){
 
 					(buf+next)->GetFirst(t);
 					insert->rec = *t;
-					insert->run = next; 	
+					insert->run = next;
+
+					//insert->rec.Print(&schema);
+ 	
 					pQueue.push(insert);
 					
 				}
@@ -371,6 +384,9 @@ void* BigQ::TPMMS_Phase1(void* arg){
 
 				insert->rec = *t;
 				insert->run = next; 	
+
+				//insert->rec.Print(&schema);		
+
 				pQueue.push(insert);
 
 			}	
@@ -415,7 +431,7 @@ BigQ :: BigQ (Pipe &in, Pipe &out, OrderMaker &sortorder, int runlen) {
 	pthread_join(worker,NULL);// Why?
 	
 	cout<<"thread shut";	
-	//out.ShutDown ();
+	out.ShutDown ();
 }
 
 

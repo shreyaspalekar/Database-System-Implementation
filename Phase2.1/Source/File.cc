@@ -91,6 +91,9 @@ void Page :: ToBinary (char *bits) {
 	// first write the number of records on the page
 	((int *) bits)[0] = numRecs;
 
+
+	cout<<"set no of recs as"<<numRecs<<"\n";
+
 	char *curPos = bits + sizeof (int);
 
 	// and copy the records one-by-one

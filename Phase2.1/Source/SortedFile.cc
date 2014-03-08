@@ -18,6 +18,7 @@ SortedFile::SortedFile () {
 	readPageBuffer = new Page();
 	tobeMerged = new Page();	
 	m = R;
+	isDirty=0;
 }
 
 void* SortedFile::instantiate_BigQ(void* arg){
@@ -37,6 +38,7 @@ int SortedFile::Create (char *f_path, fType f_type, void *startup) {	// done
 
 	fileName = (char *)malloc(sizeof(f_path)+1);
 	strcpy(fileName,f_path);
+	isDirty=0;
 	
 	// use startup to get runlength and ordermaker
 	si = (SortInfo *) startup;
@@ -49,6 +51,7 @@ void SortedFile::Load (Schema &f_schema, char *loadpath) {		// requires BigQ ins
 
 	if(m!=W){
 		m = W;
+		isDirty=1;
 		// create input, output pipe and BigQ instance
 		//if(inPipe==NULL)inPipe = new Pipe(100);	// requires size ?
 		//if(outPipe==NULL)outPipe = new Pipe(100);
@@ -65,6 +68,9 @@ void SortedFile::Load (Schema &f_schema, char *loadpath) {		// requires BigQ ins
 }
 
 int SortedFile::Open (char *f_path) {
+
+
+	isDirty=0;
 	char *fName = new char[20];
 	sprintf(fName, "%s.meta", f_path);
 //	FILE *f = fopen(fName,"r");
@@ -88,7 +94,7 @@ int SortedFile::Open (char *f_path) {
 
 	m = R;
 
-	MoveFirst();
+	//MoveFirst();
 
 	// set to read mode
 	// bring first page into read buffer and initialize first record
@@ -102,11 +108,14 @@ int SortedFile::Open (char *f_path) {
 
 void SortedFile::MoveFirst () {			// requires MergeFromOuputPipe()
 
+	isDirty=0;	
+	pageIndex = 1;
+
 	if(m==R){
 		// In read mode, so direct movefirst is possible
 		
 		if(file->GetLength()!=0){
-			file->GetPage(readPageBuffer,1); //TODO: check off_t type,  void GetPage (Page *putItHere, off_t whichPage)
+			file->GetPage(readPageBuffer,pageIndex); //TODO: check off_t type,  void GetPage (Page *putItHere, off_t whichPage)
 			readPageBuffer->GetFirst(current);
 		}
 
@@ -116,7 +125,7 @@ void SortedFile::MoveFirst () {			// requires MergeFromOuputPipe()
 		m = R;
 		// Merge contents if any from BigQ
 		MergeFromOutpipe();
-		file->GetPage(readPageBuffer,1); //TODO: check off_t type,  void GetPage (Page *putItHere, off_t whichPage)
+		file->GetPage(readPageBuffer,pageIndex); //TODO: check off_t type,  void GetPage (Page *putItHere, off_t whichPage)
 		readPageBuffer->GetFirst(current);
 		// bring the first page into readPageBuffer
 		// Set curr Record to first record
@@ -131,6 +140,7 @@ int SortedFile::Close () {			// requires MergeFromOuputPipe()	done
 		MergeFromOutpipe();
 
 	file->Close();
+	isDirty=0;
 	endOfFile = 1;
 	// write updated state to meta file
 
@@ -152,12 +162,14 @@ int SortedFile::Close () {			// requires MergeFromOuputPipe()	done
 void SortedFile::Add (Record &rec) {	// requires BigQ instance		done
 
 	//cout<<"check "<<inPipe<<"\n";
+	
 
 	inPipe->Insert(&rec);
 	//inPipe->ShutDown();
 	//cout<<m<<"\n";
 
 	if(m!=W){
+		isDirty=1;
 		m = W;
 		//cout<<m<<"\n";
 
@@ -170,6 +182,10 @@ void SortedFile::Add (Record &rec) {	// requires BigQ instance		done
 			outPipe = new Pipe(100);
 			cout<<"Setting up output pipe\n";
 		}*/
+
+		inPipe= new Pipe(100);
+		outPipe= new Pipe(100);
+
 		if(bq==NULL){
 
 			//cout<<"run length "<<si->runLength<<"\n";
@@ -203,7 +219,7 @@ void SortedFile::Add (Record &rec) {	// requires BigQ instance		done
 int SortedFile::GetNext (Record &fetchme) {		// requires MergeFromOuputPipe()		done
 
 	if(m!=R){
-
+		isDirty=0;
 		m = R;
 		readPageBuffer->EmptyItOut();		// requires flush
 		MergeFromOutpipe();		// 
@@ -212,10 +228,14 @@ int SortedFile::GetNext (Record &fetchme) {		// requires MergeFromOuputPipe()		d
 	}
 
 	if(endOfFile==1) return 0;
-	while(!readPageBuffer->GetFirst(&fetchme)) {
+
+	fetchme.Copy(current);
+
+	if(!readPageBuffer->GetFirst(current)) {
 
 		if(pageIndex>=this->file->GetLength()-1){
-				endOfFile = 1;	
+				endOfFile = 1;
+				return 0;	
 		}
 		else {
 			pageIndex++;
@@ -224,6 +244,7 @@ int SortedFile::GetNext (Record &fetchme) {		// requires MergeFromOuputPipe()		d
 
 		}
 	}
+
 	return 1;
 }
 
@@ -252,19 +273,34 @@ void SortedFile:: MergeFromOutpipe(){		// requires both read and write modes
 
 	bool nomore = false;
         int result =GetNew(rFromFile);
+	int pageIndex = 1;
 
-	while(true&&result!=0){
+
+	Schema nu("catalog","lineitem");
+
+
+	if(result==0)
+		nomore =true;
+
+	while(isDirty!=0&&!nomore){
+
+		
 
 		if(outPipe->Remove(rtemp)==1){		// got the record from out pipe
 
-			while(ce->Compare(rFromFile,rtemp,si->myOrder)<=0){ 		// merging this record with others
+			rtemp->Print(&nu);
 
-				if(ptowrite->Append(rFromFile)!=1){		// merge already existing record
+			while(ce->Compare(rFromFile,rtemp,si->myOrder)<0){ 		// merging this record with others
+
+				if(ptowrite->Append(rFromFile)==0){		// merge already existing record
 						// page full
-						int pageIndex = newFile->GetLength()==0? 0:newFile->GetLength()-1;
+						
+						//int pageIndex = newFile->GetLength()==0? 0:newFile->GetLength()-1;
+
 						//*
 						// write this page to file
-						newFile->AddPage(ptowrite,pageIndex);
+						newFile->AddPage(ptowrite,pageIndex++);
+						//pageIndex++;
 						// empty this out
 						ptowrite->EmptyItOut();
 						// append the current record ?
@@ -274,12 +310,17 @@ void SortedFile:: MergeFromOutpipe(){		// requires both read and write modes
 				if(!GetNew(rFromFile)){ nomore = true; break; }	// bring next rFromFile record ?// check if records already present are exhausted
 
 			}
+
+
 			if(ptowrite->Append(rtemp)!=1){				// copy record from pipe
 						// page full
-						int pageIndex = newFile->GetLength()==0? 0:newFile->GetLength()-1;
+						
+						//int pageIndex = newFile->GetLength()==0? 0:newFile->GetLength()-1;
+
+
 						//*
 						// write this page to file
-						newFile->AddPage(ptowrite,pageIndex);
+						newFile->AddPage(ptowrite,pageIndex++);
 						// empty this out
 						ptowrite->EmptyItOut();
 						// append the current record ?
@@ -292,10 +333,10 @@ void SortedFile:: MergeFromOutpipe(){		// requires both read and write modes
 			do{
 				if(ptowrite->Append(rFromFile)!=1){			
 
-					int pageIndex = newFile->GetLength()==0? 0:newFile->GetLength()-1;	// page full
+					//int pageIndex = newFile->GetLength()==0? 0:newFile->GetLength()-1;	// page full
 					//*
 					// write this page to file
-					newFile->AddPage(ptowrite,pageIndex);
+					newFile->AddPage(ptowrite,pageIndex++);
 					// empty this out
 					ptowrite->EmptyItOut();
 					// append the current record ?
@@ -305,12 +346,21 @@ void SortedFile:: MergeFromOutpipe(){		// requires both read and write modes
 			break;
 		}
 	}
+
+	outPipe->Remove(rtemp);
+
+	
+
 	if(nomore==true){									// file is empty
 		do{
+
+			//rtemp->Print(&nu);	
+		
 			if(ptowrite->Append(rtemp)!=1){				// copy record from pipe
-						int pageIndex = newFile->GetLength()==0? 0:newFile->GetLength()-1;		// page full
+						//int pageIndex = newFile->GetLength()==0? 0:newFile->GetLength()-1;		// page full
 						// write this page to file
-						newFile->AddPage(ptowrite,pageIndex);
+						cout<<"write at index "<<pageIndex<<"\n";
+						newFile->AddPage(ptowrite,pageIndex++);
 						// empty this out
 						ptowrite->EmptyItOut();
 						// append the current record ?
@@ -319,9 +369,10 @@ void SortedFile:: MergeFromOutpipe(){		// requires both read and write modes
 		}while(outPipe->Remove(rtemp)!=0);
 	}
 
-	newFile->AddPage(ptowrite,newFile->GetLength()-1);
+	newFile->AddPage(ptowrite,pageIndex);//newFile->GetLength()-1);
 
 	newFile->Close();
+	file->Close();
 
 	// delete resources that are not required
 
@@ -336,6 +387,9 @@ void SortedFile:: MergeFromOutpipe(){		// requires both read and write modes
 	}
 
 	readPageBuffer->EmptyItOut();
+
+
+
 
 	file->Open(1, this->fileName);
 

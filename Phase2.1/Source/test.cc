@@ -19,7 +19,7 @@ int add_data (FILE *src, int numrecs, int &res) {
 		
 		//cout<<&temp<<"\n";			
 		dbfile.Add (temp);
-		cout<<proc<<"\n";
+		//cout<<proc<<"\n";
 		if (proc == xx) cerr << "\t ";
 		if (proc % xx == 0) cerr << ".";
 	}
@@ -64,6 +64,9 @@ void test1 () {
 			cout << " \t 1. add a few (1 to 1k recs)\n";
 			cout << " \t 2. add a lot (1k to 1e+06 recs) \n";
 			cout << " \t 3. run some query \n \t ";
+
+			//cin.clear();// cin.ignore(INT_MAX,'\n'); 
+
 			cin >> x;
 		}
 		if (x < 3) {

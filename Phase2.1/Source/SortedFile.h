@@ -33,6 +33,7 @@ private:
 	off_t writeIndex;
 	int endOfFile;
 	pthread_t bigQ_t;
+	int isDirty;
 
 
 	struct thread_arguments{
