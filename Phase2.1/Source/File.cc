@@ -50,6 +50,7 @@ int Page :: GetFirst (Record *firstOne) {
 
 	// make sure there is data 
 	if (!myRecs->RightLength ()) {
+
 		return 0;
 	}
 
@@ -89,10 +90,12 @@ int Page :: Append (Record *addMe) {
 void Page :: ToBinary (char *bits) {
 
 	// first write the number of records on the page
+	
+	cout<<"to binary "<<numRecs<<endl;
 	((int *) bits)[0] = numRecs;
 
 
-	cout<<"set no of recs as"<<numRecs<<"\n";
+	//cout<<"set no of recs as"<<numRecs<<"\n";
 
 	char *curPos = bits + sizeof (int);
 
@@ -115,6 +118,9 @@ void Page :: FromBinary (char *bits) {
 
 	// first read the number of records on the page
 	numRecs = ((int *) bits)[0];
+
+	cout<<((int*)bits)[100]<<endl;
+	cout<<"from binary "<<numRecs<<endl;
 
 	// sanity check
 	if (numRecs > 1000000 || numRecs < 0) {

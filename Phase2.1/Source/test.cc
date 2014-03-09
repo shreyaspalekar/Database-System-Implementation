@@ -1,6 +1,7 @@
 #include "test.h"
 #include "BigQ.h"
 #include <pthread.h>
+#include <limits>
 void test1 ();
 void test2 ();
 void test3 ();
@@ -65,9 +66,17 @@ void test1 () {
 			cout << " \t 2. add a lot (1k to 1e+06 recs) \n";
 			cout << " \t 3. run some query \n \t ";
 
-			//cin.clear();// cin.ignore(INT_MAX,'\n'); 
 
-			cin >> x;
+			cin.clear();
+			cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+
+			
+			cin>>x;
+			//getline(cin,x,'\n');
+			//x=getchar();
+			//scanf("%d",&x);	
+		
+			//cout<<"X: "<<x<<endl;
 		}
 		if (x < 3) {
 			proc = add_data (tblfile,lrand48()%(int)pow(1e3,x)+(x-1)*1000, res);
@@ -78,6 +87,9 @@ void test1 () {
 		else {
 			test3 ();
 		}
+
+
+
 	}
 	cout << "\n create finished.. " << tot << " recs inserted\n";
 	fclose (tblfile);

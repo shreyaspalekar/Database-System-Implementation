@@ -32,7 +32,7 @@ DBFile::~DBFile(){
 int DBFile::Create (char *f_path, fType f_type, void *startup) {
 
 	
-	memcpy(this->file_path,f_path,strlen(f_path)+1);	
+	//memcpy(this->file_path,f_path,strlen(f_path)+1);	
 	this->file->Open(0,f_path);
 	pageIndex=1;
 	writeIndex=1;
@@ -57,7 +57,7 @@ void DBFile::Load (Schema &f_schema, char *loadpath) {
 
 int DBFile::Open (char *f_path) {
 	//TODO:metadata
-	memcpy(this->file_path,f_path,strlen(f_path)+1);	
+	//memcpy(this->file_path,f_path,strlen(f_path)+1);	
 	this->file->Open(1,f_path);
 	pageIndex=1;
 	endOfFile = 0;
@@ -81,7 +81,7 @@ int DBFile::Close () {
 	}
 
 	//TODO:metadata
-	char meta_path[20];
+	/*char meta_path[20];
 
 	sprintf(meta_path,"%s.meta",this->file_path);
 
@@ -89,7 +89,7 @@ int DBFile::Close () {
 
 	fprintf(meta,"%s","heap");
 	fclose(meta);
-
+*/
 
 	endOfFile = 1;
 	return this->file->Close();

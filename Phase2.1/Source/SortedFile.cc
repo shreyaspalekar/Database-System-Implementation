@@ -16,7 +16,8 @@ SortedFile::SortedFile () {
 	bq = NULL;
 	file = new File();
 	readPageBuffer = new Page();
-	tobeMerged = new Page();	
+	tobeMerged = new Page();
+	current = new Record();	
 	m = R;
 	isDirty=0;
 }
@@ -101,7 +102,7 @@ int SortedFile::Open (char *f_path) {
 
 	//fclose(f);
 
-	//file->Open(1, f_path);	// open the corresponding file
+	file->Open(1, f_path);	// open the corresponding file
 	pageIndex = 1;
 	endOfFile = 0;
 }
@@ -116,7 +117,9 @@ void SortedFile::MoveFirst () {			// requires MergeFromOuputPipe()
 		
 		if(file->GetLength()!=0){
 			file->GetPage(readPageBuffer,pageIndex); //TODO: check off_t type,  void GetPage (Page *putItHere, off_t whichPage)
-			readPageBuffer->GetFirst(current);
+	
+			int result = readPageBuffer->GetFirst(current);
+			//cout<<result<<endl;
 		}
 
 	}
@@ -148,7 +151,7 @@ int SortedFile::Close () {			// requires MergeFromOuputPipe()	done
 	sprintf(fName,"%s.meta",fileName);
 
 	ofstream out(fName);
-    	out << "sorted\n";
+    	out <<"sorted"<<endl;
     	out.close();
 
 
@@ -200,7 +203,7 @@ void SortedFile::Add (Record &rec) {	// requires BigQ instance		done
 			pthread_create(&bigQ_t, NULL, &SortedFile::instantiate_BigQ , (void *)&thread_args);
 
 
-			cout<<"Setting up BigQ\n";
+			cout<<"Setting up BigQ"<<endl;
 		}
 	}
 
@@ -254,7 +257,7 @@ int SortedFile::GetNext (Record &fetchme, CNF &cnf, Record &literal) {		// requi
 void SortedFile:: MergeFromOutpipe(){		// requires both read and write modes
 
 	// close input pipe
-	cout<<inPipe<<"\n";
+	cout<<inPipe<<endl;
 
 	inPipe->ShutDown();
 	// get sorted records from output pipe
@@ -359,7 +362,7 @@ void SortedFile:: MergeFromOutpipe(){		// requires both read and write modes
 			if(ptowrite->Append(rtemp)!=1){				// copy record from pipe
 						//int pageIndex = newFile->GetLength()==0? 0:newFile->GetLength()-1;		// page full
 						// write this page to file
-						cout<<"write at index "<<pageIndex<<"\n";
+						//cout<<"write at index "<<pageIndex<<endl;
 						newFile->AddPage(ptowrite,pageIndex++);
 						// empty this out
 						ptowrite->EmptyItOut();
@@ -380,6 +383,8 @@ void SortedFile:: MergeFromOutpipe(){		// requires both read and write modes
 		cerr <<"rename file error!"<<endl;
 		return;
 	}
+	
+	remove("mergefile.tmp");
 
 	if(rename("mergedFile",fileName)!=0) {				// making merged file the new file
 		cerr <<"rename file error!"<<endl;
