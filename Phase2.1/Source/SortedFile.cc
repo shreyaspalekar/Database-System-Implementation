@@ -492,6 +492,7 @@ void SortedFile:: MergeFromOutpipe(){		// requires both read and write modes
 
 	while(isDirty!=0&&!nomore){
 
+		cout<<" rtemp "<<rtemp<<" rfile "<<rFromFile<<"\n";
 		
 
 		if(outPipe->Remove(rtemp)==1){		// got the record from out pipe
@@ -509,7 +510,7 @@ void SortedFile:: MergeFromOutpipe(){		// requires both read and write modes
 						// write this page to file
 
 
-						cout<<"write at index "<<pageIndex<<endl;
+						cout<<"1. write at index "<<pageIndex<<endl;
 
 
 
@@ -518,9 +519,11 @@ void SortedFile:: MergeFromOutpipe(){		// requires both read and write modes
 						// empty this out
 						ptowrite->EmptyItOut();
 						// append the current record ?
-						ptowrite->Append(rtemp);		// does this consume the record ?
+						ptowrite->Append(rFromFile);		// does this consume the record ?
 						
 				}
+
+				cout<<"1. rfile "<<rFromFile<<"\n";
 
 				if(!GetNew(rFromFile)){ nomore = true; break; }	// bring next rFromFile record ?// check if records already present are exhausted
 
@@ -537,7 +540,7 @@ void SortedFile:: MergeFromOutpipe(){		// requires both read and write modes
 						// write this page to file
 
 
-						cout<<"write at index "<<pageIndex<<endl;
+						cout<<"2. write at index "<<pageIndex<<endl;
 
 
 						newFile->AddPage(ptowrite,pageIndex++);
@@ -551,6 +554,9 @@ void SortedFile:: MergeFromOutpipe(){		// requires both read and write modes
 		else{
 			// pipe is empty now, copy rest of records to new file
 			do{
+
+				cout<<"2. rfile "<<rFromFile<<"\n";	
+				
 				if(ptowrite->Append(rFromFile)!=1){			
 
 					//int pageIndex = newFile->GetLength()==0? 0:newFile->GetLength()-1;	// page full
@@ -558,7 +564,7 @@ void SortedFile:: MergeFromOutpipe(){		// requires both read and write modes
 					// write this page to file
 
 
-					cout<<"write at index "<<pageIndex<<endl;
+					cout<<"3. write at index "<<pageIndex<<endl;
 
 
 					newFile->AddPage(ptowrite,pageIndex++);
