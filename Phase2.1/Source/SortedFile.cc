@@ -15,11 +15,13 @@ SortedFile::SortedFile () {
 	outPipe = new Pipe(100);	
 	bq = NULL;
 	file = new File();
-	readPageBuffer = new Page();
-	tobeMerged = new Page();
-	current = new Record();	
-	m = R;
 	isDirty=0;
+	current = new Record();	
+	readPageBuffer = new Page();		// store contents of current page from where program is reading
+	tobeMerged = new Page();			// used for merging existing records with those from BigQ
+	m = R;								// Mode set to read
+	OrderMaker *queryOrder = NULL;		// queryOrder used in GetNext(3 parameters)
+	bool queryChange = true;			// maintains if query is changed
 }
 
 void* SortedFile::instantiate_BigQ(void* arg){
@@ -44,6 +46,7 @@ int SortedFile::Create (char *f_path, fType f_type, void *startup) {	// done
 	// use startup to get runlength and ordermaker
 	si = (SortInfo *) startup;
 	pageIndex=1;
+	recordIndex = 0;
 	endOfFile=1;
 	return 1;
 }
@@ -104,6 +107,7 @@ int SortedFile::Open (char *f_path) {
 
 	file->Open(1, f_path);	// open the corresponding file
 	pageIndex = 1;
+	recordIndex = 0;
 	endOfFile = 0;
 }
 
@@ -111,15 +115,24 @@ void SortedFile::MoveFirst () {			// requires MergeFromOuputPipe()
 
 	isDirty=0;	
 	pageIndex = 1;
+	recordIndex = 0;
 
 	if(m==R){
 		// In read mode, so direct movefirst is possible
-		
+
+	
 		if(file->GetLength()!=0){
 			file->GetPage(readPageBuffer,pageIndex); //TODO: check off_t type,  void GetPage (Page *putItHere, off_t whichPage)
 	
 			int result = readPageBuffer->GetFirst(current);
 			//cout<<result<<endl;
+			
+		//	pageIndex = 1;
+			
+		}
+		else{
+		//	pageIndex = 1;
+
 		}
 
 	}
@@ -130,11 +143,13 @@ void SortedFile::MoveFirst () {			// requires MergeFromOuputPipe()
 		MergeFromOutpipe();
 		file->GetPage(readPageBuffer,pageIndex); //TODO: check off_t type,  void GetPage (Page *putItHere, off_t whichPage)
 		readPageBuffer->GetFirst(current);
+
+		
 		// bring the first page into readPageBuffer
 		// Set curr Record to first record
 		// 
 	}
-
+	queryChange = true;
 }
 
 int SortedFile::Close () {			// requires MergeFromOuputPipe()	done
@@ -207,6 +222,7 @@ void SortedFile::Add (Record &rec) {	// requires BigQ instance		done
 		}
 	}
 
+	queryChange = true;
 
 	//cout<<"record adr"<<&rec<<"\n";
 	
@@ -252,7 +268,194 @@ int SortedFile::GetNext (Record &fetchme) {		// requires MergeFromOuputPipe()		d
 }
 
 int SortedFile::GetNext (Record &fetchme, CNF &cnf, Record &literal) {		// requires binary search // requires MergeFromOuputPipe()
+
+	if(m!=R){
+	
+		m = R;
+		readPageBuffer->EmptyItOut();		// requires flush
+		MergeFromOutpipe();		// 
+		MoveFirst();	// always start from first record
+	
+	}	
+	
+	// TODO: update queryChange
+	
+	if(queryChange != true){		// current query same last CNF query
+	
+	}
+	else{				// query changed ; need to construct new queryOrder
+	
+		queryOrder = checkIfMatches(cnf, *(si->myOrder));
+		
+	}
+	
+	ComparisonEngine *comp;
+		
+	if(queryOrder==NULL) {		// no compatible order maker; return first record that matches the Record literal
+			
+		while(GetNext(fetchme)){			// linear scan from current record
+			
+			if(comp->Compare(&fetchme, &literal, &cnf)) {		//record found, return 1
+				return 1;
+			}
+		}
+		return 0;					// record not found
+	}
+	else{							 // some order maker compatible to given CNF is constructed
+	
+		Record *r1 = new Record();
+		
+		r1 = GetMatchPage(literal);
+		
+		if(r1==NULL) return 0;
+		
+		fetchme.Consume(r1);
+		
+		if(comp->Compare(&fetchme,&literal,&cnf)){
+			 return 1;
+		}
+		
+		while(GetNext(fetchme)) {
+			if(comp->Compare(&fetchme, &literal, queryOrder)!=0) {
+				//not match to query order
+				return 0;
+			} else {
+				if(comp->Compare(&fetchme, &literal, &cnf)) {
+					//find the right record
+					return 1;
+				}
+			}
+		}
+	
+	}
+	return 0;
 }
+
+
+
+OrderMaker* SortedFile::checkIfMatches(CNF &c, OrderMaker &o) {
+
+	OrderMaker *query = new OrderMaker();	// ordermaker that we try to build
+	bool matches = false;
+	
+	for(int i=0;i<o.numAtts;i++)	// Over every attribute of file's ordermaker
+	{
+		matches = false;
+		
+		for(int j = 0; j<c.numAnds; j++) {	// Over list of all disjunctions
+
+			if(!matches) {
+			
+				for(int k=0; k<c.orLens[j]; k++) {	// over every comparison
+				
+					if(c.orList[j][k].op == Equals){	// check is operator is 'Equals'
+						
+						if(c.orList[j][k].operand1 == Literal) {		// check if operand is 'Literal'
+							
+							if((o.whichAtts[i] == c.orList[j][k].whichAtt1)		// 		attribute and type matches 
+										&& (o.whichTypes[i] == c.orList[j][k].attType)){
+										
+									query->whichAtts[query->numAtts] = o.whichAtts[i];
+									query->whichTypes[query->numAtts++] = o.whichTypes[i];
+									matches = true;
+									break;
+							}
+						} else if(c.orList[j][k].operand2 == Literal) {
+							
+							if((o.whichAtts[i] == c.orList[j][k].whichAtt2)
+									&& (o.whichTypes[i] == c.orList[j][k].attType)){
+									
+								query->whichAtts[query->numAtts] = o.whichAtts[i];
+								query->whichTypes[query->numAtts++] = o.whichTypes[i];
+								matches = true;
+								break;
+							}
+						}
+					}				
+				}
+			}
+		if(!matches) break; 	// this happens 
+		}
+	}
+
+	if(query->numAtts == 0)
+	{
+		delete query;
+		return NULL;
+	}
+	return query;
+	
+	
+}
+
+
+Record* SortedFile::GetMatchPage(Record &literal) {			//returns the first record which equals to literal based on queryorder;
+		
+	int low = pageIndex;
+	int high = file->GetLength()-2;
+	
+	int matchPage = bsearch(low, high, queryOrder, literal);
+	if(matchPage == -1) {	//not found
+		return NULL;
+	}
+	if(matchPage != pageIndex-1) {
+		readPageBuffer->EmptyItOut();
+		file->GetPage(readPageBuffer, matchPage);
+		pageIndex = matchPage+1;
+	}
+	queryChange = false;
+
+	//find the potential page, make reader buffer pointer to the first record
+	// that equal to query order
+	ComparisonEngine *comp;
+	Record *returnRcd = new Record;
+	while(readPageBuffer->GetFirst(returnRcd)) {
+		if(comp->Compare(returnRcd, &literal, queryOrder) == 0) {
+			//find the first one
+			return returnRcd;
+		}
+	}
+	if(pageIndex >= file->GetLength()-2) {
+		return NULL;
+	} else {
+		//since the first record may exist on the next page
+		pageIndex++;
+		file->GetPage(readPageBuffer, pageIndex);
+		while(readPageBuffer->GetFirst(returnRcd)) {
+			if(comp->Compare(returnRcd, &literal, queryOrder) == 0) {
+				//find the first one
+				return returnRcd;
+			}
+		}
+	}
+	return NULL;
+
+}
+
+int SortedFile::bsearch(int low, int high, OrderMaker *queryOM, Record &literal) {
+	
+	ComparisonEngine *comp;
+	if(high < low) return -1;
+	if(high == low) return low;
+	//high > low
+	Page *tmpPage = new Page;
+	Record *tmpRcd = new Record;
+	int mid = (int) (high+low)/2;
+	file->GetPage(tmpPage, mid);
+	tmpPage->GetFirst(tmpRcd);
+	int res = comp->Compare(tmpRcd, &literal, queryOM);
+	if( res == -1) {
+		if(low==mid)
+			return mid;
+		return bsearch(mid, high, queryOM, literal);
+	}
+	else if(0 == res) {
+		return bsearch(low, mid-1, queryOM, literal);
+	}
+	else
+		return bsearch(low, mid-1, queryOM, literal);
+}
+
 
 void SortedFile:: MergeFromOutpipe(){		// requires both read and write modes
 
@@ -291,7 +494,7 @@ void SortedFile:: MergeFromOutpipe(){		// requires both read and write modes
 
 		if(outPipe->Remove(rtemp)==1){		// got the record from out pipe
 
-			//rtemp->Print(&nu);
+			rtemp->Print(&nu);
 
 			while(ce->Compare(rFromFile,rtemp,si->myOrder)<0){ 		// merging this record with others
 

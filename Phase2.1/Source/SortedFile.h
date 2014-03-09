@@ -32,6 +32,9 @@ private:
 	off_t pageIndex;
 	off_t writeIndex;
 	int endOfFile;
+	int recordIndex;
+	bool queryChange;
+	OrderMaker *queryOrder;
 	pthread_t bigQ_t;
 	int isDirty;
 
@@ -64,6 +67,9 @@ public:
 	void MergeFromOutpipe();
 	int GetNew(Record *r1);	
 
+	int bsearch(int low, int high, OrderMaker *queryOM, Record &literal);
+	Record* GetMatchPage(Record &literal);
+	OrderMaker* checkIfMatches(CNF &c, OrderMaker &o);
 
 	static void *instantiate_BigQ(void*);
 
