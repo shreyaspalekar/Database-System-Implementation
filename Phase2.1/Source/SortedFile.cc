@@ -291,7 +291,7 @@ void SortedFile:: MergeFromOutpipe(){		// requires both read and write modes
 
 		if(outPipe->Remove(rtemp)==1){		// got the record from out pipe
 
-			rtemp->Print(&nu);
+			//rtemp->Print(&nu);
 
 			while(ce->Compare(rFromFile,rtemp,si->myOrder)<0){ 		// merging this record with others
 
