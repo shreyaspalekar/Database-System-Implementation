@@ -12,7 +12,7 @@ int add_data (FILE *src, int numrecs, int &res) {
 	dbfile.Open (rel->path ());
 	Record temp;
 
-	cout<<"Adding Data\n";
+	//cout<<"Adding Data\n";
 
 	int proc = 0;
 	int xx = 20000;

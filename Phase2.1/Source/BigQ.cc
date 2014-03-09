@@ -4,7 +4,7 @@
 void BigQ::sort_run(Page *p, int num_recs,File& new_file,int& gp_index,OrderMaker *sort_order){
 
 
-	cout<<"G index start "<<gp_index<<"\n";
+	//cout<<"G index start "<<gp_index<<"\n";
 
 
 	Record **record_Buffer= new Record*[num_recs];
@@ -39,7 +39,7 @@ void BigQ::sort_run(Page *p, int num_recs,File& new_file,int& gp_index,OrderMake
 	sort(record_Buffer,record_Buffer+(num_recs),sort_func(sort_order));
 
 	//DEBUG
-
+/*
 	int k = 0,err = 0,succ = 0;
 
 
@@ -87,9 +87,9 @@ void BigQ::sort_run(Page *p, int num_recs,File& new_file,int& gp_index,OrderMake
 	cout << "succ in sorting this run = " << succ << endl;
 
 
-	
-
-	/*Schema schema("catalog","lineitem");
+	*/
+	/*
+	Schema schema("catalog","lineitem");
 	for(int i=0;i<num_recs;i++){
 	
 		(*(record_Buffer+i))->Print(&schema);
@@ -132,7 +132,7 @@ void BigQ::sort_run(Page *p, int num_recs,File& new_file,int& gp_index,OrderMake
 
 	}
 
-	cout<<"G index end "<<gp_index<<"\n";
+	//cout<<"G index end "<<gp_index<<"\n";
 
 	delete tp;
 	
@@ -159,7 +159,7 @@ void* BigQ::TPMMS_Phase1(void* arg){
 	new_file.Open(0,f_path);
 
 
-	cout<<"runlength in thread"<<*(args->run_length)<<"\n";
+	//cout<<"runlength in thread"<<*(args->run_length)<<"\n";
 	
 	Page *p = new Page[*(args->run_length)]();	
  
@@ -196,9 +196,13 @@ void* BigQ::TPMMS_Phase1(void* arg){
 
 			else if(++p_index == *(args->run_length)){
 
+
+				/*
 				cout <<"Run no "<<num_runs<<"\n";
 				cout <<"Pages "<<p_index<<"\n";
 				cout <<"No of Records "<<num_recs<<"\n\n";				
+				*/
+
 
 				sort_run(p,num_recs,new_file,gp_index,args->sort_order);			
 				
@@ -226,16 +230,18 @@ void* BigQ::TPMMS_Phase1(void* arg){
 
 		else{
 
+
+			/*
 			cout <<"Run no "<<num_runs<<"\n";
 			cout <<"Pages "<<p_index<<"\n";
 			cout <<"No of Records "<<num_recs<<"\n\n";		
-
+			*/
 			
 			sort_run(p,num_recs,new_file,gp_index,args->sort_order);
-			
+			/*
 	                cout << "Runs created  " << num_runs << "\n";
 			cout << "Total Pages Read " <<  gp_index << "\n";
-			
+			*/
 
 			//Empty file into record buffer
 
@@ -292,7 +298,7 @@ void* BigQ::TPMMS_Phase1(void* arg){
 //	Schema schema("catalog","lineitem");
 //	(pQueue.top())->Print(&schema);
 		
-	cout<<"Setting Indexes\n";	
+	//cout<<"Setting Indexes\n";	
 
 	int flags  = num_runs;
 	int next  = 0;
@@ -323,14 +329,14 @@ void* BigQ::TPMMS_Phase1(void* arg){
 		
 	for(int i=0;i<num_runs;i++){
 
-		cout<<"run "<<i<<" start "<<index[i][start]<<" end "<<index[i][end]<<"\n";	
+		//cout<<"run "<<i<<" start "<<index[i][start]<<" end "<<index[i][end]<<"\n";	
 	
 	}	
 
 
 	//DEBUG
 
-	cout<<"Begin Merge\n";
+	//cout<<"Begin Merge\n";
 	while(flags!=0){
 
 		//Schema schema("catalog","lineitem");
@@ -365,7 +371,7 @@ void* BigQ::TPMMS_Phase1(void* arg){
 				}
 				else{
 
-					cout<<"Read at index"<<index[next][start]+c_i[next]<<"\n";
+					//cout<<"Read at index"<<index[next][start]+c_i[next]<<"\n";
 
 					new_file.GetPage(buf+next,(off_t)(index[next][start]+c_i[next]));
 
@@ -406,7 +412,7 @@ void* BigQ::TPMMS_Phase1(void* arg){
 	
 
 	//pthread_exit();
-	cout<<"thread shutting down";
+	//cout<<"thread shutting down";
 	//args->output->ShutDown();
 }
 
@@ -430,7 +436,7 @@ BigQ :: BigQ (Pipe &in, Pipe &out, OrderMaker &sortorder, int runlen) {
 
 	pthread_join(worker,NULL);// Why?
 	
-	cout<<"thread shut";	
+	//cout<<"thread shut";	
 	out.ShutDown ();
 }
 

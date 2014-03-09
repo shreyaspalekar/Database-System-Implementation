@@ -449,7 +449,7 @@ void CNF :: GrowFromParseTree (struct AndList *parseTree, Schema *mySchema,
 		
 		// see if we have run off of the end of all of the ANDs
 		if (parseTree == NULL) {
-			cout<<"NULL Parse tree";
+			//cout<<"NULL Parse tree";
 			cnf.numAnds = whichAnd;
 			break;
 		}	
