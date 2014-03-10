@@ -17,7 +17,6 @@ SortedFile::SortedFile () {
 	bq = NULL;
 	file = new File();
 	isDirty=0;
-	si = NULL;
 	current = new Record();	
 	readPageBuffer = new Page();		// store contents of current page from where program is reading
 	tobeMerged = new Page();			// used for merging existing records with those from BigQ
@@ -93,11 +92,8 @@ int SortedFile::Open (char *f_path) {
 	ifstream ifs(fName,ios::binary);
 
 	ifs.seekg(sizeof(fileName)-1);//,ifs.beg);
-	
-	if(si==NULL)
-		si = new SortInfo;
 
-	ifs.read((char*)si, sizeof(*si)); 
+	ifs.read((char*)&si, sizeof(si)); 
 
 	//ifs.sync();
 
@@ -200,7 +196,7 @@ int SortedFile::Close () {			// requires MergeFromOuputPipe()	done
 
 	ofstream ofs(fName,ios::binary|ios::app);
 
-	ofs.write((char*)si,sizeof(*si));	
+	ofs.write((char*) &si,sizeof(si));	
 
 	ofs.close();
 }
@@ -622,7 +618,7 @@ void SortedFile:: MergeFromOutpipe(){		// requires both read and write modes
 		}
 	}
 
-	outPipe->Remove(rtemp);//1 missing record
+	outPipe->Remove(rtemp);
 
 	
 
