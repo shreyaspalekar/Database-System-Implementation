@@ -112,7 +112,7 @@ int SortedFile::Open (char *f_path) {
     		cout << "error: only " << ifs.gcount() << " could be read";
 
 
-	ifs.seekg(sizeof(*(si->myOrder))-1);
+	//ifs.seekg(sizeof(*(si->myOrder))-1);
 
 	ifs.read((char*)&(si->runLength), sizeof(si->runLength));
 
