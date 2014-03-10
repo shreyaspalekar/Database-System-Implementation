@@ -98,6 +98,10 @@ int SortedFile::Open (char *f_path) {
 
 	m = R;
 
+
+	cout<<"Dereferencing si ordermaker \n";
+	cout<<"si "<<si->myOrder;
+
 	//MoveFirst();
 
 	// set to read mode
@@ -269,15 +273,23 @@ int SortedFile::GetNext (Record &fetchme) {		// requires MergeFromOuputPipe()		d
 
 int SortedFile::GetNext (Record &fetchme, CNF &cnf, Record &literal) {		// requires binary search // requires MergeFromOuputPipe()
 
+	//cout<<"1. here\n";
+
 	if(m!=R){
 	
+		isDirty=0;
 		m = R;
 		readPageBuffer->EmptyItOut();		// requires flush
 		MergeFromOutpipe();		// 
 		MoveFirst();	// always start from first record
+		
+		//cout<<"2. here\n";
+
 	
 	}	
-	
+
+	//cout<<"3. here\n";
+		
 	// TODO: update queryChange
 	
 	if(queryChange != true){		// current query same last CNF query
@@ -285,7 +297,9 @@ int SortedFile::GetNext (Record &fetchme, CNF &cnf, Record &literal) {		// requi
 	}
 	else{				// query changed ; need to construct new queryOrder
 	
+		//cout<<"4. here\n"<<si<<" addr \n";
 		queryOrder = checkIfMatches(cnf, *(si->myOrder));
+		
 		
 	}
 	
@@ -293,7 +307,10 @@ int SortedFile::GetNext (Record &fetchme, CNF &cnf, Record &literal) {		// requi
 		
 	if(queryOrder==NULL) {		// no compatible order maker; return first record that matches the Record literal
 			
+		//cout<<"5. here\n";		
+
 		while(GetNext(fetchme)){			// linear scan from current record
+
 			
 			if(comp->Compare(&fetchme, &literal, &cnf)) {		//record found, return 1
 				return 1;
@@ -337,6 +354,8 @@ OrderMaker* SortedFile::checkIfMatches(CNF &c, OrderMaker &o) {
 
 	OrderMaker *query = new OrderMaker();	// ordermaker that we try to build
 	bool matches = false;
+
+	cout<<"o addr " <<&o;
 	
 	for(int i=0;i<o.numAtts;i++)	// Over every attribute of file's ordermaker
 	{
@@ -492,7 +511,7 @@ void SortedFile:: MergeFromOutpipe(){		// requires both read and write modes
 
 	while(isDirty!=0&&!nomore){
 
-		cout<<" rtemp "<<rtemp<<" rfile "<<rFromFile<<"\n";
+		//cout<<" rtemp "<<rtemp<<" rfile "<<rFromFile<<"\n";
 		
 
 		if(outPipe->Remove(rtemp)==1){		// got the record from out pipe
@@ -523,7 +542,7 @@ void SortedFile:: MergeFromOutpipe(){		// requires both read and write modes
 						
 				}
 
-				cout<<"1. rfile "<<rFromFile<<"\n";
+				//cout<<"1. rfile "<<rFromFile<<"\n";
 
 				if(!GetNew(rFromFile)){ nomore = true; break; }	// bring next rFromFile record ?// check if records already present are exhausted
 
@@ -555,7 +574,7 @@ void SortedFile:: MergeFromOutpipe(){		// requires both read and write modes
 			// pipe is empty now, copy rest of records to new file
 			do{
 
-				cout<<"2. rfile "<<rFromFile<<"\n";	
+				//cout<<"2. rfile "<<rFromFile<<"\n";	
 				
 				if(ptowrite->Append(rFromFile)!=1){			
 
