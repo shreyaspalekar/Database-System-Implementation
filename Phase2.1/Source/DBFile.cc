@@ -54,11 +54,17 @@ int DBFile::Open (char *f_path) {
 	char f_type[10];
 
 	fscanf(meta,"%s",f_type);
+
+	cout<<"scanned file type"<<endl;
+	cout<<f_type<<endl;
+	//cout<<strcmp(f_type,"sorted")<<endl;
+
 	//read meta details from file
 
 	if(strcmp(f_type,"heap")==0){
 	
 
+		cout<<"created heap file";
 		HeapFile *h = new HeapFile();
 		this->file= h;
 
@@ -66,11 +72,13 @@ int DBFile::Open (char *f_path) {
 	else if(strcmp(f_type,"sorted")==0){
 	
 
+		cout<<"created sorted file"<<endl;
 		SortedFile *s = new SortedFile();
 		this->file= s;	
 
 	}
 
+	cout<<file<<endl;
 	file->Open(f_path);
 
 	//Note:should we read the order maker at this level or let the sorted file handle it??

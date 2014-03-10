@@ -84,7 +84,7 @@ int SortedFile::Open (char *f_path) {
 	fileName = (char *)malloc(sizeof(f_path)+1);
 	strcpy(fileName,f_path);
 
-
+	cout<<"reading metadata"<<endl;
 	// to decide what to store in meta file
 	// and parse and get sort order and run length
 	// requires some kind of de serialization
@@ -94,10 +94,36 @@ int SortedFile::Open (char *f_path) {
 
 	ifs.seekg(sizeof(fileName)-1);//,ifs.beg);
 	
-	if(si==NULL)
+	if(si==NULL){
 		si = new SortInfo;
+		si->myOrder = new OrderMaker();
+	}
 
-	ifs.read((char*)si, sizeof(*si)); 
+
+	ifs.read((char*)si->myOrder, sizeof(*(si->myOrder))); 
+
+
+	cout<<"read ordermaker"<<endl;
+	si->myOrder->Print();
+
+	if (ifs)
+      		cout << "all characters read successfully.";
+    	else
+    		cout << "error: only " << ifs.gcount() << " could be read";
+
+
+	ifs.seekg(sizeof(*(si->myOrder))-1);
+
+	ifs.read((char*)&(si->runLength), sizeof(si->runLength));
+
+
+	cout<<"read run length "<<si->runLength<<endl;
+
+
+	//ofs.write((char*)si->myOrder,sizeof(*(si->myOrder)));	
+	//ofs.write((char*)&(si->runLength),sizeof(si->runLength));
+
+
 
 	//ifs.sync();
 
@@ -200,7 +226,8 @@ int SortedFile::Close () {			// requires MergeFromOuputPipe()	done
 
 	ofstream ofs(fName,ios::binary|ios::app);
 
-	ofs.write((char*)si,sizeof(*si));	
+	ofs.write((char*)si->myOrder,sizeof(*(si->myOrder)));	
+	ofs.write((char*)&(si->runLength),sizeof(si->runLength));
 
 	ofs.close();
 }
