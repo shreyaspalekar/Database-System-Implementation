@@ -84,7 +84,7 @@ int SortedFile::Open (char *f_path) {
 	fileName = (char *)malloc(sizeof(f_path)+1);
 	strcpy(fileName,f_path);
 
-	cout<<"reading metadata"<<endl;
+	//cout<<"reading metadata"<<endl;
 	// to decide what to store in meta file
 	// and parse and get sort order and run length
 	// requires some kind of de serialization
@@ -103,21 +103,21 @@ int SortedFile::Open (char *f_path) {
 	ifs.read((char*)si->myOrder, sizeof(*(si->myOrder))); 
 
 
-	cout<<"read ordermaker"<<endl;
-	si->myOrder->Print();
+	//cout<<"read ordermaker"<<endl;
+	//si->myOrder->Print();
 
-	if (ifs)
+/*	if (ifs)
       		cout << "all characters read successfully.";
     	else
     		cout << "error: only " << ifs.gcount() << " could be read";
-
+*/
 
 	//ifs.seekg(sizeof(*(si->myOrder))-1);
 
 	ifs.read((char*)&(si->runLength), sizeof(si->runLength));
 
 
-	cout<<"read run length "<<si->runLength<<endl;
+//	cout<<"read run length "<<si->runLength<<endl;
 
 
 	//ofs.write((char*)si->myOrder,sizeof(*(si->myOrder)));	
@@ -127,11 +127,11 @@ int SortedFile::Open (char *f_path) {
 
 	//ifs.sync();
 
-	if (ifs)
+	/*if (ifs)
       		cout << "all characters read successfully.";
     	else
     		cout << "error: only " << ifs.gcount() << " could be read";
-
+*/
 
 
 	ifs.close();
@@ -139,10 +139,10 @@ int SortedFile::Open (char *f_path) {
 	m = R;
 
 
-	cout<<"size of f name "<<sizeof(fileName)-1<<endl;
+	//cout<<"size of f name "<<sizeof(fileName)-1<<endl;
 
-	cout<<"Dereferencing si\n";
-	cout<<"si "<<si<<endl;
+	//cout<<"Dereferencing si\n";
+	//cout<<"si "<<si<<endl;
 
 	//sleep(2);
 
@@ -324,7 +324,11 @@ int SortedFile::GetNext (Record &fetchme) {		// requires MergeFromOuputPipe()		d
 
 int SortedFile::GetNext (Record &fetchme, CNF &cnf, Record &literal) {		// requires binary search // requires MergeFromOuputPipe()
 
-	cout<<"1. here\n";
+	//cout<<"1. here\n";
+
+
+	//Schema nu("catalog","lineitem");
+	//literal.Print(&nu);
 
 	if(m!=R){
 	
@@ -334,12 +338,12 @@ int SortedFile::GetNext (Record &fetchme, CNF &cnf, Record &literal) {		// requi
 		MergeFromOutpipe();		// 
 		MoveFirst();	// always start from first record
 		
-		cout<<"2. here\n";
+		//cout<<"2. here\n";
 
 	
 	}	
 
-	cout<<"3. here\n";
+	//cout<<"3. here\n";
 		
 	// TODO: update queryChange
 	
@@ -348,8 +352,9 @@ int SortedFile::GetNext (Record &fetchme, CNF &cnf, Record &literal) {		// requi
 	}
 	else{				// query changed ; need to construct new queryOrder
 	
-		cout<<"4. here\n"<<si<<" addr \n";
-		queryOrder = checkIfMatches(cnf, *(si->myOrder));
+		//cout<<"4. here\n"<<si<<" addr \n";
+		queryOrder = cnf.CreateQueryMaker(*(si->myOrder));		
+		//queryOrder = checkIfMatches(cnf, *(si->myOrder));
 		
 		
 	}
@@ -358,7 +363,7 @@ int SortedFile::GetNext (Record &fetchme, CNF &cnf, Record &literal) {		// requi
 		
 	if(queryOrder==NULL) {		// no compatible order maker; return first record that matches the Record literal
 			
-		cout<<"5. here\n";		
+		//cout<<"Empty Query OM\n";		
 
 		while(GetNext(fetchme)){			// linear scan from current record
 
@@ -400,7 +405,194 @@ int SortedFile::GetNext (Record &fetchme, CNF &cnf, Record &literal) {		// requi
 }
 
 
+OrderMaker *SortedFile::checkIfMatches(CNF &cnf, OrderMaker &sortOrder) {
+	
 
+	OrderMaker *matchOrder= new OrderMaker;	// create new order make
+	//cout<<"ordermaker";
+	//sortOrder.Print();
+	//cout<<"\n";
+	//cout<<"cnf";
+	//cnf.Print();
+
+	
+	for(int i = 0; i<sortOrder.numAtts; i++) {	// over every attribute of sortorder
+
+		//cout <<"now checking att: "<<sortOrder.whichAtts[i]<<endl;
+		//cout<<sortOrder.numAtts<<"\n";
+		//cout<<sortOrder.whichTypes[i]<<"\n";
+
+		bool match = false;
+		
+		for(int j = 0; j<cnf.numAnds; j++) {			// 
+
+			if(!match) {
+				
+				for(int k=0; k<cnf.orLens[j]; k++) {	//
+					
+					//cout <<"now try matching cnf att: "<<cnf.orList[j][k].whichAtt1<< " Op2: "<<cnf.orList[j][k].whichAtt2<<endl;
+
+					if(cnf.orList[j][k].op == Equals) {
+		
+						if(cnf.orList[j][k].operand1 == Literal) {
+	
+							//cout<<sortOrder.whichAtts[i]<<"\t"<<cnf.orList[j][k].whichAtt1;
+							//cout<<"\n"<<sortOrder.whichTypes[i]<<"\t"<<cnf.orList[j][k].attType;
+	
+							if((sortOrder.whichAtts[i] == cnf.orList[j][k].whichAtt1)
+									&& (sortOrder.whichTypes[i] == cnf.orList[j][k].attType)){
+								
+								matchOrder->whichAtts[matchOrder->numAtts] = sortOrder.whichAtts[i];
+								matchOrder->whichTypes[matchOrder->numAtts++] = sortOrder.whichTypes[i];
+								match = true;
+								
+								//cout<<"matchs!!";
+
+								//matchOrder->Print();
+								break;
+							}
+	
+						} else if(cnf.orList[j][k].operand2 == Literal) {
+						
+							if((sortOrder.whichAtts[i] == cnf.orList[j][k].whichAtt2)
+									&& (sortOrder.whichTypes[i] == cnf.orList[j][k].attType)){
+						
+								matchOrder->whichAtts[matchOrder->numAtts] = sortOrder.whichAtts[i];
+								matchOrder->whichTypes[matchOrder->numAtts++] = sortOrder.whichTypes[i];
+								match = true;
+								//cout<<"match1";
+								//matchOrder->Print();
+								break;
+							}
+						}
+					}
+				}
+			}
+		}
+		if(!match) break;
+	}
+	if(matchOrder->numAtts == 0)
+	{
+		cout <<"No query OrderMaker can be constructed!"<<endl;
+		delete matchOrder;
+		return NULL;
+	}
+
+	//cout<<"BS OM constructed";
+	return matchOrder;
+}
+
+
+
+Record* SortedFile::GetMatchPage(Record &literal) {			//returns the first record which equals to literal based on queryorder;
+	
+	//cout<<"pi3"<<pageIndex;
+	if(queryChange) {
+		int low = pageIndex;
+		int high = file->GetLength()-2;
+		int matchPage = bsearch(low, high, queryOrder, literal);
+		//cout <<"matchpage: "<<matchPage<<endl;
+		if(matchPage == -1) {
+			//not found
+			return NULL;
+		}
+		if(matchPage != pageIndex) {
+			readPageBuffer->EmptyItOut();
+			file->GetPage(readPageBuffer, matchPage);
+			pageIndex = matchPage+1;
+		}
+		queryChange = false;
+	}
+
+	//find the potential page, make reader buffer pointer to the first record
+	// that equal to query order
+	Record *returnRcd = new Record;
+	ComparisonEngine cmp1;
+	while(readPageBuffer->GetFirst(returnRcd)) {
+		if(cmp1.Compare(returnRcd, &literal, queryOrder) == 0) {
+			//find the first one
+			return returnRcd;
+		}
+	}
+	if(pageIndex >= file->GetLength()-2) {
+		return NULL;
+	} else {
+		//since the first record may exist on the next page
+		pageIndex++;
+		file->GetPage(readPageBuffer, pageIndex);
+		while(readPageBuffer->GetFirst(returnRcd)) {
+			if(cmp1.Compare(returnRcd, &literal, queryOrder) == 0) {
+				//find the first one
+				return returnRcd;
+			}
+		}
+	}
+	return NULL;
+		
+
+}
+
+int SortedFile::bsearch(int low, int high, OrderMaker *queryOM, Record &literal) {
+	
+	queryOM->Print();
+	si->myOrder->Print();
+
+	if(high < low) return -1;
+	if(high == low) return low;
+	//high > low
+	
+	ComparisonEngine *comp;
+	Page *tmpPage = new Page;
+	Record *tmpRcd = new Record;
+	int mid = (int) (high+low)/2;
+	file->GetPage(tmpPage, mid);
+	
+	int res;
+
+	//cout<<"l "<<low<<" m "<<mid<<" h "<<high<<endl;
+	Schema nu("catalog","lineitem");
+
+	//tmpPage->GetFirst(tmpRcd) == 1;
+
+	tmpPage->GetFirst(tmpRcd);
+	
+	///cout<<"TeMP"<<endl<<endl<<endl;
+	//tmpRcd->Print(&nu);
+	//cout<<"literal"<<endl<<endl<<endl;
+	//cout<<&literal;//.Print(&nu);
+
+	tmpRcd->Print(&nu);
+
+		res = comp->Compare(tmpRcd,si->myOrder, &literal,queryOM );
+
+		//if(res==0){
+			//cout<<"FOUND!!!"<<endl;
+	//		break;
+//		}
+	
+
+	delete tmpPage;
+	delete tmpRcd;
+
+	//cout<<"compare result"<<res<<"\n";
+
+
+	if( res == -1) {
+		if(low==mid)
+			return mid;
+		return bsearch(low, mid-1, queryOM, literal);
+	}
+	else if(res == 0) {
+		return mid;//bsearch(low, mid-1, queryOM, literal);
+	}
+	else
+		return bsearch(mid+1, high,queryOM, literal);
+}
+
+
+
+
+/*
 OrderMaker* SortedFile::checkIfMatches(CNF &c, OrderMaker &o) {
 
 	OrderMaker *query = new OrderMaker();	// ordermaker that we try to build
@@ -457,8 +649,8 @@ OrderMaker* SortedFile::checkIfMatches(CNF &c, OrderMaker &o) {
 	
 	
 }
-
-
+*/
+/*
 Record* SortedFile::GetMatchPage(Record &literal) {			//returns the first record which equals to literal based on queryorder;
 		
 	int low = pageIndex;
@@ -466,7 +658,10 @@ Record* SortedFile::GetMatchPage(Record &literal) {			//returns the first record
 	
 	int matchPage = bsearch(low, high, queryOrder, literal);
 	if(matchPage == -1) {	//not found
-		return NULL;
+
+		cout<<"No page found"<<endl;
+		return NULL;		
+
 	}
 	if(matchPage != pageIndex-1) {
 		readPageBuffer->EmptyItOut();
@@ -486,7 +681,10 @@ Record* SortedFile::GetMatchPage(Record &literal) {			//returns the first record
 		}
 	}
 	if(pageIndex >= file->GetLength()-2) {
+
+		cout<<"Reached EOF"<<endl;
 		return NULL;
+
 	} else {
 		//since the first record may exist on the next page
 		pageIndex++;
@@ -525,7 +723,7 @@ int SortedFile::bsearch(int low, int high, OrderMaker *queryOM, Record &literal)
 	else
 		return bsearch(low, mid-1, queryOM, literal);
 }
-
+*/
 
 void SortedFile:: MergeFromOutpipe(){		// requires both read and write modes
 
@@ -580,7 +778,7 @@ void SortedFile:: MergeFromOutpipe(){		// requires both read and write modes
 						// write this page to file
 
 
-						cout<<"1. write at index "<<pageIndex<<endl;
+						//cout<<"1. write at index "<<pageIndex<<endl;
 
 
 
@@ -610,7 +808,7 @@ void SortedFile:: MergeFromOutpipe(){		// requires both read and write modes
 						// write this page to file
 
 
-						cout<<"2. write at index "<<pageIndex<<endl;
+						//cout<<"2. write at index "<<pageIndex<<endl;
 
 
 						newFile->AddPage(ptowrite,pageIndex++);
@@ -634,7 +832,7 @@ void SortedFile:: MergeFromOutpipe(){		// requires both read and write modes
 					// write this page to file
 
 
-					cout<<"3. write at index "<<pageIndex<<endl;
+					//cout<<"3. write at index "<<pageIndex<<endl;
 
 
 					newFile->AddPage(ptowrite,pageIndex++);
@@ -662,7 +860,7 @@ void SortedFile:: MergeFromOutpipe(){		// requires both read and write modes
 			if(ptowrite->Append(rtemp)!=1){				// copy record from pipe
 						//int pageIndex = newFile->GetLength()==0? 0:newFile->GetLength()-1;		// page full
 						// write this page to file
-						cout<<"write at index "<<pageIndex<<endl;
+						//cout<<"write at index "<<pageIndex<<endl;
 						newFile->AddPage(ptowrite,pageIndex++);
 						// empty this out
 						ptowrite->EmptyItOut();
@@ -675,7 +873,7 @@ void SortedFile:: MergeFromOutpipe(){		// requires both read and write modes
 	}
 
 	newFile->AddPage(ptowrite,pageIndex);//newFile->GetLength()-1);
-	cout<<"last write at index "<<pageIndex<<endl;
+	//cout<<"last write at index "<<pageIndex<<endl;
 
 
 	newFile->Close();
