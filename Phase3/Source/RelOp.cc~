@@ -192,16 +192,9 @@ void Join::join(){
 
 	OrderMaker *omL = new OrderMaker();
 	OrderMaker *omR = new OrderMaker();
-
-
 	if(selOp->GetSortOrders(*omL,*omR)==0){}
 	else{
 		
-		Pipe *OL = new Pipe(100);
-		Pipe *OR = new Pipe(100);
-
-		BigQ L = BigQ (*inPipeL, *OL, *omL, nPages);
-		BigQ R = BigQ (*inPipeR, *OR, *omR, nPages);
 		
 	
 
