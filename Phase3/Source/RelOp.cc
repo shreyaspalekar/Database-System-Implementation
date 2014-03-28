@@ -202,7 +202,18 @@ void Join::join(){
 
 		BigQ L = BigQ (*inPipeL, *OL, *omL, nPages);
 		BigQ R = BigQ (*inPipeR, *OR, *omR, nPages);
-		
+
+		Record *RL = new Record();
+		Record *RR = new Record();
+
+		int resultL = OL->Remove(RL);
+		int resultR = OR->Remove(RR);
+
+		while(resultL&&resultR){
+
+			
+
+		}
 	
 
 	}
