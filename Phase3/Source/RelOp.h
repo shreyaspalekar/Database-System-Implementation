@@ -65,13 +65,31 @@ class DuplicateRemoval : public RelationalOp {
 	void Use_n_Pages (int n) { }
 };
 class Sum : public RelationalOp {
+
+	private:
+        Pipe *inPipe;
+        Pipe *outPipe;
+        Function *function;
+
 	public:
 	void Run (Pipe &inPipe, Pipe &outPipe, Function &computeMe) { }
+	void sspwn(void);
+	void doSum();
 	void WaitUntilDone () { }
 	void Use_n_Pages (int n) { }
 };
 class GroupBy : public RelationalOp {
+
+	private:
+	Pipe *inPipe;
+	Pipe *outPipe;
+        OrderMaker *groupbyOrder;
+        Function *function;
+        int runLength;
+
 	public:
+	void gspwn(void);
+	void doGroupBy();
 	void Run (Pipe &inPipe, Pipe &outPipe, OrderMaker &groupAtts, Function &computeMe) { }
 	void WaitUntilDone () { }
 	void Use_n_Pages (int n) { }
