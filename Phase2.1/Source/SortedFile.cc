@@ -377,7 +377,9 @@ int SortedFile::GetNext (Record &fetchme, CNF &cnf, Record &literal) {		// requi
 	else{							 // some order maker compatible to given CNF is constructed
 	
 		Record *r1 = new Record();
-		
+
+		cout<<"matchpage called using "<< queryOrder<<endl;
+			
 		r1 = GetMatchPage(literal);
 		
 		if(r1==NULL) return 0;
@@ -534,7 +536,9 @@ Record* SortedFile::GetMatchPage(Record &literal) {			//returns the first record
 
 int SortedFile::bsearch(int low, int high, OrderMaker *queryOM, Record &literal) {
 	
+	cout<<"serach OM "<<endl;
 	queryOM->Print();
+	cout<<endl<<"file om"<<endl;
 	si->myOrder->Print();
 
 	if(high < low) return -1;

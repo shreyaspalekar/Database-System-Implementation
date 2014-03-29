@@ -182,7 +182,7 @@ OrderMaker* CNF :: CreateQueryMaker(OrderMaker& order)
 {
     OrderMaker orderCNF;
     OrderMaker orderCopy = order;
-    GetOrder(orderCNF, orderCopy);
+    GetOrder(orderCNF, order);//Copy);
     
     OrderMaker *query = new OrderMaker();
     
@@ -193,9 +193,13 @@ OrderMaker* CNF :: CreateQueryMaker(OrderMaker& order)
         {
             if((order.whichAtts[i] == orderCNF.whichAtts[j]) && (order.whichTypes[i] == orderCNF.whichTypes[j]))
             {
-                hasMatched = true;
-                query->whichAtts[query->numAtts] = orderCopy.whichAtts[j];
-                query->whichTypes[query->numAtts] = orderCopy.whichTypes[j];
+			
+		cout<<"Match at i = "<<i<<" j="<<j<<endl;
+		cout<<"setting query at "<<query->numAtts<<endl;                
+		
+		hasMatched = true;
+                query->whichAtts[j] = orderCopy.whichAtts[j];//query->numAtts
+                query->whichTypes[j] = orderCopy.whichTypes[j];
                 query->numAtts++;
                 break;
             }
