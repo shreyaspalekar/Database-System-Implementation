@@ -1,9 +1,10 @@
 #include "File.h"
 #include "TwoWayList.cc"
 
-#include <sys/types.h>
-#include <sys/stat.h>
+#include <x86_64-linux-gnu/sys/types.h>
+#include <x86_64-linux-gnu/sys/stat.h>
 #include <fcntl.h>
+#include <unistd.h>
 #include <string.h>
 #include <iostream>
 #include <stdlib.h>

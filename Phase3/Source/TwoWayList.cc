@@ -2,7 +2,7 @@
 #define _TWO_WAY_LIST_C
 
 #include "TwoWayList.h"
-
+#include <stdlib.h>
 #include <iostream>
 
 

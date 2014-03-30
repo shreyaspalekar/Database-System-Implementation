@@ -8,7 +8,7 @@ void *SelectPipe::selectPipe(void *arg) {
 	return NULL;
 }
 
-void SelectPipe::mySelectPipe() {
+void SelectPipe::DoSelectPipe() {
 	Record *tmpRecord = new Record();
 	ComparisonEngine cmp;
 	while(this->inPipe->Remove(tmpRecord)) {
@@ -44,7 +44,7 @@ void *SelectFile::selectFile(void *arg) {
 	return NULL;
 }
 
-void SelectFile::mySelectFile() {
+void SelectFile::DoSelectFile() {
 	Record *tmpRecord = new Record();
 	ComparisonEngine cmp;
 	while(this->inFile->GetNext(*tmpRecord)) {
@@ -61,7 +61,7 @@ void SelectFile::Run (DBFile &inFile, Pipe &outPipe, CNF &selOp, Record &literal
 	this->outPipe = &outPipe;
 	this->selOp = &selOp;
 	this->literal = &literal;
-	pthread_create(&thread, NULL, selectPipe, this);
+	pthread_create(&thread, NULL, selectFile, this);
 }
 
 void SelectFile::WaitUntilDone () {
@@ -112,44 +112,56 @@ void Project::Use_n_Pages (int n) {
 
 // Duplicate Removal
 
-void DuplicateRemoval::duprem(void *arg){
+void *DuplicateRemoval::duprem(void *arg){
 	DuplicateRemoval *dr = (DuplicateRemoval *) arg;
-	dr->myDuplicateRemoval();	
-	return NULL:
+	dr->DoDuplicateRemoval();	
+	return NULL;
 }
 
-void DuplicateRemoval::myDuplicateRemoval(){
+void DuplicateRemoval::DoDuplicateRemoval(){
+
 	OrderMaker *om = new OrderMaker(this->mySchema);
-	
-	Pipe myOutPipe(1000);
-	
-	BigQ *bq = new BigQ(*(this->inPipe),myOutPipe,*om, );	// ? requires run length 4th parameter
-	
-	Record *tmpRcd = new Record();
-	Record *r1 = new Record();
-	
-	ComparisonEngine *ce;
-	
-	myOutPipe->Remove(r1);				// get first record
-	Record *copyMe = new Record();
-	copyMe->Copy(r1);					// copy it
-	this->outPipe->Insert(copyMe);		// put in out pipe
-	
-	while(myOutPipe->Remove(tmpRcd)){
-		if(ce->Compare(r1,tmpRcd,om)!=0){	// compare next with current, if equal then continue; else put copy of next into out pipe and make current as next
-			r1->Copy(tmpRcd);
-			this->outPipe->Insert(tmpRcd);
+	cout <<"duplicate removal on ordermaker: "; om->Print();
+//	Attribute *atts = this->mySchema->GetAtts();
+		// loop through all of the attributes, and list as it is
+
+//	cout <<"distince on ";
+//	om->Print(); cout <<endl;
+	if(!om)
+		cerr <<"Can not allocate ordermaker!"<<endl;
+	Pipe sortPipe(1000);
+//	int runlen = 50;//temp...
+	BigQ *bigQ = new BigQ(*(this->inPipe), sortPipe, *om, nPages);
+
+	ComparisonEngine cmp;
+	Record *tmp = new Record();
+	Record *chk = new Record();
+	if(sortPipe.Remove(tmp)) {
+		//insert the first one
+		bool more = true;
+		while(more) {
+			more = false;
+			Record *copyMe = new Record();
+			copyMe->Copy(tmp);
+			this->outPipe->Insert(copyMe);
+			while(sortPipe.Remove(chk)) {
+				if(cmp.Compare(tmp, chk, om) != 0) { //equal
+					tmp->Copy(chk);
+					more = true;
+					break;
+				}
+			}
 		}
 	}
-	
+
+//	sortPipe.ShutDown();
 	this->outPipe->ShutDown();
-	myOutPipe->ShutDown();
 }
 
 void DuplicateRemoval::Run(Pipe &inPipe, Pipe &outPipe, Schema &mySchema) { 
 	this->inPipe = &inPipe;
 	this->outPipe = &outPipe;
-	this->schema = &mySchema;
+	this->mySchema = &mySchema;
 	pthread_create(&thread,NULL,duprem,this);
 }
 
@@ -180,7 +192,7 @@ void Join::Run (Pipe &inPipeL, Pipe &inPipeR, Pipe &outPipe, CNF &selOp, Record 
 
 }
 
-void Join::jspwn(void arg){
+void* Join::jswpn(void* arg){
 
 	Join *j = (Join *) arg;
 	j->join();	
@@ -229,16 +241,16 @@ void Join::join(){
     
 	ComparisonEngine compEng;
 
-        int sortMergeFlag = selOP->GetSortOrders(*omL, *omR);
+        int sortMergeFlag = selOp->GetSortOrders(*omL, *omR);
 
         // if sort merge flag != 0 perform SORT-MERGE JOIN
         if (sortMergeFlag != 0) {
 
                 // sort left pipe
-                BigQ L(*inPipeL, *LO, *omL, params->runLength);
+                BigQ L(*inPipeL, *LO, *omL, this->nPages);
 
                 // sort right pipe
-                BigQ R(*inPipeR, *RO, *omR, params->runLength);
+                BigQ R(*inPipeR, *RO, *omR, this->nPages);
 
                 Record RL;
                 Record *RR = new Record();
@@ -282,7 +294,7 @@ void Join::join(){
                                 
                                 // get all matching records (on join attr) in vector
                                 while (orderMakerAnswer == 0 && isRightPipeEmpty != 0) {
-                                        mergeVector.push_back(rightRec);
+                                        mergeVector.push_back(RR);
                                         RR = new Record();
                                         isRightPipeEmpty = RO->Remove(RR);
                                         if (isRightPipeEmpty != 0) {
@@ -303,7 +315,7 @@ void Join::join(){
                                         }
                                         
                                         //Take next Record from left pipe;
-                                        isLeftPipeEmpty = LO->Remove(&leftRec);
+                                        isLeftPipeEmpty = LO->Remove(&RL);
                                         orderMakerAnswer = compEng.Compare(&RL, omL, mergeVector[0], omR);
 
                                 }
@@ -328,8 +340,11 @@ void Join::join(){
                 int x = rand();
                 sprintf(fileName, "rightRelation_bnj.tmp%d", x);
 
+		
+
+
                 DBFile rightRelationFIle;
-                Record rightRecord;
+                Record RR;
                 rightRelationFIle.Create(fileName, heap, NULL);
 
                 //Add entire right relation to a temporary dbFile
@@ -370,7 +385,7 @@ void Join::join(){
                                 //For block nested loop join, n-1 pages of left relation are joined with each record of right relation
                                 
                                 // start reading right relation from file when n - 1 buffer pages are full OR pipe is empty
-                                if (numPagesAllocatedForLeft == params->runLength - 1 || isPipeEnded) {
+                                if (numPagesAllocatedForLeft == this->nPages - 1 || isPipeEnded) {
 
                                         rightRelationFIle.Open(fileName);
                                         rightRelationFIle.MoveFirst();
@@ -393,7 +408,7 @@ void Join::join(){
                                         while (isRightRecPresent != 0) {
                                                 for (int i = 0; i < leftRelationVector.size(); i++) {
                                                         
-                                                        int isAccepted = compEng.Compare(leftRelationVector[i], &rightRec, literal, selOP);
+                                                        int isAccepted = compEng.Compare(leftRelationVector[i], &rightRec, literal, selOp);
                                                        
                                                         // merge records when the cnf is accepted
                                                         if (isAccepted != 0) {
@@ -450,7 +465,7 @@ void Join::Use_n_Pages (int n) {
 }
 
 
-void* doSum() {
+void Sum::doSum() {
 
         cout << "Starting Summation" << endl;
 
@@ -512,7 +527,7 @@ void* doSum() {
 
 
 
-void Sum::sspwn(void arg){
+void* Sum::sspwn(void* arg){
 
 	Sum *s = (Sum *) arg;
 	s->doSum();	
@@ -545,10 +560,12 @@ void Sum::Use_n_Pages(int n) {
 
 
 
-void* doGroupBy() {
+void GroupBy::doGroupBy() {
 
-        cout << "Starting group by" << endl;
-        struct RunParams* params = (struct RunParams*) parameters;
+        
+/*
+	cout << "Starting group by" << endl;
+        //struct RunParams* params = (struct RunParams*) parameters;
 
         Attribute DA = {"double", Double};
         Schema out_sch_double("out_sch", 1, &DA);
@@ -671,10 +688,10 @@ void* doGroupBy() {
         resultRec.MergeRecords(&groupSumRec, &currRec, 1, numGroupByAttrs, mergeAttrsToKeep, 1 + numGroupByAttrs, 1);
 
         params->outputPipe->Insert(&resultRec);
-        params->outputPipe->ShutDown();
+        params->outputPipe->ShutDown();*/
 }
 
-void GroupBy::gspwn(void arg){
+void* GroupBy::gspwn(void* arg){
 
 	GroupBy *g = (GroupBy *) arg;
 	g->doGroupBy();	
@@ -689,7 +706,7 @@ void GroupBy::Run(Pipe &inPipe, Pipe &outPipe, OrderMaker &groupAtts, Function &
         this->outPipe = &outPipe;
         this->groupbyOrder = &groupAtts;
         this->function = &computeMe;
-        this->runLength = runLength;
+        //this->nPages = runLength;
 
         pthread_create(&thread, NULL, gspwn, this);
 }
@@ -706,3 +723,7 @@ void GroupBy::Use_n_Pages(int n) {
         cout << "Setting run length in use n pages : " << n << endl;
         this->nPages = n;
 }
+
+	void WriteOut::Run (Pipe &inPipe, FILE *outFile, Schema &mySchema) {}
+	void WriteOut::WaitUntilDone (){}
+	void WriteOut::Use_n_Pages (int n){} 
