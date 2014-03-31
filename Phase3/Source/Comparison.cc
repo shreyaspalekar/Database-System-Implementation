@@ -176,6 +176,99 @@ int CNF :: GetSortOrders (OrderMaker &left, OrderMaker &right) {
 	return left.numAtts;
 }
 
+int CNF :: GetOrder (OrderMaker &left, OrderMaker &right) {
+    
+    // initialize the size of the OrderMakers
+    left.numAtts = 0;
+    right.numAtts = 0;
+    
+    // loop through all of the disjunctions in the CNF and find those
+    // that are acceptable for use in a sort ordering
+    for (int i = 0; i < numAnds; i++)
+    {
+        // if we don't have a disjunction of length one, then it
+        // can't be acceptable for use with a sort ordering
+        if (orLens[i] != 1) {
+            continue;
+        }
+        
+        // First verify that it is an equality check
+        if (orList[i][0].op != Equals) {
+            continue;
+        }
+        
+        // check if operand1 is Left and operand2 is Literal
+        if (orList[i][0].operand1 == Left && orList[i][0].operand2 == Literal)
+        {
+            // get type and column-position-in-file for column
+            left.whichAtts[left.numAtts] = orList[i][0].whichAtt1;
+            left.whichTypes[left.numAtts] = orList[i][0].attType;
+            // get type and the position in CNF
+            right.whichAtts[right.numAtts] = orList[i][0].whichAtt2;
+            right.whichTypes[right.numAtts] = orList[i][0].attType;
+        }
+        
+        // check if operand1 is Literal and operand2 is Right
+        else if (orList[i][0].operand1 == Literal && orList[i][0].operand2 == Right)
+        {
+            // get type and column-position-in-file for column
+            left.whichAtts[left.numAtts] = orList[i][0].whichAtt2;
+            left.whichTypes[left.numAtts] = orList[i][0].attType;
+            // get type and the position in CNF
+            right.whichAtts[right.numAtts] = orList[i][0].whichAtt1;
+            right.whichTypes[right.numAtts] = orList[i][0].attType;
+        }
+        else
+            continue;
+        
+        left.numAtts++;
+        right.numAtts++;
+    }
+    
+    return left.numAtts;
+    
+}
+
+OrderMaker* CNF :: CreateQueryMaker(OrderMaker& order)
+{
+    OrderMaker orderCNF;
+    OrderMaker orderCopy = order;
+    GetOrder(orderCNF, order);//Copy);
+    
+    OrderMaker *query = new OrderMaker();
+    
+    for (int i = 0; i < order.numAtts; i++)
+    {
+        bool hasMatched = false;
+        for(int j = 0; j < orderCNF.numAtts; j++)
+        {
+            if((order.whichAtts[i] == orderCNF.whichAtts[j]) && (order.whichTypes[i] == orderCNF.whichTypes[j]))
+            {
+			
+		cout<<"Match at i = "<<i<<" j="<<j<<endl;
+		cout<<"setting query at "<<query->numAtts<<endl;                
+		
+		hasMatched = true;
+                query->whichAtts[j] = orderCopy.whichAtts[j];//query->numAtts
+                query->whichTypes[j] = orderCopy.whichTypes[j];
+                query->numAtts++;
+                break;
+            }
+        }
+        if(!hasMatched)
+            break;
+    }
+    if(query->numAtts > 0)
+        return query;
+    else
+    {
+        delete query;
+        return NULL;
+    }
+}
+
+
+
 
 void CNF :: Print () {
 

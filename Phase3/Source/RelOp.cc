@@ -2,30 +2,48 @@
 
 // SelectPipe
 
-void *SelectPipe::selectPipe(void *arg) {
-	SelectPipe *sp = (SelectPipe *) arg;
-	sp->DoSelectPipe();
-	return NULL;
-}
+typedef struct params{
 
-void SelectPipe::DoSelectPipe() {
+	Pipe *inPipe;
+	Pipe *outPipe;
+	CNF *selOp;
+	DBFile *inFile;
+	Record *literal;
+	int *keepMe;
+	int numAttsInput;
+	int numAttsOutput;
+
+} params;
+
+
+void *SelectPipe::selectPipe(void *arg) {
+	params *sp = (params *) arg;
+	cout<<"created thread"<<endl;
+
 	Record *tmpRecord = new Record();
 	ComparisonEngine cmp;
-	while(this->inPipe->Remove(tmpRecord)) {
-		if(cmp.Compare(tmpRecord, this->literal, this->selOp)) {	// compares record with CNF, if true puts it into outPipe
-			this->outPipe->Insert(tmpRecord);
+
+	while(sp->inPipe->Remove(tmpRecord)) {
+
+		if(cmp.Compare(tmpRecord, sp->literal, sp->selOp)) {	// compares record with CNF, if true puts it into outPipe
+			sp->outPipe->Insert(tmpRecord);
 		}
 	}
 	delete tmpRecord;
-	this->outPipe->ShutDown();
+	sp->outPipe->ShutDown();
 }
 
 void SelectPipe::Run (Pipe &inPipe, Pipe &outPipe, CNF &selOp, Record &literal){
-	this->inPipe = &inPipe;
-	this->outPipe = &outPipe;
-	this->selOp = &selOp;
-	this->literal = &literal;
-	pthread_create(&thread, NULL, selectPipe, this);
+
+	cout<<"called run"<<endl;
+
+	params* sp = new params;
+
+	sp->inPipe = &inPipe;
+	sp->outPipe = &outPipe;
+	sp->selOp = &selOp;
+	sp->literal = &literal;
+	pthread_create(&thread, NULL, selectPipe,(void*) sp);
 }
 
 void SelectPipe::WaitUntilDone () {
@@ -39,29 +57,42 @@ void SelectPipe::Use_n_Pages (int runlen) {
 // SelectFile
 
 void *SelectFile::selectFile(void *arg) {
-	SelectFile *sp = (SelectFile *) arg;
-	sp->DoSelectFile();
-	return NULL;
-}
+	params *sp = (params *) arg;
 
-void SelectFile::DoSelectFile() {
 	Record *tmpRecord = new Record();
+
+	//cout<<"call to sf"<<endl;
+
 	ComparisonEngine cmp;
-	while(this->inFile->GetNext(*tmpRecord)) {
-		if(cmp.Compare(tmpRecord, this->literal, this->selOp)) {	// compares record with CNF, if true puts it into outPipe
-			this->outPipe->Insert(tmpRecord);
+
+	//cout<<sp->inFile<<endl;//addr
+	sp->selOp->Print();
+	
+	while(sp->inFile->GetNext(*tmpRecord)) {
+		//cout<<"read"<<endl;
+		if(cmp.Compare(tmpRecord, sp->literal, sp->selOp)) {	// compares record with CNF, if true puts it into outPipe
+
+			cout<<"found"<<endl;
+			sp->outPipe->Insert(tmpRecord);
+
 		}
 	}
 	delete tmpRecord;
-	this->outPipe->ShutDown();
+	sp->outPipe->ShutDown();
 }
 
 void SelectFile::Run (DBFile &inFile, Pipe &outPipe, CNF &selOp, Record &literal) {
-	this->inFile = &inFile;
-	this->outPipe = &outPipe;
-	this->selOp = &selOp;
-	this->literal = &literal;
-	pthread_create(&thread, NULL, selectFile, this);
+
+	cout<<"called run"<<endl;
+
+	params* sp = new params;
+
+	sp->inFile = &inFile;
+	sp->outPipe = &outPipe;
+	sp->selOp = &selOp;
+	sp->literal = &literal;
+	pthread_create(&thread, NULL, selectFile,(void*) sp);
+
 }
 
 void SelectFile::WaitUntilDone () {
@@ -76,30 +107,31 @@ void SelectFile::Use_n_Pages (int runlen) {
 // Project 
 
 void *Project::project(void *arg) {
-	Project *pj = (Project *) arg;
-	pj->DoProject();
-	return NULL;
-}
+	params *sp = (params *) arg;
 
-void Project::DoProject() {
 	Record *tmpRcd = new Record;
-	while(this->inPipe->Remove(tmpRcd)) {
-		tmpRcd->Project(this->keepMe, this->numAttsOutput, this->numAttsInput);
-		this->outPipe->Insert(tmpRcd);
+	while(sp->inPipe->Remove(tmpRcd)) {
+		tmpRcd->Project(sp->keepMe, sp->numAttsOutput, sp->numAttsInput);
+		sp->outPipe->Insert(tmpRcd);
 	}
-	this->outPipe->ShutDown();
+	sp->outPipe->ShutDown();
 	delete tmpRcd;
-	return;
+	//return;
 }
 
 void Project::Run (Pipe &inPipe, Pipe &outPipe, int *keepMe,
 		int numAttsInput, int numAttsOutput) {
-	this->inPipe = &inPipe;
-	this->outPipe = &outPipe;
-	this->keepMe = keepMe;
-	this->numAttsInput = numAttsInput;
-	this->numAttsOutput = numAttsOutput;
-	pthread_create(&thread, NULL, project, this);
+
+	params* sp = new params;
+
+	sp->inPipe = &inPipe;
+	sp->outPipe = &outPipe;
+	sp->keepMe = keepMe;
+	sp->numAttsInput = numAttsInput;
+	sp->numAttsOutput = numAttsOutput;
+	pthread_create(&thread, NULL, project, sp);
+
+
 }
 
 void Project::WaitUntilDone () {

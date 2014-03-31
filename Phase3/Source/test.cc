@@ -55,36 +55,55 @@ int nAtts = 4;
 int rAtts = 3;
 
 void init_SF_ps (char *pred_str, int numpgs) {
+	
+	cout<<ps->path()<<endl;
+
 	dbf_ps.Open (ps->path());
 	get_cnf (pred_str, ps->schema (), cnf_ps, lit_ps);
 	SF_ps.Use_n_Pages (numpgs);
 }
 
 void init_SF_p (char *pred_str, int numpgs) {
+	
+	cout<<p->path()<<endl;
+
 	dbf_p.Open (p->path());
 	get_cnf (pred_str, p->schema (), cnf_p, lit_p);
 	SF_p.Use_n_Pages (numpgs);
 }
 
 void init_SF_s (char *pred_str, int numpgs) {
+
+	cout<<s->path()<<endl;
+
 	dbf_s.Open (s->path());
 	get_cnf (pred_str, s->schema (), cnf_s, lit_s);
 	SF_s.Use_n_Pages (numpgs);
 }
 
 void init_SF_o (char *pred_str, int numpgs) {
+
+	cout<<o->path()<<endl;
+
 	dbf_o.Open (o->path());
 	get_cnf (pred_str, o->schema (), cnf_o, lit_o);
 	SF_o.Use_n_Pages (numpgs);
 }
 
 void init_SF_li (char *pred_str, int numpgs) {
+
+
+	cout<<li->path()<<endl;
+
 	dbf_li.Open (li->path());
 	get_cnf (pred_str, li->schema (), cnf_li, lit_li);
 	SF_li.Use_n_Pages (numpgs);
 }
 
 void init_SF_c (char *pred_str, int numpgs) {
+
+	cout<<c->path()<<endl;
+
 	dbf_c.Open (c->path());
 	get_cnf (pred_str, c->schema (), cnf_c, lit_c);
 	SF_c.Use_n_Pages (numpgs);
@@ -96,6 +115,8 @@ void q1 () {
 
 	char *pred_ps = "(ps_supplycost < 1.03)";
 	init_SF_ps (pred_ps, 100);
+
+	cout<<"calling run"<<endl;
 
 	SF_ps.Run (dbf_ps, _ps, cnf_ps, lit_ps);
 	SF_ps.WaitUntilDone ();

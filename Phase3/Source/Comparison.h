@@ -13,6 +13,7 @@ class Comparison {
 
 	friend class ComparisonEngine;
 	friend class CNF;
+	friend class SortedFile;
 
 	Target operand1;
 	int whichAtt1;
@@ -42,6 +43,7 @@ class OrderMaker {
 
 	friend class ComparisonEngine;
 	friend class CNF;
+	friend class SortedFile;	
 
 public:
 
@@ -71,6 +73,7 @@ class Record;
 class CNF {
 
 	friend class ComparisonEngine;
+	friend class SortedFile;
 
 	Comparison orList[MAX_ANDS][MAX_ORS];
 	
@@ -99,6 +102,11 @@ public:
         // a relational selection over a single relation so only one schema is used
         void GrowFromParseTree (struct AndList *parseTree, Schema *mySchema, 
 		Record &literal);
+
+	int GetOrder (OrderMaker &left, OrderMaker &right);
+
+	OrderMaker* CreateQueryMaker(OrderMaker& order);
+
 
 };
 
