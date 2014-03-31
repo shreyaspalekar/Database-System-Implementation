@@ -62,7 +62,15 @@ void Comparison :: Print () {
 		cout << "(String)";
 }
 
+void OrderMaker::GetOrderMakerAttrs(vector<int> *orderMakerAttrs, vector<Type> *orderMakerTypes) {
 
+        for (int i = 0; i < numAtts; i++) {
+                orderMakerAttrs->push_back(whichAtts[i]);
+                orderMakerTypes->push_back(whichTypes[i]);
+
+        }
+
+}
 
 
 OrderMaker :: OrderMaker() {

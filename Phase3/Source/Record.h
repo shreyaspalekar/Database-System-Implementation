@@ -5,6 +5,8 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
+#include <sstream>
+#include <vector>
 
 #include "Defs.h"
 #include "ParseTree.h"
@@ -68,6 +70,8 @@ public:
 	// prints the contents of the record; this requires
 	// that the schema also be given so that the record can be interpreted
 	void Print (Schema *mySchema);
+
+	void WriteToFile(FILE *writeFile, Schema *mySchema);
 
         int getNumAttrs(){
                         return ((int*)bits)[1]/sizeof(int)-1;

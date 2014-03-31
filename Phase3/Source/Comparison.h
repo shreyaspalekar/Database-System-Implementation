@@ -1,12 +1,15 @@
 #ifndef COMPARISON_H
 #define COMPARISON_H
 
+#include <vector>
 #include "Record.h"
 #include "Schema.h"
 #include "File.h"
 #include "Comparison.h"
 #include "ComparisonEngine.h"
 #include <stdlib.h>
+
+using std::vector;
 
 // This stores an individual comparison that is part of a CNF
 class Comparison {
@@ -60,6 +63,8 @@ public:
 	// create an OrderMaker that can be used to sort records
 	// based upon ALL of their attributes
 	OrderMaker(Schema *schema);
+
+	void GetOrderMakerAttrs(vector<int> *orderMakerAttrs, vector<Type> *orderMakerTypes);
 
 	// print to the screen
 	void Print ();
