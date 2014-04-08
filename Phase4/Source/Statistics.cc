@@ -12,6 +12,17 @@ Statistics::~Statistics()
 
 void Statistics::AddRel(char *relName, int numTuples)
 {
+
+//	if(relationData.find(relName)){
+
+		relData n = new relData;
+		n.numTuples = numTuples;
+
+		relationData.insert(pair<char*,relData>(relName,n));
+
+
+//	}
+
 }
 void Statistics::AddAtt(char *relName, char *attName, int numDistincts)
 {

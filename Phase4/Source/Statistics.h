@@ -2,9 +2,27 @@
 #define STATISTICS_
 #include "ParseTree.h"
 
+struct cmp_str
+{
+   bool operator()(char const *a, char const *b)
+   {
+      return std::strcmp(a, b) < 0;
+   }
+};
+
+typedef struct relData{
+
+	int numTuples;
+	map<char*,int,cmp_str> attrData;
+
+
+}reldata;
 
 class Statistics
 {
+
+	map<char*,relData,cmp_str> relationData;
+
 public:
 	Statistics();
 	Statistics(Statistics &copyMe);	 // Performs deep copy
