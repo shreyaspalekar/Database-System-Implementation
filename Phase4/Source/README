@@ -1,0 +1,31 @@
+==============================================================================
+032608-1719
+
+readme 
+=========
+Previous drivers are not included!
+
+This driver is for assignment 4.1 (Query Compiler)
+
+To compile the driver, type
+	make a4-1.out
+
+To run the driver, type 'test.out' followed by the query # you wish to execute
+	./a4-1.out [0-11]
+
+
+Using the Driver:
+==================
+I modify Lexer.l, please use this new version. 
+
+For those who use Solaris machines, do not delete included lex.yy.c, otherwise, there may have
+link error.
+
+
+
+Submission Instructions: 
+========================= 
+
+ Create directory a4-1. The turnin file should be called a4-1.tar.gz)
+The executable produced by your file should be called a4-1.out
+-------------------------------------------------------------------------------

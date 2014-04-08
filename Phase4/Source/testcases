@@ -1,0 +1,148 @@
+
+Q1: relations:  lineitem
+     T(lineitem) =6001215
+     v(lineitem, l_returnflag) =3
+     v(lineitem,l_discount) = 11
+     v(lineitem, l_shipmode) = 7
+
+    CNF: (l_returnflag = 'R') 
+    		AND ((l_discount < 0.04) OR (l_shipmode = 'MAIL'))
+	Answer:  8.5732e+5
+
+     
+
+Q2:
+   Relation: supplier, partsupp
+     T(supplier) = 10000, (partsupp) = 800000
+     v(supplier, s_suppkey) = 10000, v(partsupp, ps_suppkey)= 10000,
+     CNF:	(s_suppkey = ps_suppkey)
+     Answer: 800000
+
+ Q3: Relation: orders, customer, nation
+
+     T(customer) = 150000, T(nation) = 25,  T(orders)＝1500000
+
+    v(customer, c_custkey) = 1500000, v(orders,o_custkey) = 150000, 
+    v(customer, c_nationkey) = 25, v(nation, n_nationkey)=25,
+    
+    CNF: (c_custkey = o_custkey)
+   		AND (c_nationkey = n_nationkey)
+    Answer:1500000
+
+Q4: relation: part, supplier, partsupp, nation, region
+    T(part) = 200000, T(supplier) = 10000, T(partsupp) = 800000, T(nation) = 25, T(region) = 5
+    v(part, p_partkey) = 200000, v(partsupp, ps_partkey) = 200000
+    v(supplier, s_suppkey) = 10000, v(partsupp, ps_suppkey= 10000
+    v(part,p_size) = 50
+    v(supplier, s_nationkey) = 25, v(nation, n_nationkey)=25,
+    v(nation, n_regionkey) = 5, v(region, r_regionkey) =5,
+    v(region, r_name) = 5
+    CNF: (p_partkey=ps_partkey) 
+    		AND (s_suppkey = ps_suppkey)
+		AND (p_size = 2) 
+		AND (s_nationkey = n_nationkey)
+		AND(n_regionkey = r_regionkey) 
+		AND (r_name = 'AMERICA')
+	Answer: 3200
+
+
+   	
+
+Q5: relations:  supplier, customer,nation
+ T(supplier) = 10000, T(customer) = 150000, T(nation) = 25
+   
+     v(nation, n_nationkey) =25
+     v(supplier,s_nationkey) = 25
+     v(customer, c_nationkey) = 25
+
+    CNF: (s.s_nationkey = n1.n_nationkey) AND (c.c_nationkey = n2.n_nationkey) AND (n1.n_nationkey = n2.n_nationkey)
+	Answer:  60000000
+
+   	
+
+Q6: relation: customer,orders,lineitem
+
+      T(orders) = 1500000, T(customer) = 150000, T(lineitem) = 6001215,
+    v(customer, c_mktsegment) = 5
+    v(customer, c_custkey) = 150000, v(orders, o_custkey) = 99996, 
+    v(lineitem, l_orderkey)= 1500000, v(orders,o_orderkey) = 1500000
+    CNF: (c_mktsegment = 'BUILDING') 
+		AND (c_custkey = o_custkey) 
+		AND (l_orderkey = o_orderkey)
+		AND o_orderdate < date '1995-03-1'
+
+   Answer:  40081
+
+Q7: relation: partsupp, supplier, nation
+    T(partsupp) = 800000, T(supplier) = 10000,  T(nation) = 25, 
+    v(supplier, s_suppkey) = 10000, v(partsupp, ps_suppkey)= 10000, 
+    v(supplier, s_nationkey) = 25, v(nation, n_nationkey)=25,
+    v(nation,n_name ) =25
+    CNF:  (s_suppkey = ps_suppkey)
+       		AND (s_nationkey = n_nationkey) 
+		AND (n_name = 'AMERICA')
+Answer:32000
+
+Q8：Relation: orders, lineitem
+
+      T(orders) = 1500000,  T(lineitem) = 6001215,
+    v(lineitem, l_orderkey)= 1500000, v(orders,o_orderkey) = 1500000
+    CNF: (l_receiptdate >'1995-02-01' ) AND (l_orderkey = o_orderkey)
+		 Answer: 2000405
+
+Q9: Relation:partsupp, part
+ 
+    T(part) = 200000,  T(partsupp) = 800000 
+    v(part, p_partkey) = 200000, v(partsupp, ps_partkey) = 200000
+     v(part,p_size) = 50
+    CNF: (p_partkey=ps_partkey) AND ((p_size =3) OR (p_size=6) OR (p_size =19))
+	Answer: 48000
+ 
+Q10: Relation: part, supplier,  partsupp  
+
+    T(part) = 200000, T(supplier) = 10000, T(partsupp) = 800000
+
+    v(part, p_partkey) = 200000, v(partsupp, ps_partkey) = 200000, 
+    v(supplier, s_suppkey) = 10000, v(partsupp, ps_suppkey= 10000,
+    v(part,p_name) = 199996,
+    CNF: (p_partkey=ps_partkey) 
+		AND (s_suppkey = ps_suppkey)
+		AND (p_name = 'dark green antique puff wheat
+		')
+	Answer:4 
+
+Q11:
+   relation: customer, orders, lineitem, nation
+
+     T(customer) = 150000, T(nation) = 25, T(lineitem) = 6001215, T(orders)＝1500000
+
+    v(customer, o_custkey) = 1500000, v(orders,o_custkey) = 150000, 
+    v(customer, c_nationkey) = 25, v(nation, n_nationkey)=25,
+    v(lineitem, l_orderkey) =1500000, v(orders,o_orderkey) = 1500000
+    v(lineitem, l_returnflag) =3 
+    
+    CNF: (c_custkey = o_custkey)  
+				AND (o_orderdate > '1994-01-23')  
+				AND (l_orderkey = o_orderkey) 
+				AND (c_nationkey = n_nationkey) 
+
+   Answer: 2000405 
+
+Q12: 
+   Relation: part,lineitem
+
+     T(lineitem) = 6001215, T(part)＝200000
+
+    v(part, p_partkey) = 200000, v(lineitem, l_partkey) = 200000, 
+    v(part,p_container) = 40,
+    v(lineitem, l_shipinstruct) = 4
+    v(lineitem, l_shipmode) =7 
+    
+    CNF: (l_orderkey = o_orderkey) 
+				AND (l_shipmode = 'AIR' OR l_shipmode = 'AIR REG') 
+				AND (p_container ='SM BOX' OR p_container = 'SM PACK') 
+				AND (l_shipinstruct = 'DELIVER IN PERSON')
+
+	Answer : 150040
+
+
