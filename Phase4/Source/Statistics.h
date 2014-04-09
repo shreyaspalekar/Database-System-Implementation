@@ -1,6 +1,8 @@
 #ifndef STATISTICS_
 #define STATISTICS_
 #include "ParseTree.h"
+#include <string>
+#include <map>
 
 /*struct cmp_str
 {
@@ -18,11 +20,15 @@
 
 }reldata;*/
 
+using namespace std;
+
 class Statistics
 {
 
 	map<string,int> *relationData;
-	map<string,map <string, int>> *attrData;
+	map<string,map <string, int> > *attrData;
+	bool isCalledFrmApply;
+	bool isApply;
 
 public:
 	Statistics();

@@ -1,10 +1,18 @@
 #include "Statistics.h"
+#include <iostream>
+#include <map>
+#include <stdlib.h>
+#include <fstream>
+#include <sstream>
+
 
 Statistics::Statistics()
 {
 
+	isCalledFrmApply = false;
+	isApply = false;
 	relationData = new map<string,int>();
-	attrData= new map<string,map <string, int>>();
+	attrData= new map<string,map <string, int> >();
 
 }
 
@@ -12,8 +20,8 @@ Statistics::Statistics()
 Statistics::Statistics(Statistics &copyMe)
 {
 
-	relationData = new map<string,int>(copyMe.relationData);
-	attrData = new map<string,map <string, int>>(copyMe.attrData);
+	relationData = new map<string,int>(*(copyMe.relationData));
+	attrData = new map<string,map <string, int> >(*(copyMe.attrData));
 
 }
 
@@ -34,14 +42,14 @@ void Statistics::AddRel(char *relName, int numTuples)
 
 	string rel(relName);
 
-	pair < map<string,int>::iterator, bool> ret = relationData.insert(pair<string,int>(rel,numTuples));
+	pair < map<string,int>::iterator, bool> ret = relationData->insert(pair<string,int>(rel,numTuples));
 
 	if(ret.second==false){
 
 		cout<<"Duplicate found";
 
-		relationData.erase(ret.first);
-		relationData.insert(pair<string,int>(rel,numTuples));
+		relationData->erase(ret.first);
+		relationData->insert(pair<string,int>(rel,numTuples));
 
 	}
 
@@ -55,16 +63,16 @@ void Statistics::AddAtt(char *relName, char *attName, int numDistincts)
 
 	if (numDistincts == -1) {
 
-                int numTuples = relationData.at(rel);
-                attrData[rel][att] = numTuples;
+                int numTuples = relationData->at(rname);
+                (*attrData)[rname][aName] = numTuples;
 
         } else {
-                attrData[rel][att] = numDistincts;
+                (*attrData)[rname][aName] = numDistincts;
         }	
 	
 
 }
-void Statistics::CopyRel(char *oldName, char *newName)
+void Statistics::CopyRel(char *_oldName, char *_newName)
 {
 
 
@@ -73,19 +81,19 @@ void Statistics::CopyRel(char *oldName, char *newName)
 
 	//copy relation data
 
-        int oldNumTuples = relationData[oldName];
-        relationData[newName] = oldNumTuples;
+        int oldNumTuples = (*relationData)[oldName];
+        (*relationData)[newName] = oldNumTuples;
 
 	//copy relation attribute 
 
-	map<string, int> &oldattrData = attrData[oldName];
+	map<string, int> &oldattrData = (*attrData)[oldName];
 
         for (map<string, int>::iterator oldAttrInfo = oldattrData.begin(); oldAttrInfo != oldattrData.end(); ++oldAttrInfo) {
                 
 		string newAtt = newName;
-                newAtt += "." + oldattrData->first;
+                newAtt += "." + oldAttrInfo->first;
                 //cout << (*oldAttrInfo).first << ": " << (*oldAttrInfo).second << endl;
-                attrData[newName][newAtt] = oldattrData->second;
+                (*attrData)[newName][newAtt] = oldAttrInfo->second;
         }
 
 
@@ -114,7 +122,7 @@ void Statistics::Read(char *fromWhere)
         int relationDataSize = atoi(input.c_str());
 
 	//clear relation data
-        relationData.clear();
+        relationData->clear();
 
 	//2.read actual relationdata map
         for (int i = 0; i < relationDataSize; i++) {
@@ -127,7 +135,7 @@ void Statistics::Read(char *fromWhere)
 
 
                 int part2Int = atoi(part2.c_str());
-                relationData[part1] = part2Int;
+                (*relationData)[part1] = part2Int;
 
         }
 
@@ -135,7 +143,7 @@ void Statistics::Read(char *fromWhere)
         readFile >> input;
 
 	//clear attrData map
-        attrData.clear();
+        attrData->clear();
 
 	//4. read in actual attrData map
         string relName, attrName, distinctCount;
@@ -144,7 +152,7 @@ void Statistics::Read(char *fromWhere)
         while (!readFile.eof()) {
 
                 int distinctCountInt = atoi(distinctCount.c_str());
-                attrData[relName][attrName] = distinctCountInt;
+                (*attrData)[relName][attrName] = distinctCountInt;
                 readFile >> relName >> attrName >> distinctCount;
 
         }
@@ -168,12 +176,12 @@ void Statistics::Write(char *fromWhere)
 
 	//1.relation data size
 
-        int relationDataSize = relationData.size();
+        int relationDataSize = relationData->size();
         writeFile << relationDataSize << "\n";
 
 	//2. actual relation data map
 
-        for (map<string, int>::iterator entry = relationData.begin(); entry != relationData.end(); entry++) {
+        for (map<string, int>::iterator entry = relationData->begin(); entry != relationData->end(); entry++) {
 
                 const char *first = entry->first.c_str();
                 int second = entry->second;
@@ -186,12 +194,12 @@ void Statistics::Write(char *fromWhere)
 
 	//3. attrData size
 
-        int attrDataSize = attrData.size();
+        int attrDataSize = attrData->size();
         writeFile << attrDataSize << "\n";
 
 	//4. actual attrData map
 
-        for (map<string, map<string, int> >::iterator ii = attrData.begin(); ii != attrData.end(); ++ii) {
+        for (map<string, map<string, int> >::iterator ii = attrData->begin(); ii != attrData->end(); ++ii) {
 
                 for (map<string, int>::iterator j = ii->second.begin(); j != ii->second.end(); ++j) {
                         //cout << (*ii).first << " : " << (*j).first << " : " << (*j).second << endl;
@@ -215,7 +223,11 @@ void Statistics::Write(char *fromWhere)
 void  Statistics::Apply(struct AndList *parseTree, char *relNames[], int numToJoin)
 {
 
-
+	isCalledFrmApply = true;
+        isApply = true;
+        Estimate(parseTree, relNames, numToJoin);
+        isApply = false;
+        isCalledFrmApply = false;
 
 }
 

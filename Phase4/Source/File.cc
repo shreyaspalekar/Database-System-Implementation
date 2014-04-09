@@ -1,9 +1,10 @@
 #include "File.h"
 #include "TwoWayList.cc"
 
-#include <sys/types.h>
-#include <sys/stat.h>
+#include <x86_64-linux-gnu/sys/types.h>
+#include <x86_64-linux-gnu/sys/stat.h>
 #include <fcntl.h>
+#include <unistd.h>
 #include <string.h>
 #include <iostream>
 #include <stdlib.h>
@@ -49,6 +50,7 @@ int Page :: GetFirst (Record *firstOne) {
 
 	// make sure there is data 
 	if (!myRecs->RightLength ()) {
+
 		return 0;
 	}
 
@@ -72,6 +74,8 @@ int Page :: Append (Record *addMe) {
 	}
 
 	// move to the last record
+	//cout<<"myrecs "<<myRecs<<"\n";
+	
 	myRecs->MoveToFinish ();
 
 	// and add it
@@ -86,7 +90,12 @@ int Page :: Append (Record *addMe) {
 void Page :: ToBinary (char *bits) {
 
 	// first write the number of records on the page
+	
+	//cout<<"to binary "<<numRecs<<endl;
 	((int *) bits)[0] = numRecs;
+
+
+	//cout<<"set no of recs as"<<numRecs<<"\n";
 
 	char *curPos = bits + sizeof (int);
 
@@ -109,7 +118,9 @@ void Page :: FromBinary (char *bits) {
 
 	// first read the number of records on the page
 	numRecs = ((int *) bits)[0];
-	//subi //cerr << " numRecs in page " << numRecs << endl;
+
+	//cout<<((int*)bits)[100]<<endl;
+	//cout<<"from binary "<<numRecs<<endl;
 
 	// sanity check
 	if (numRecs > 1000000 || numRecs < 0) {
@@ -167,7 +178,6 @@ void File :: GetPage (Page *putItHere, off_t whichPage) {
 
 	// this is because the first page has no data
 	whichPage++;
-	//subi// cerr << "get_pg " << whichPage << " file_sz " << curLength << endl;
 
 	if (whichPage >= curLength) {
 		cerr << "whichPage " << whichPage << " length " << curLength << endl;
