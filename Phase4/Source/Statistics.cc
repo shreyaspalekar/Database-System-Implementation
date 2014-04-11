@@ -224,7 +224,7 @@ void Statistics::Write(char *fromWhere)
 void  Statistics::Apply(struct AndList *parseTree, char *relNames[], int numToJoin)
 {
 
-	isCalledFrmApply = true;
+		isCalledFrmApply = true;
         isApply = true;
         Estimate(parseTree, relNames, numToJoin);
         isApply = false;
@@ -243,7 +243,7 @@ double Statistics::Estimate(struct AndList *parseTree, char **relNames, int numT
 
     currentAnd = parseTree;
 
-string leftRelation;
+    string leftRelation;
     string rightRelation;
 
     string leftAttr;
@@ -363,6 +363,9 @@ string leftRelation;
     }
 
     if (isApply) {
+
+    		cout<<"is apply is" <<isApply;
+
             map<string, int>::iterator relOpMapITR, distinctCountMapITR;
             set<string> addedJoinAttrSet;
             if (isJoinPerformed) {
