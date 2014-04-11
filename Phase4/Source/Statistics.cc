@@ -255,7 +255,7 @@ double Statistics::Estimate(struct AndList *parseTree, char **relNames, int numT
     bool isJoinPerformed = false;
 
     double resultANDFactor = 1.0;
-    double resultORFactor = 0.0;
+    double resultORFactor = 1.0;
 
     map<string, int> relOpMap;
 
@@ -268,7 +268,7 @@ double Statistics::Estimate(struct AndList *parseTree, char **relNames, int numT
 
 
             currentOr = currentAnd->left;
-            resultORFactor = 0.0;
+            resultORFactor = 1.0;
 
 
            while (currentOr != NULL) {
@@ -326,7 +326,7 @@ double Statistics::Estimate(struct AndList *parseTree, char **relNames, int numT
                             double rightDistinctCount = (*attrData)[rightRelation][currentCompOp->right->value];
 
                             if (currentCompOp->code == EQUALS) {
-                                    resultORFactor += (1.0 / max(leftDistinctCount, rightDistinctCount));//ORFACTOR??
+                                    resultORFactor *=(1.0 - (1.0 / max(leftDistinctCount, rightDistinctCount)));//ORFACTOR??
                             }
 
                             joinLeftRelation = leftRelation;
@@ -335,17 +335,19 @@ double Statistics::Estimate(struct AndList *parseTree, char **relNames, int numT
                     } else {
 
                             if (currentCompOp->code == GREATER_THAN || currentCompOp->code == LESS_THAN) {
-                                    resultORFactor += (1.0 / 3.0);
+                                    resultORFactor *= (2.0 / 3.0);
                                     relOpMap[currentCompOp->left->value] = currentCompOp->code;
 
                             }
                             if (currentCompOp->code == EQUALS) {
-                                    resultORFactor += (1.0 / (*attrData)[leftRelation][currentCompOp->left->value]);
+                                    resultORFactor *=(1.0- (1.0 / (*attrData)[leftRelation][currentCompOp->left->value]));
                                     relOpMap[currentCompOp->left->value] = currentCompOp->code;
                             }
                     }
                     currentOr = currentOr->rightOr;
             }
+	
+		resultORFactor =1.0 -resultORFactor;
 
             resultANDFactor *= resultORFactor;
             currentAnd = currentAnd->rightAnd;
