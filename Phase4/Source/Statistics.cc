@@ -1,6 +1,7 @@
 #include "Statistics.h"
 #include <iostream>
 #include <map>
+#include <set>
 #include <stdlib.h>
 #include <fstream>
 #include <sstream>
@@ -233,6 +234,197 @@ void  Statistics::Apply(struct AndList *parseTree, char *relNames[], int numToJo
 
 double Statistics::Estimate(struct AndList *parseTree, char **relNames, int numToJoin)
 {
+
+
+    double resultEstimate = 0.0;
+    // TODO error checking
+    struct AndList *currentAnd;
+    struct OrList *currentOr;
+
+    currentAnd = parseTree;
+
+string leftRelation;
+    string rightRelation;
+
+    string leftAttr;
+    string rightAttr;
+
+    string joinLeftRelation, joinRightRelation;
+
+    bool isJoin = false;
+    bool isJoinPerformed = false;
+
+    double resultANDFactor = 1.0;
+    double resultORFactor = 0.0;
+
+    map<string, int> relOpMap;
+
+//And list is structured as a root, a orlist the left and andlist to the right.
+//Or list is structured as a root, a comparison the left and orlist to the right.
+//a comparison is structed as a root and operands to the left and right.
+//operands consists of a code and value.
+
+    while (currentAnd != NULL) {
+
+
+            currentOr = currentAnd->left;
+            resultORFactor = 0.0;
+
+
+           while (currentOr != NULL) {
+
+
+                    isJoin = false;
+                    ComparisonOp *currentCompOp = currentOr->left;
+
+
+                    // find relation of left attribute
+		//first attribute has to be a name
+                    if (currentCompOp->left->code != NAME) {
+                            cout << "LEFT should be attribute name" << endl;
+
+                            return 0;
+                    } else {
+
+			//find the relation where the attribute lies.
+
+                            leftAttr = currentCompOp->left->value;
+                            //cout << "Left Attribute is " << leftAttr << endl;
+
+                            for (map<string, map<string, int> >::iterator mapEntry = attrData->begin(); mapEntry != attrData->end(); mapEntry++) {
+                                    if ((*attrData)[mapEntry->first].count(leftAttr) > 0) {
+
+                                            leftRelation = mapEntry->first;
+                                            break;
+                                    }
+
+                            }
+
+                    }
+
+                    // find relation of right attribute
+                    if (currentCompOp->right->code == NAME) {//the right operand is a name too hence it is a join
+                            isJoin = true;
+                            isJoinPerformed = true;
+                            rightAttr = currentCompOp->right->value;
+
+			//find right relation
+
+                            for (map<string, map<string, int> >::iterator mapEntry = attrData->begin(); mapEntry != attrData->end(); ++mapEntry) {
+                                    if ((*attrData)[mapEntry->first].count(rightAttr) > 0) {
+                                            rightRelation = mapEntry->first;
+                                            break;
+                                    }
+                            }
+                    }
+
+                    if (isJoin == true) {
+
+			//find distinct counts of both attributes for the relations.
+
+                            double leftDistinctCount = (*attrData)[leftRelation][currentCompOp->left->value];
+                            double rightDistinctCount = (*attrData)[rightRelation][currentCompOp->right->value];
+
+                            if (currentCompOp->code == EQUALS) {
+                                    resultORFactor += (1.0 / max(leftDistinctCount, rightDistinctCount));//ORFACTOR??
+                            }
+
+                            joinLeftRelation = leftRelation;
+                            joinRightRelation = rightRelation;
+
+                    } else {
+
+                            if (currentCompOp->code == GREATER_THAN || currentCompOp->code == LESS_THAN) {
+                                    resultORFactor += (1.0 / 3.0);
+                                    relOpMap[currentCompOp->left->value] = currentCompOp->code;
+
+                            }
+                            if (currentCompOp->code == EQUALS) {
+                                    resultORFactor += (1.0 / (*attrData)[leftRelation][currentCompOp->left->value]);
+                                    relOpMap[currentCompOp->left->value] = currentCompOp->code;
+                            }
+                    }
+                    currentOr = currentOr->rightOr;
+            }
+
+            resultANDFactor *= resultORFactor;
+            currentAnd = currentAnd->rightAnd;
+    }
+
+
+    double rightTupleCount = (*relationData)[rightRelation];
+
+    if (isJoinPerformed == true) {
+            double leftTupleCount = (*relationData)[joinLeftRelation];
+            resultEstimate = leftTupleCount * rightTupleCount * resultANDFactor;
+    } else {
+            double leftTupleCount = (*relationData)[leftRelation];
+            resultEstimate = leftTupleCount * resultANDFactor;
+    }
+
+    if (isApply) {
+            map<string, int>::iterator relOpMapITR, distinctCountMapITR;
+            set<string> addedJoinAttrSet;
+            if (isJoinPerformed) {
+                    for (relOpMapITR = relOpMap.begin(); relOpMapITR != relOpMap.end(); relOpMapITR++) {
+
+                            for (int i = 0; i < relationData->size(); i++) {
+                                    if (relNames[i] == NULL)
+                                            continue;
+                                    int cnt = ((*attrData)[relNames[i]]).count(relOpMapITR->first);
+                                    if (cnt == 0)
+                                            continue;
+                                    else if (cnt == 1) {
+
+                                            for (distinctCountMapITR = (*attrData)[relNames[i]].begin(); distinctCountMapITR != (*attrData)[relNames[i]].end(); distinctCountMapITR++) {
+                                                    if ((relOpMapITR->second == LESS_THAN) || (relOpMapITR->second == GREATER_THAN)) {
+                                                    	(*attrData)[joinLeftRelation + "_" + joinRightRelation][distinctCountMapITR->first] = (distinctCountMapITR->second) / 3;
+                                                    } else if (relOpMapITR->second == EQUALS) {
+                                                            if (relOpMapITR->first == distinctCountMapITR->first) { //same attribute on which condition is imposed
+                                                            	(*attrData)[joinLeftRelation + "_" + joinRightRelation][distinctCountMapITR->first] = 1;
+                                                            } else
+                                                            	(*attrData)[joinLeftRelation + "_" + joinRightRelation][distinctCountMapITR->first] = min((int) resultEstimate, distinctCountMapITR->second);
+                                                    }
+                                            }
+                                            break;
+                                    } else if (cnt > 1) {
+
+                                            for (distinctCountMapITR = (*attrData)[relNames[i]].begin(); distinctCountMapITR != (*attrData)[relNames[i]].end(); distinctCountMapITR++) {
+                                                    if (relOpMapITR->second == EQUALS) {
+                                                            if (relOpMapITR->first == distinctCountMapITR->first) {
+                                                            	(*attrData)[joinLeftRelation + "_" + joinRightRelation][distinctCountMapITR->first] = cnt;
+                                                            } else
+                                                            	(*attrData)[joinLeftRelation + "_" + joinRightRelation][distinctCountMapITR->first] = min((int) resultEstimate, distinctCountMapITR->second);
+                                                    }
+                                            }
+                                            break;
+                                    }
+                                    addedJoinAttrSet.insert(relNames[i]);
+                            }
+                    }
+
+                    if (addedJoinAttrSet.count(joinLeftRelation) == 0) {
+                            for (map<string, int>::iterator entry = (*attrData)[joinLeftRelation].begin(); entry != (*attrData)[joinLeftRelation].end(); entry++) {
+                            	(*attrData)[joinLeftRelation + "_" + joinRightRelation][entry->first] = entry->second;
+
+                            }
+                    }
+                    if (addedJoinAttrSet.count(joinRightRelation) == 0) {
+                            for (map<string, int>::iterator entry = (*attrData)[joinRightRelation].begin(); entry != (*attrData)[joinRightRelation].end(); entry++) {
+                            	(*attrData)[joinLeftRelation + "_" + joinRightRelation][entry->first] = entry->second;
+
+                            }
+                    }
+                    (*relationData)[joinLeftRelation + "_" + joinRightRelation] = resultEstimate;
+                    relationData->erase(joinLeftRelation);
+                    relationData->erase(joinRightRelation);
+
+                    attrData->erase(joinLeftRelation);
+                    attrData->erase(joinRightRelation);
+
+            }
+    }
+    return resultEstimate;
 
 
 }
