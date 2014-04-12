@@ -304,7 +304,7 @@ double Statistics::Estimate(struct AndList *parseTree, char **relNames, int numT
 				if(strcmp(leftAttr.c_str(),prev.c_str())==0)
 				{
 
-					cout<<"equal"<<endl;
+					//cout<<"equal"<<endl;
 					isdep=true;
 				}
 
@@ -367,7 +367,7 @@ double Statistics::Estimate(struct AndList *parseTree, char **relNames, int numT
 
 				if(!done){
 					
-					cout<<"done"<<endl;
+					//cout<<"done"<<endl;
 					resultORFactor =1.0 -resultORFactor;
 					done = true;
 

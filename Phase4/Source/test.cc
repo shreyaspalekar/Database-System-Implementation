@@ -237,7 +237,7 @@ void q3 (){
 
 	double result = s.Estimate(final, set3, 4);
 	
-	cerr<<"result = "<<result<<endl;
+	//cerr<<"result = "<<result<<endl;
 
 	if(fabs(result-60000000.0)>0.1)
 		cout<<"error in estimating Q3\n";
@@ -429,7 +429,7 @@ void q8 (){
 	Statistics s;
         char *relName[] = { "part",  "partsupp"};
 
-	s.Read(fileName);
+	//s.Read(fileName);
 	
 	s.AddRel(relName[0],200000);
 	s.AddAtt(relName[0], "p_partkey",200000);
@@ -447,7 +447,7 @@ void q8 (){
 		
 	double result = s.Estimate(final, relName,2);
 
-	cerr<<"res 8: "<<result<<endl;
+	//cerr<<"res 8: "<<result<<endl;
 
 	if(fabs(result-48000)>0.1)
 		cout<<"error in estimating Q8\n";
@@ -545,7 +545,7 @@ void q11 (){
 	Statistics s;
         char *relName[] = { "part",  "lineitem"};
 
-	s.Read(fileName);
+	//s.Read(fileName);
 	
 	s.AddRel(relName[0],200000);
 	s.AddAtt(relName[0], "p_partkey",200000);
@@ -564,7 +564,7 @@ void q11 (){
 	double result = s.Estimate(final, relName,2);
 
 
-	cerr<<"res 11: "<<result<<endl;
+	//cerr<<"res 11: "<<result<<endl;
 
 	if(fabs(result-21432.9)>0.5)
 		cout<<"error in estimating Q11\n";
