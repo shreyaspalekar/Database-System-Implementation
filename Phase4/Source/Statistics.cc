@@ -5,6 +5,7 @@
 #include <stdlib.h>
 #include <fstream>
 #include <sstream>
+#include <math.h>
 
 
 Statistics::Statistics()
@@ -366,7 +367,7 @@ double Statistics::Estimate(struct AndList *parseTree, char **relNames, int numT
 
     if (isApply) {
 
-    		cout<<"is apply is" <<isApply;
+//    		cout<<"is apply is" <<isApply;
 
             map<string, int>::iterator relOpMapITR, distinctCountMapITR;
             set<string> addedJoinAttrSet;
@@ -383,12 +384,12 @@ double Statistics::Estimate(struct AndList *parseTree, char **relNames, int numT
 
                                             for (distinctCountMapITR = (*attrData)[relNames[i]].begin(); distinctCountMapITR != (*attrData)[relNames[i]].end(); distinctCountMapITR++) {
                                                     if ((relOpMapITR->second == LESS_THAN) || (relOpMapITR->second == GREATER_THAN)) {
-                                                    	(*attrData)[joinLeftRelation + "_" + joinRightRelation][distinctCountMapITR->first] = (distinctCountMapITR->second) / 3;
+                                                    	(*attrData)[joinLeftRelation + "_" + joinRightRelation][distinctCountMapITR->first] = (int)round((double)(distinctCountMapITR->second) / 3.0);
                                                     } else if (relOpMapITR->second == EQUALS) {
                                                             if (relOpMapITR->first == distinctCountMapITR->first) { //same attribute on which condition is imposed
                                                             	(*attrData)[joinLeftRelation + "_" + joinRightRelation][distinctCountMapITR->first] = 1;
                                                             } else
-                                                            	(*attrData)[joinLeftRelation + "_" + joinRightRelation][distinctCountMapITR->first] = min((int) resultEstimate, distinctCountMapITR->second);
+                                                            	(*attrData)[joinLeftRelation + "_" + joinRightRelation][distinctCountMapITR->first] = min((int)round(resultEstimate), distinctCountMapITR->second);
                                                     }
                                             }
                                             break;
@@ -399,7 +400,7 @@ double Statistics::Estimate(struct AndList *parseTree, char **relNames, int numT
                                                             if (relOpMapITR->first == distinctCountMapITR->first) {
                                                             	(*attrData)[joinLeftRelation + "_" + joinRightRelation][distinctCountMapITR->first] = cnt;
                                                             } else
-                                                            	(*attrData)[joinLeftRelation + "_" + joinRightRelation][distinctCountMapITR->first] = min((int) resultEstimate, distinctCountMapITR->second);
+                                                            	(*attrData)[joinLeftRelation + "_" + joinRightRelation][distinctCountMapITR->first] = min((int) round(resultEstimate), distinctCountMapITR->second);
                                                     }
                                             }
                                             break;
@@ -420,7 +421,7 @@ double Statistics::Estimate(struct AndList *parseTree, char **relNames, int numT
 
                             }
                     }
-                    (*relationData)[joinLeftRelation + "_" + joinRightRelation] = resultEstimate;
+                    (*relationData)[joinLeftRelation + "_" + joinRightRelation] =round(resultEstimate);
                     relationData->erase(joinLeftRelation);
                     relationData->erase(joinRightRelation);
 

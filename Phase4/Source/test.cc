@@ -100,7 +100,9 @@ void q0 (){
 	yy_scan_string(cnf);
 	yyparse();
 	double result = s.Estimate(final, relName, 2);
-	if(result!=800000)
+
+
+	if(round(result)!=800000)
 		cout<<"error in estimating Q1 before apply \n ";
 	s.Apply(final, relName, 2);
 
@@ -114,7 +116,11 @@ void q0 (){
 	yy_scan_string(cnf);
 	yyparse();
 	double dummy = s1.Estimate(final, relName, 2);
-	if(fabs(dummy*3.0-result) >0.1)
+
+
+//	cout<<"err :" <<dummy*3.0<<endl ;	
+
+	if(round(fabs(dummy*3.0-result)) >0.1)
 	{
 		cout<<"Read or write or last apply is not correct\n";
 	}	
@@ -230,6 +236,9 @@ void q3 (){
 	yyparse();
 
 	double result = s.Estimate(final, set3, 4);
+	
+	cerr<<"result = "<<result<<endl;
+
 	if(fabs(result-60000000.0)>0.1)
 		cout<<"error in estimating Q3\n";
 
