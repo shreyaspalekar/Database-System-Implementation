@@ -6,6 +6,11 @@
 #include <fstream>
 #include <sstream>
 #include <math.h>
+#include <string.h>
+#include <iomanip>
+#include <typeinfo> 
+#define _DEP
+//#define _DEBUG
 
 
 Statistics::Statistics()
@@ -255,6 +260,10 @@ double Statistics::Estimate(struct AndList *parseTree, char **relNames, int numT
     bool isJoin = false;
     bool isJoinPerformed = false;
 
+    bool isdep = false;
+    bool done = false;
+    string prev;
+
     double resultANDFactor = 1.0;
     double resultORFactor = 1.0;
 
@@ -288,9 +297,24 @@ double Statistics::Estimate(struct AndList *parseTree, char **relNames, int numT
                     } else {
 
 			//find the relation where the attribute lies.
-
+				
                             leftAttr = currentCompOp->left->value;
+
+				#ifdef _DEP
+				if(strcmp(leftAttr.c_str(),prev.c_str())==0)
+				{
+
+					cout<<"equal"<<endl;
+					isdep=true;
+				}
+
+				prev= leftAttr;
+				#endif
+
+
                             //cout << "Left Attribute is " << leftAttr << endl;
+
+
 
                             for (map<string, map<string, int> >::iterator mapEntry = attrData->begin(); mapEntry != attrData->end(); mapEntry++) {
                                     if ((*attrData)[mapEntry->first].count(leftAttr) > 0) {
@@ -334,6 +358,50 @@ double Statistics::Estimate(struct AndList *parseTree, char **relNames, int numT
                             joinRightRelation = rightRelation;
 
                     } else {
+		
+			#ifdef _DEP
+			if(isdep){
+
+
+			
+
+				if(!done){
+					
+					cout<<"done"<<endl;
+					resultORFactor =1.0 -resultORFactor;
+					done = true;
+
+
+				}
+
+			    if (currentCompOp->code == GREATER_THAN || currentCompOp->code == LESS_THAN) {
+                                    resultORFactor += (1.0 / 3.0);
+                                    relOpMap[currentCompOp->left->value] = currentCompOp->code;
+
+                            }
+                            if (currentCompOp->code == EQUALS) {
+                                    resultORFactor +=(1.0 / ((*attrData)[leftRelation][currentCompOp->left->value]));
+                                    relOpMap[currentCompOp->left->value] = currentCompOp->code;
+                            }
+
+
+			#ifdef _DEBUG
+			            cout<<"or "<<std::setprecision (15) <<resultORFactor<<endl;
+				    cout<<"ikr "<< (*attrData)[leftRelation][currentCompOp->left->value]<<endl;
+
+		            #endif
+
+				
+				
+
+
+			}
+			
+
+
+
+
+                        else{
 
                             if (currentCompOp->code == GREATER_THAN || currentCompOp->code == LESS_THAN) {
                                     resultORFactor *= (2.0 / 3.0);
@@ -344,11 +412,60 @@ double Statistics::Estimate(struct AndList *parseTree, char **relNames, int numT
                                     resultORFactor *=(1.0- (1.0 / (*attrData)[leftRelation][currentCompOp->left->value]));
                                     relOpMap[currentCompOp->left->value] = currentCompOp->code;
                             }
+
+				#ifdef _DEBUG
+			            cout<<"or"<<resultORFactor<<endl;
+					cout<<"ikr "<< (*attrData)[leftRelation][currentCompOp->left->value]<<endl;
+
+
+		            #endif
+
+
+
+			}
+
+			#else
+
+
+			if (currentCompOp->code == GREATER_THAN || currentCompOp->code == LESS_THAN) {
+                                    resultORFactor *= (2.0 / 3.0);
+                                    relOpMap[currentCompOp->left->value] = currentCompOp->code;
+
+                            }
+                            if (currentCompOp->code == EQUALS) {
+                                    resultORFactor *=(1.0- (1.0 / (*attrData)[leftRelation][currentCompOp->left->value]));
+                                    relOpMap[currentCompOp->left->value] = currentCompOp->code;
+                            }
+
+			#endif
+
+
+				
+
+
+
                     }
                     currentOr = currentOr->rightOr;
             }
 	
-		resultORFactor =1.0 -resultORFactor;
+      
+
+
+	    #ifdef _DEP
+	    if(!isdep)
+		resultORFactor =1.0 -resultORFactor;	
+
+            #else
+	    resultORFactor =1.0 -resultORFactor;
+	    #endif
+
+		#ifdef _DEBUG
+			cout<<"prev and"<<resultANDFactor <<" or "<< resultORFactor<<"curr and "<< resultANDFactor*resultORFactor<<endl;
+
+		#endif
+
+		      isdep=false;
+	    done =false;
 
             resultANDFactor *= resultORFactor;
             currentAnd = currentAnd->rightAnd;

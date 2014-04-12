@@ -447,6 +447,8 @@ void q8 (){
 		
 	double result = s.Estimate(final, relName,2);
 
+	cerr<<"res 8: "<<result<<endl;
+
 	if(fabs(result-48000)>0.1)
 		cout<<"error in estimating Q8\n";
 
@@ -560,6 +562,9 @@ void q11 (){
 	yyparse();
 	
 	double result = s.Estimate(final, relName,2);
+
+
+	cerr<<"res 11: "<<result<<endl;
 
 	if(fabs(result-21432.9)>0.5)
 		cout<<"error in estimating Q11\n";
